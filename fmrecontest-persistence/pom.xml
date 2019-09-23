@@ -7,7 +7,7 @@
 		<groupId>mx.fmre.rttycontest</groupId>
 		<artifactId>parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../fmrecontest-parent</relativePath>
+		<relativePath>../</relativePath>
 	</parent>
 
 	<artifactId>persistence</artifactId>
