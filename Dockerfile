@@ -1,7 +1,7 @@
 FROM openjdk:8-jdk-alpine
 LABEL maintainer="eduardo_gd@hotmail.com"
 VOLUME /tmp
-EXPOSE 8080
+#EXPOSE 8080
 ARG JAR_FILE=fmrecontest-recibir/target/recibir*.jar
 ADD ${JAR_FILE} recibir.jar
 
