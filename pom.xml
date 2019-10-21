@@ -11,7 +11,7 @@
 
 	<groupId>mx.fmre.rttycontest</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${global.version}</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -24,6 +24,9 @@
 		<java.version>1.8</java.version>
 		<bootstrap.version>3.3.7</bootstrap.version>
 		<jquery.version>3.2.1</jquery.version>
+		
+		<!-- Unique entry point for version number management -->
+		<global.version>0.1-SNAPSHOT</global.version>
 	</properties>
 
 	<dependencies>

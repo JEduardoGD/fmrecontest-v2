@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>mx.fmre.rttycontest</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${global.version}</version>
 		<relativePath>../</relativePath>
 	</parent>
 
@@ -61,7 +61,7 @@
 		<dependency>
 			<groupId>mx.fmre.rttycontest</groupId>
 			<artifactId>persistence</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${global.version}</version>
 		</dependency>
 	</dependencies>
 
