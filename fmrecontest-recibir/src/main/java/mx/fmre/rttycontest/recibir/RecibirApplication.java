@@ -1,6 +1,7 @@
 package mx.fmre.rttycontest.recibir;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -24,12 +25,18 @@ public class RecibirApplication {
 	@Autowired
 	private IMailService mailService;
 
+	@Value("${env_var}")
+	private String env_var;
+
 	public static void main(String[] args) {
 		SpringApplication.run(RecibirApplication.class, args);
 	}
 
 	@Scheduled(cron = "${cron.expression}")
 	public void scheduleTaskUsingCronExpression() {
+		System.out.println("========================");
+		System.out.println(env_var);
+		System.out.println("========================");
 
 		long now = System.currentTimeMillis() / 1000;
 		System.out.println("schedule tasks using cron jobs - " + now);
