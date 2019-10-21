@@ -54,7 +54,7 @@
 	    <insert tableName="TBL_EMAIL_ACCOUNT">
 	    	<column name="N_ID_EMAIL_ACCOUNT" value="1" />
 			<column name="N_ID_CONTEST" value="1" />
-			<column name="S_host" value="fmre.mx" />
+			<column name="S_host" value="imap.fmre.mx" />
 			<column name="S_EMAIL_ADDRESS" value="rtty@fmre.mx" />
 			<column name="S_USERNAME" value="rtty@fmre.mx" />
 			<column name="S_PASSWORD" value="aJX24Yxiljgg16SmL6YJyA==" />
