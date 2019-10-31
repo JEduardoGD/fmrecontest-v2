@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.recibir.services.IMailService;
 
 @SpringBootApplication
@@ -19,20 +20,22 @@ import mx.fmre.rttycontest.recibir.services.IMailService;
 	"mx.fmre.rttycontest.persistence.service", 
 	"mx.fmre.rttycontest.recibir.services",
 	"mx.fmre.rttycontest.recibir.helper" })
+@Slf4j
 public class RecibirApplication {
 
 	@Autowired
 	private IMailService mailService;
 
 	public static void main(String[] args) {
-		SpringApplication.run(RecibirApplication.class, args);
+		SpringApplication.run(RecibirApplication.class);
 	}
 
 	@Scheduled(cron = "${cron.expression}")
 	public void scheduleTaskUsingCronExpression() {
 
 		long now = System.currentTimeMillis() / 1000;
-		System.out.println("schedule tasks using cron jobs - " + now);
+		
+		log.info("schedule tasks using cron jobs - {}", now);
 
 		mailService.scanContest();
 	}

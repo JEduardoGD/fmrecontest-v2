@@ -17,6 +17,7 @@ import javax.mail.Session;
 import javax.mail.Store;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Contest;
@@ -31,6 +32,7 @@ import mx.fmre.rttycontest.recibir.helper.MailHelper;
 import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 
 @AllArgsConstructor
+@Slf4j
 public class ScannerThread implements Runnable{
 
 	private Edition edition;
@@ -45,12 +47,8 @@ public class ScannerThread implements Runnable{
 		try {
 			this.scan();
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | MessagingException
-				| IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FmreContestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				| IOException | FmreContestException e) {
+			log.error(e.getLocalizedMessage());
 		}
 	}
 
@@ -81,7 +79,6 @@ public class ScannerThread implements Runnable{
 			      .mapToInt(v -> v)
 			      .max()
 			      .orElse(0);
-			      //.orElseThrow(NoSuchElementException::new);
 		int messageCount = inbox.getMessageCount();
 		
 		int maxIdEmail = messageCount > maxIdEmailSaved ? messageCount : maxIdEmailSaved;
@@ -93,7 +90,7 @@ public class ScannerThread implements Runnable{
 				.collect(Collectors.toList());
 		shouldBeSaved.removeAll(saved);
 		
-		if(shouldBeSaved.size() <= 0)
+		if(shouldBeSaved.isEmpty())
 			return;
 		
 		int upperLimit = 10 < shouldBeSaved.size() ? 10 : shouldBeSaved.size();

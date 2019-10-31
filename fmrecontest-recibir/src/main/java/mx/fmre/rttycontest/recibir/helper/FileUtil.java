@@ -7,6 +7,11 @@ import java.io.InputStream;
 import java.util.Base64;
 
 public class FileUtil {
+	
+	private FileUtil() {
+		//not called
+	}
+	
 	public static byte[] inputStreamToByteArray(InputStream is) throws IOException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		int nRead;
@@ -16,8 +21,7 @@ public class FileUtil {
 		}
 
 		buffer.flush();
-		byte[] byteArray = buffer.toByteArray();
-		return byteArray;
+		return buffer.toByteArray();
 	}
 
 	public static String byteArrayToBase64(byte[] byteArray) {
@@ -26,14 +30,12 @@ public class FileUtil {
 	}
 
 	public static InputStream byteArrayToInputStream(byte[] byteArray) {
-		InputStream targetStream = new ByteArrayInputStream(byteArray);
-		return targetStream;
+		return new ByteArrayInputStream(byteArray);
 	}
 
 	public static String getMd5Hash(byte[] byteArray) throws IOException {
 		try (InputStream is = byteArrayToInputStream(byteArray)) {
-			String md5 = org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
-			return md5;
+			return org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
 		}
 	}
 }

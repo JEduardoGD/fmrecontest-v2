@@ -9,7 +9,6 @@ public class EditionHelper {
 	public String createBucketName(Edition edition) {
 		Integer contestId = edition.getContest().getId();
 		Integer editionId = edition.getId();
-		String bucketName = "contest_" + contestId.intValue() + "/" + "edition_" + editionId.intValue();
-		return bucketName;
+		return "contest_" + contestId.intValue() + "/" + "edition_" + editionId.intValue();
 	}
 }

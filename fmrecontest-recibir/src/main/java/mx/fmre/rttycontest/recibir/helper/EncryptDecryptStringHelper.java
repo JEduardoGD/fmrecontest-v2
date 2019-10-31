@@ -1,6 +1,6 @@
 package mx.fmre.rttycontest.recibir.helper;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -45,11 +45,11 @@ public class EncryptDecryptStringHelper {
 
 	private static String privEncrypt(String str, Cipher ecipher) throws FmreContestException {
 		try {
-			byte[] utf8 = str.getBytes("UTF8");
+			byte[] utf8 = str.getBytes(StandardCharsets.UTF_8);
 			byte[] enc = ecipher.doFinal(utf8);
 			enc = BASE64EncoderStream.encode(enc);
 			return new String(enc);
-		} catch (IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+		} catch (IllegalBlockSizeException | BadPaddingException e) {
 			log.error(e.getLocalizedMessage());
 			throw new FmreContestException(e.getLocalizedMessage());
 		}
@@ -59,8 +59,8 @@ public class EncryptDecryptStringHelper {
 		try {
 			byte[] dec = BASE64DecoderStream.decode(str.getBytes());
 			byte[] utf8 = dcipher.doFinal(dec);
-			return new String(utf8, "UTF8");
-		} catch (IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+			return new String(utf8, StandardCharsets.UTF_8);
+		} catch (IllegalBlockSizeException | BadPaddingException e) {
 			log.error(e.getLocalizedMessage());
 			throw new FmreContestException(e.getLocalizedMessage());
 		}

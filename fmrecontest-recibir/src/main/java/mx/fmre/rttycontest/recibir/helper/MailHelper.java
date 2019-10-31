@@ -23,9 +23,13 @@ import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 
 public class MailHelper {
+	private MailHelper() {
+		//not called
+	}
+	
 	public static List<AttachedFileDTO> getAttachedFiles(Message message) throws IOException, MessagingException {
 		Object content = message.getContent();
-		if (content != null && content instanceof Multipart) {
+		if (content instanceof Multipart) {
 			Multipart multipart = (Multipart) message.getContent();
 
 			List<AttachedFileDTO> listAttachedFileDTO = new ArrayList<>();

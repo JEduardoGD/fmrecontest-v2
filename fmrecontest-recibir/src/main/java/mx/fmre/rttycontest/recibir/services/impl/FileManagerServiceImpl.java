@@ -52,6 +52,7 @@ public class FileManagerServiceImpl implements IFileManagerService {
 
 	@Override
 	public void saveFile(AttachedFileDTO fileDTO) {
+		throw new UnsupportedOperationException();
 	}
 
 }
