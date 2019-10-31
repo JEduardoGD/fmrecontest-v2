@@ -14,6 +14,10 @@ import javax.crypto.spec.SecretKeySpec;
 import com.sun.mail.util.BASE64DecoderStream;
 import com.sun.mail.util.BASE64EncoderStream;
 
+import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.exception.FmreContestException;
+
+@Slf4j
 public class EncryptDecryptStringHelper {
 
 	private SecretKey key;
@@ -31,38 +35,34 @@ public class EncryptDecryptStringHelper {
 		this.dcipher.init(Cipher.DECRYPT_MODE, key);
 	}
 
-	public String encrypt(String message) {
+	public String encrypt(String message) throws FmreContestException {
 		return privEncrypt(message, this.ecipher);
 	}
 
-	public String decrypt(String message) {
+	public String decrypt(String message) throws FmreContestException {
 		return privDecrypt(message, this.dcipher);
 	}
 
-	private static String privEncrypt(String str, Cipher ecipher) {
+	private static String privEncrypt(String str, Cipher ecipher) throws FmreContestException {
 		try {
 			byte[] utf8 = str.getBytes("UTF8");
 			byte[] enc = ecipher.doFinal(utf8);
 			enc = BASE64EncoderStream.encode(enc);
 			return new String(enc);
 		} catch (IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} finally {
-
+			log.error(e.getLocalizedMessage());
+			throw new FmreContestException(e.getLocalizedMessage());
 		}
-		return null;
 	}
 
-	private static String privDecrypt(String str, Cipher dcipher) {
+	private static String privDecrypt(String str, Cipher dcipher) throws FmreContestException {
 		try {
 			byte[] dec = BASE64DecoderStream.decode(str.getBytes());
 			byte[] utf8 = dcipher.doFinal(dec);
 			return new String(utf8, "UTF8");
 		} catch (IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} finally {
-
+			log.error(e.getLocalizedMessage());
+			throw new FmreContestException(e.getLocalizedMessage());
 		}
-		return null;
 	}
 }

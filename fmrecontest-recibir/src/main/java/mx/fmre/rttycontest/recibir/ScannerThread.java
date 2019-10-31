@@ -17,6 +17,7 @@ import javax.mail.Session;
 import javax.mail.Store;
 
 import lombok.AllArgsConstructor;
+import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Contest;
 import mx.fmre.rttycontest.persistence.model.Edition;
@@ -47,11 +48,14 @@ public class ScannerThread implements Runnable{
 				| IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (FmreContestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
 	private void scan() throws MessagingException, IOException, InvalidKeyException, NoSuchAlgorithmException,
-			NoSuchPaddingException {
+			NoSuchPaddingException, FmreContestException {
 		Contest contest = contestRepository.findById(edition.getContest().getId()).orElse(null);
 		EncryptDecryptStringHelper encryptDecryptStringHelper = null;
 		if (contest == null)
