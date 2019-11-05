@@ -33,7 +33,7 @@ import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 
 @Slf4j
 @AllArgsConstructor
-public class ScannerThread implements Runnable{
+public class ScannerThread {
 
 	private Edition edition;
 	private IContestRepository contestRepository;
@@ -42,7 +42,6 @@ public class ScannerThread implements Runnable{
 	private int emailFieldsToLenght;
 	private IFileManagerService fileManagerService;
 
-	@Override
 	public void run() {
 		try {
 			this.scan();
@@ -112,8 +111,6 @@ public class ScannerThread implements Runnable{
 			for (AttachedFileDTO attachedFileDTO : attachedFilesDTO) {
 				AttachedFile attachedFile = MailHelper.attachedFileDTOToAttachedFile(attachedFileDTO);
 				attachedFile.setEmail(email);
-				
-				
 				
 				String bucketPath = fileManagerService.saveFile(email, attachedFileDTO);
 				attachedFile.setPath(bucketPath);

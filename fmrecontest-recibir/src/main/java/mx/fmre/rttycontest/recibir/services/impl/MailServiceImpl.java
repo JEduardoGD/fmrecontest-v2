@@ -52,7 +52,7 @@ public class MailServiceImpl implements IMailService {
 					emailRepository,
 					emailFieldsToLenght, 
 					fileManagerService);
-			new Thread(st, edition.getDescription()).start();
+			st.run();
 		});
 	}
 }
