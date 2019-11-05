@@ -45,11 +45,6 @@ public class FileManagerServiceLocalImpl implements IFileManagerService {
 		}
 		
 		try (OutputStream os = new FileOutputStream(filename)) {
-			Path path = Paths.get(filename);
-			Path parentPath = path.getParent();
-			if (!parentPath.toFile().exists()) {
-				Files.createDirectories(parentPath);
-			}
 			os.write(fileDTO.getByteArray());
 			putObjectResult = filename;
 		} catch (IOException e) {
