@@ -31,8 +31,8 @@ import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
 import mx.fmre.rttycontest.recibir.helper.MailHelper;
 import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 
-@AllArgsConstructor
 @Slf4j
+@AllArgsConstructor
 public class ScannerThread implements Runnable{
 
 	private Edition edition;
@@ -112,6 +112,9 @@ public class ScannerThread implements Runnable{
 			for (AttachedFileDTO attachedFileDTO : attachedFilesDTO) {
 				AttachedFile attachedFile = MailHelper.attachedFileDTOToAttachedFile(attachedFileDTO);
 				attachedFile.setEmail(email);
+				
+				
+				
 				String bucketPath = fileManagerService.saveFile(email, attachedFileDTO);
 				attachedFile.setPath(bucketPath);
 				attachedFiles.add(attachedFile);

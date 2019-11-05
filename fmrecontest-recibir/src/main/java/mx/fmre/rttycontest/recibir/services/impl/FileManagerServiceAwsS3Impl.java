@@ -18,7 +18,7 @@ import mx.fmre.rttycontest.recibir.services.AWSS3Service;
 import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 
 @Slf4j
-@Service
+@Service("FileManagerServiceAwsS3")
 public class FileManagerServiceAwsS3Impl implements IFileManagerService {
 	
 //	SampleInterface sample = appContext.getBean(service, SampleInterface.class);
@@ -31,7 +31,7 @@ public class FileManagerServiceAwsS3Impl implements IFileManagerService {
 
 	@Value("${amazon.s3.bucketname}")
 	private String bocketName;
-
+	
 	@Override
 	public String saveFile(Email email, AttachedFileDTO fileDTO) {
 		log.info("start saving file {}", fileDTO.getFilename());

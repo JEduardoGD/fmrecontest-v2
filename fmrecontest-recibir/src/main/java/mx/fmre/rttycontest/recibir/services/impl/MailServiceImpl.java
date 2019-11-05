@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.persistence.model.Edition;
@@ -21,9 +22,6 @@ public class MailServiceImpl implements IMailService {
 	private IEditionRepository editionRepository;
 
 	@Autowired
-	private IFileManagerService fileManagerService;
-
-	@Autowired
 	private IEmailRepository emailRepository;
 
 	@Autowired
@@ -34,9 +32,17 @@ public class MailServiceImpl implements IMailService {
 
 	@Value("${email.fields.to.legth}")
 	private int emailFieldsToLenght;
+	
+	@Autowired
+    private ApplicationContext appContext;
+	
+	@Value("${fileManagerImpl}")
+	private String fileManagerImpl;
 
 	@Override
 	public void scanContest() {
+		IFileManagerService fileManagerService = appContext.getBean(fileManagerImpl, IFileManagerService.class);
+		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		editions.forEach(edition -> {
 			ScannerThread st = new ScannerThread(
