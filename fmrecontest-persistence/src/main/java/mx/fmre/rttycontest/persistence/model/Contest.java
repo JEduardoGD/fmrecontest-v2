@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.persistence.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,12 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "TBL_CONTEST")
-public class Contest {
+public class Contest implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8685550122948241889L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

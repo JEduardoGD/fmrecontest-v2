@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		mx.fmre.rttycontest.persistence.model.User user = userRepository.findByEmail(email);
 		
-		List<SimpleGrantedAuthority> listGrantedAuthorities = user.getRoles().stream()
+		List<SimpleGrantedAuthority> listGrantedAuthorities = user.getUserRoles().stream()
 				.map(r -> r.getRole())
 				.map(rl -> new SimpleGrantedAuthority(rl))
 				.collect(Collectors.toList());

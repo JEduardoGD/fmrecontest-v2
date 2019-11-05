@@ -1,5 +1,7 @@
 package mx.fmre.rttycontest.persistence.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +16,12 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "TBL_EMAIL_ACCOUNT")
-public class EmailAccount {
+public class EmailAccount implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3554856035045760278L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
