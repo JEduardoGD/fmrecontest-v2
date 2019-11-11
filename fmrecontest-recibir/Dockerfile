@@ -2,8 +2,7 @@ FROM openjdk:8-alpine
 LABEL maintainer="eduardo_gd@hotmail.com"
 VOLUME /tmp
 EXPOSE 8080
-ARG JAR_FILE=target/${JAR_FILE}
-ADD ${JAR_FILE} application.jar
+ADD target/${JAR_FILE} application.jar
 
 WORKDIR /
 ENV AMAZON_CRED_SECRETKEY=
@@ -14,3 +13,4 @@ ENV MYSQL_DB_URL=
 ENV MYSQL_DB_USERNAME=
 
 ENTRYPOINT ["java","-jar","/application.jar"]
+
