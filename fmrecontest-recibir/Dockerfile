@@ -2,7 +2,7 @@ FROM openjdk:8-alpine
 LABEL maintainer="eduardo_gd@hotmail.com"
 VOLUME /tmp
 EXPOSE 8080
-ARG JAR_FILE=target/recibir-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=target/${JAR_FILE}
 ADD ${JAR_FILE} application.jar
 
 WORKDIR /
