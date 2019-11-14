@@ -14,7 +14,7 @@ public class DashboardController {
 
 	@GetMapping
 	public String findAll(@RequestParam Map<String, Object> params, Model model) {
-		return "/dashboard/dashboard";
+		return "dashboard/dashboard";
 	}
 
 //	@GetMapping(value = "/test")
