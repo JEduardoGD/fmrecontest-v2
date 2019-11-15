@@ -21,9 +21,9 @@ public class HomeController {
         return "login";
     }
 
-    @GetMapping("/access-denied")
+    @GetMapping("access-denied")
     public String accessDenied() {
-        return "/error/access-denied";
+        return "error/access-denied";
     }
 
 }

@@ -26,6 +26,6 @@ public class EditionsController {
 	public String getEditionsList(@PathVariable("contestId") Integer contestId, Model model) {
 		List<Edition> listEdition = editionService.getAllByContestId(contestId);
 		model.addAttribute("listEdition", editionHelper.parse(listEdition));
-		return "/editions/editions";
+		return "editions/editions";
 	}
 }

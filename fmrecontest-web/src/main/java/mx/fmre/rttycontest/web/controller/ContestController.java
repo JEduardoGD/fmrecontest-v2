@@ -40,6 +40,6 @@ public class ContestController {
 	public String getContestList(@RequestParam Map<String, Object> params, Model model) {
 		List<Contest> listContest = contestService.getAll();
 		model.addAttribute("listContest", contestHelper.parse(listContest));
-		return "/contest/contest";
+		return "contest/contest";
 	}
 }
