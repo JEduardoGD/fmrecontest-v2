@@ -21,7 +21,6 @@ public class EditionsController {
 	@Autowired private IEditionService editionService;
 	@Autowired private EditionHelper editionHelper;
 
-
 	@GetMapping("/bycontestid/{contestId}")
 	public String getEditionsList(@PathVariable("contestId") Integer contestId, Model model) {
 		List<Edition> listEdition = editionService.getAllByContestId(contestId);

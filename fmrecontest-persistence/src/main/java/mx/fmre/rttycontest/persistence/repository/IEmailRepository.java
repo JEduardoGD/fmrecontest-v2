@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 
 @Repository
@@ -30,4 +31,6 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 	public List<Integer> getEmailCountsSaved(
 			@Param("emailCountStart") Integer emailCountStart,
 			@Param("idEdition") Integer idEdition);
+	
+	public List<Email> findByEdition(Edition edition);
 }

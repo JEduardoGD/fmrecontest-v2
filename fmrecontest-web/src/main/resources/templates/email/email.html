@@ -19,24 +19,22 @@
                 <table class="table-datatable table table-striped table-hover mv-lg" id="datatable1">
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Contest</th>
-                      <th>Description</th>
-                      <th>Year</th>
-                      <th>Start UTC</th>
-                      <th>End UTC</th>
+                      <th>Count</th>
+                      <th>From</th>
+                      <th>Subject</th>
+                      <th>Sent date</th>
+                      <th>Received date</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                  	<tr th:each="edition : ${listEdition}">
-                  		<td th:text="${edition.id}"></td>
-                  		<td th:text="${edition.contestDescription}"></td>
-                  		<td th:text="${edition.description}"></td>
-                  		<td th:text="${edition.year}"></td>
-                  		<td th:text="${edition.start}"></td>
-                  		<td th:text="${edition.end}"></td>
-                  		<td><a th:href="'/email/by-editionid/' + ${edition.id}">show emails</a></td>
+                  	<tr th:each="email : ${listEmail}">
+                  		<td th:text="${email.emailCount}"></td>
+                  		<td th:text="${email.from}"></td>
+                  		<td th:text="${email.subject}"></td>
+                  		<td th:text="${email.sentDate}"></td>
+                  		<td th:text="${email.receivedDate}"></td>
+                  		<td></td>
                   	</tr>
                   </tbody>
                 </table>
@@ -49,5 +47,10 @@
       </main>
     </div>
     <th:block th:include="fragments/scripts"></th:block>
+    <script type="text/javascript">
+    $('#datatable1').dataTable( {
+        "order": []
+    } );
+    </script>
   </body>
 </html>
