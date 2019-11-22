@@ -17,7 +17,6 @@ import mx.fmre.rttycontest.web.service.IEditionService;
 @RequestMapping(value = "/edition")
 public class EditionsController {
 
-	
 	@Autowired private IEditionService editionService;
 	@Autowired private EditionHelper editionHelper;
 

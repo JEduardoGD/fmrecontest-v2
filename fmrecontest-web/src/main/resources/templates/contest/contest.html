@@ -30,7 +30,7 @@
                   	<tr th:each="contest : ${listContest}">
                   		<td th:text="${contest.id}"></td>
                   		<td th:text="${contest.descripcion}"></td>
-                  		<td><a th:href="'/edition/bycontestid/' + ${contest.id}">show editions</a></td>
+                  		<td><a th:href="'/contest/' + ${contest.id}">show editions</a></td>
                   	</tr>
                   </tbody>
                 </table>

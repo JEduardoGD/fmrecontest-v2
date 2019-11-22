@@ -20,13 +20,14 @@ import lombok.Data;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
+import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 
 public class MailHelper {
 	private MailHelper() {
-		//not called
+		// not called
 	}
-	
+
 	public static List<AttachedFileDTO> getAttachedFiles(Message message) throws IOException, MessagingException {
 		Object content = message.getContent();
 		if (content instanceof Multipart) {
@@ -68,7 +69,8 @@ public class MailHelper {
 		return attachedFile;
 	}
 
-	public static Email messageToEmailMapper(Edition edition, Message message, int toFieldLenght) throws MessagingException {
+	public static Email messageToEmailMapper(Edition edition, Message message, int toFieldLenght,
+			EmailStatus emailStatus) throws MessagingException {
 		ParsedAddressDTO parsedAddressDTO = parseAddress(message.getFrom()[0]);
 		Email email = new Email();
 		email.setEdition(edition);
@@ -79,9 +81,10 @@ public class MailHelper {
 		email.setRecipientsTo(stringAddresses(message.getRecipients(RecipientType.TO), toFieldLenght));
 		email.setSentDate(message.getSentDate());
 		email.setSubject(message.getSubject());
+		email.setEmailStatus(emailStatus);
 		return email;
 	}
-	
+
 	private static ParsedAddressDTO parseAddress(Address address) {
 		InternetAddress internetAddress = (InternetAddress) address;
 		ParsedAddressDTO parsedAddressDTO = new ParsedAddressDTO();
@@ -99,24 +102,16 @@ public class MailHelper {
 			String emailAddress = addressInternetAddress.getAddress();
 			String personal = addressInternetAddress.getPersonal();
 			StringBuilder sbTemp = new StringBuilder();
-			if(personal != null)
-				sbTemp
-					.append(personal)
-					.append(" ")
-					.append("<")
-					.append(emailAddress)
-					.append(">")
-					.append(",");
-			else 
-				sbTemp
-				.append(emailAddress)
-				.append(",");
-			
-			if((sb.toString() + sbTemp.toString()).length() > addressesFieldLenght)
+			if (personal != null)
+				sbTemp.append(personal).append(" ").append("<").append(emailAddress).append(">").append(",");
+			else
+				sbTemp.append(emailAddress).append(",");
+
+			if ((sb.toString() + sbTemp.toString()).length() > addressesFieldLenght)
 				break;
 			else
 				sb.append(sbTemp.toString());
-				
+
 		}
 		String newString = sb.toString();
 		return newString.substring(0, newString.length() - 1);

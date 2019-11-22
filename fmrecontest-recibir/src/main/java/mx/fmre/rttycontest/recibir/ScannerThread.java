@@ -24,6 +24,7 @@ import mx.fmre.rttycontest.persistence.model.Contest;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailAccount;
+import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
@@ -41,6 +42,7 @@ public class ScannerThread {
 	private IEmailRepository emailRepository;
 	private int emailFieldsToLenght;
 	private IFileManagerService fileManagerService;
+	private EmailStatus emailEstatusRecived;
 
 	public void run() {
 		try {
@@ -106,7 +108,7 @@ public class ScannerThread {
 
 		for (Message message : messages) {
 			List<AttachedFileDTO> attachedFilesDTO = MailHelper.getAttachedFiles(message);
-			Email email = MailHelper.messageToEmailMapper(edition, message, emailFieldsToLenght);
+			Email email = MailHelper.messageToEmailMapper(edition, message, emailFieldsToLenght, emailEstatusRecived);
 			List<AttachedFile> attachedFiles = new ArrayList<>();
 			for (AttachedFileDTO attachedFileDTO : attachedFilesDTO) {
 				AttachedFile attachedFile = MailHelper.attachedFileDTOToAttachedFile(attachedFileDTO);

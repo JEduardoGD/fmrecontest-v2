@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import mx.fmre.rttycontest.persistence.enums.EmailEstatusEnum;
 import mx.fmre.rttycontest.persistence.model.Edition;
+import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
+import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.recibir.ScannerThread;
 import mx.fmre.rttycontest.recibir.services.IFileManagerService;
@@ -38,12 +41,15 @@ public class MailServiceImpl implements IMailService {
 	
 	@Value("${fileManagerImpl}")
 	private String fileManagerImpl;
+	
+	@Autowired private IEmailEstatusRepository emailEstatusRepository;
 
 	@Override
 	public void scanContest() {
 		IFileManagerService fileManagerService = appContext.getBean(fileManagerImpl, IFileManagerService.class);
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
+		EmailStatus emailEstatusRecived = emailEstatusRepository.findById(EmailEstatusEnum.RECIVED.getId()).orElse(null);
 		editions.forEach(edition -> {
 			ScannerThread st = new ScannerThread(
 					edition, 
@@ -51,7 +57,8 @@ public class MailServiceImpl implements IMailService {
 					emailPasswordEncodingkey, 
 					emailRepository,
 					emailFieldsToLenght, 
-					fileManagerService);
+					fileManagerService,
+					emailEstatusRecived);
 			st.run();
 		});
 	}

@@ -16,7 +16,7 @@
             <div class="card">
               <div class="card-heading">Editions List</div>
                <div class="card-body">
-                <table class="table-datatable table table-striped table-hover mv-lg" id="datatable1">
+                <table class="table-datatable table table-striped table-hover mv-lg" id="emailTable">
                   <thead>
                     <tr>
                       <th>Count</th>
@@ -47,10 +47,5 @@
       </main>
     </div>
     <th:block th:include="fragments/scripts"></th:block>
-    <script type="text/javascript">
-    $('#datatable1').dataTable( {
-        "order": []
-    } );
-    </script>
   </body>
 </html>

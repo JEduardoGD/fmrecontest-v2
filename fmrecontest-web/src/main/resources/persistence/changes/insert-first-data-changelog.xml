@@ -98,4 +98,19 @@
 <insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="34" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
 <insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="35" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
 	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-008">
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="1" />
+			<column name="STATUS" value="RECIVED" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="2" />
+			<column name="STATUS" value="VERIFIED" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="3" />
+			<column name="STATUS" value="PARSED" />
+	    </insert>
+	</changeSet>
 </databaseChangeLog>

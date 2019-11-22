@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 
 @Repository
-public interface AttachedFileRepository extends JpaRepository<AttachedFile, Integer> {
+public interface IAttachedFileRepository extends JpaRepository<AttachedFile, Integer> {
 
 }

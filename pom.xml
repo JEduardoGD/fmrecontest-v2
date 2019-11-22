@@ -26,7 +26,7 @@
 		<jquery.version>3.2.1</jquery.version>
 
 		<!-- Unique entry point for version number management -->
-		<global.version>0.1-SNAPSHOT</global.version>
+		<global.version>1.0.0</global.version>
 	</properties>
 
 	<dependencies>

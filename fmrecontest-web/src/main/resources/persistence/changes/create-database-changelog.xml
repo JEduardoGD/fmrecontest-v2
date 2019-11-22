@@ -121,6 +121,19 @@
 	</changeSet>
 	
 	<changeSet author="Eduardo Gutierrez" id="CREATE-007">
+		<!-- TBL_ATTACHED_FILE -->
+		<createTable tableName="CAT_EMAIL_STATUS">
+			<column name="N_ID_EMAIL_STATUS" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="STATUS" type="VARCHAR(255)" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_EMAIL_STATUS" incrementBy="1" startWith="1"
+			tableName="CAT_EMAIL_STATUS" />
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-008">
 		<!-- TBL_EMAIL -->
 		<createTable tableName="TBL_EMAIL">
 			<column name="N_ID_EMAIL" type="INT" autoIncrement="false">
@@ -134,6 +147,7 @@
 			<column name="S_RECIPIENTS_TO" type="VARCHAR(255)" />
 			<column name="D_SENT_DATE" type="DATETIME" />
 			<column name="S_SUBJECT" type="VARCHAR(255)" />
+			<column name="N_ID_EMAIL_STATUS" type="INT" />
 		</createTable>
 		<addAutoIncrement columnDataType="INT"
 			columnName="N_ID_EMAIL" incrementBy="1" startWith="1"
@@ -144,9 +158,15 @@
             constraintName="CONSTRAINT_FK_TBL_EDITION"
             referencedTableName="TBL_EDITION"
             referencedColumnNames="N_ID_EDITION"/>
+		<addForeignKeyConstraint
+            baseTableName="TBL_EMAIL"
+			baseColumnNames="N_ID_EMAIL_STATUS"
+            constraintName="CONSTRAINT_FK_CAT_EMAIL_STATUS"
+            referencedTableName="CAT_EMAIL_STATUS"
+            referencedColumnNames="N_ID_EMAIL_STATUS"/>
 	</changeSet>
 	
-	<changeSet author="Eduardo Gutierrez" id="CREATE-008">
+	<changeSet author="Eduardo Gutierrez" id="CREATE-009">
 		<!-- TBL_ATTACHED_FILE -->
 		<createTable tableName="TBL_ATTACHED_FILE">
 			<column name="N_ID_ATTACHED_FILE" type="INT" autoIncrement="false">
