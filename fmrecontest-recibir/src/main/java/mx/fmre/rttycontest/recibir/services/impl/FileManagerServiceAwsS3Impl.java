@@ -48,10 +48,4 @@ public class FileManagerServiceAwsS3Impl implements IFileManagerService {
 		log.info("ending saving with results: {}", putObjectResult);
 		return filename;
 	}
-
-	@Override
-	public void saveFile(AttachedFileDTO fileDTO) {
-		throw new UnsupportedOperationException();
-	}
-
 }

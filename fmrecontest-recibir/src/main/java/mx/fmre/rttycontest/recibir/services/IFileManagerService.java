@@ -8,6 +8,4 @@ public interface IFileManagerService {
 
 	public String saveFile(Email email, AttachedFileDTO fileDTO) throws FmreContestException;
 
-	public void saveFile(AttachedFileDTO fileDTO) throws FmreContestException;
-
 }

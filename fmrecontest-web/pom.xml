@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>mx.fmre.rttycontest</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>fmrecontest-parent</artifactId>
 		<version>${global.version}</version>
 		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>web</artifactId>
-	<name>rttycontest-web</name>
+	<artifactId>fmrecontest-web</artifactId>
+	<name>fmrecontest-web</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -55,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>mx.fmre.rttycontest</groupId>
-			<artifactId>persistence</artifactId>
+			<artifactId>fmrecontest-persistence</artifactId>
 			<version>${global.version}</version>
 		</dependency>
 	</dependencies>

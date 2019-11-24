@@ -56,11 +56,4 @@ public class FileManagerServiceLocalImpl implements IFileManagerService {
 		return filename;
 
 	}
-
-	@Override
-	public void saveFile(AttachedFileDTO fileDTO) {
-		// TODO Auto-generated method stub
-
-	}
-
 }
