@@ -18,6 +18,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class RttycontestApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RttycontestApplication.class, args);
+		SpringApplication.run(RttycontestApplication.class);
 	}
 }

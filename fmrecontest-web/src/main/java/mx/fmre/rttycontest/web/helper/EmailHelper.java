@@ -7,6 +7,10 @@ import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.web.dto.EmailReturnDTO;
 
 public class EmailHelper {
+	private EmailHelper() {
+		// No-op; won't be called
+	}
+	
 	public static List<EmailReturnDTO> parse(List<Email> listContest) {
 		return listContest.stream().map(c -> {
 			EmailReturnDTO r = new EmailReturnDTO();

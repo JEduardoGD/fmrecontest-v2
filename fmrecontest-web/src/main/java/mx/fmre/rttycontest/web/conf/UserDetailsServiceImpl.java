@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import mx.fmre.rttycontest.persistence.model.UserRole;
 import mx.fmre.rttycontest.persistence.repository.IUserRepository;
 
 @Service
@@ -24,12 +25,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		mx.fmre.rttycontest.persistence.model.User user = userRepository.findByEmail(email);
 		
 		List<SimpleGrantedAuthority> listGrantedAuthorities = user.getUserRoles().stream()
-				.map(r -> r.getRole())
-				.map(rl -> new SimpleGrantedAuthority(rl))
+				.map(UserRole::getRole)
+				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 		
-		UserDetails userDetails = (UserDetails) new User(user.getEmail(), user.getPassword(), listGrantedAuthorities);
-		System.out.println(userDetails);
-		return userDetails;
+		return (UserDetails) new User(user.getEmail(), user.getPassword(), listGrantedAuthorities);
 	}
 }
