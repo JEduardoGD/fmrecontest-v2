@@ -24,15 +24,19 @@ public class EncryptDecryptStringHelper {
 	private Cipher ecipher;
 	private Cipher dcipher;
 
-	public EncryptDecryptStringHelper(String keyString)
-			throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-		key = new SecretKeySpec(keyString.getBytes(), "AES");
-		
-		this.ecipher = Cipher.getInstance("AES");
-		this.dcipher = Cipher.getInstance("AES");
-		
-		this.ecipher.init(Cipher.ENCRYPT_MODE, key);
-		this.dcipher.init(Cipher.DECRYPT_MODE, key);
+	public EncryptDecryptStringHelper(String keyString) throws FmreContestException {
+		try {
+			key = new SecretKeySpec(keyString.getBytes(), "AES");
+
+			this.ecipher = Cipher.getInstance("AES");
+			this.dcipher = Cipher.getInstance("AES");
+
+			this.ecipher.init(Cipher.ENCRYPT_MODE, key);
+			this.dcipher.init(Cipher.DECRYPT_MODE, key);
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+			log.error(e.getLocalizedMessage());
+			throw new FmreContestException(e.getLocalizedMessage());
+		}
 	}
 
 	public String encrypt(String message) throws FmreContestException {

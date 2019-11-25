@@ -48,15 +48,30 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
-				<groupId>org.sonarsource.scanner.maven</groupId>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.3.0.603</version>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.2</version>
 				<executions>
 					<execution>
-						<phase>verify</phase>
+						<id>agent-for-ut</id>
 						<goals>
-							<goal>sonar</goal>
+							<goal>prepare-agent</goal>
 						</goals>
+						<configuration>
+							<append>true</append>
+							<destFile>${sonar.jacoco.reportPaths}</destFile>
+						</configuration>
+					</execution>
+					<execution>
+						<id>agent-for-it</id>
+						<phase>test</phase>
+						<goals>
+							<goal>prepare-agent-integration</goal>
+						</goals>
+						<configuration>
+							<append>true</append>
+							<destFile>${sonar.jacoco.itReportPath}</destFile>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
