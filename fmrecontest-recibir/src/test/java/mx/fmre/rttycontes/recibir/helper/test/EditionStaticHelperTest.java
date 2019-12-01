@@ -1,4 +1,4 @@
-package mx.fmre.rttycontest.recibir.test;
+package mx.fmre.rttycontes.recibir.helper.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,7 +12,7 @@ import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.recibir.helper.EditionStaticHelper;
 
-@SpringBootTest
+@SpringBootTest(classes = EditionStaticHelperTest.class )
 @TestPropertySource(locations = "classpath:application.properties")
 class EditionStaticHelperTest {
 	

@@ -8,9 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import mx.fmre.rttycontest.exception.FmreContestException;
+import mx.fmre.rttycontest.recibir.RecibirApplication;
 import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
 
-@SpringBootTest
+@SpringBootTest(classes = RecibirApplication.class)
 @TestPropertySource(locations = "classpath:application.properties")
 public class EncryptDecryptStringHelperTest {
 	private String clearText = "UNOdosTRES456789";
@@ -22,6 +23,16 @@ public class EncryptDecryptStringHelperTest {
 		try {
 			EncryptDecryptStringHelper encryptDecryptStringHelper = new EncryptDecryptStringHelper(keyEncript);
 			assertEquals(encriptedText, encryptDecryptStringHelper.encrypt(clearText));
+		} catch (FmreContestException e) {
+			fail(e.getLocalizedMessage());
+		}
+	}
+
+	@Test
+	void dencryptTest() {
+		try {
+			EncryptDecryptStringHelper encryptDecryptStringHelper = new EncryptDecryptStringHelper(keyEncript);
+			assertEquals(clearText, encryptDecryptStringHelper.decrypt("XPxTNn286RMCWd3h4xK1PUS0/e6Di9SgDu/C/ToOSOk="));
 		} catch (FmreContestException e) {
 			fail(e.getLocalizedMessage());
 		}
