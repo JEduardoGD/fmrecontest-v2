@@ -17,6 +17,7 @@
 	<modules>
 		<module>fmrecontest-persistence</module>
 		<module>fmrecontest-recibir</module>
+		<module>fmrecontest-api</module>
 	</modules>
 
 	<properties>

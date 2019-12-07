@@ -1,0 +1,192 @@
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="Eduardo Gutierrez" id="CREATE-001">
+		<!-- USERS -->
+		<createTable tableName="TBL_USERS">
+			<column name="N_ID_USER" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="S_EMAIL" type="VARCHAR(255)" />
+			<column name="S_PASSWORD" type="VARCHAR(255)" />
+			<column name="S_NAME" type="VARCHAR(255)" />
+			<column name="S_LAST_NAME" type="VARCHAR(255)" />
+			<column name="B_ACTIVE" type="BOOLEAN" defaultValueBoolean="false" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_USER" incrementBy="1" startWith="1"
+			tableName="TBL_USERS" />
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-002">
+		<!-- ROLES -->
+		<createTable tableName="TBL_ROLES">
+			<column name="N_ID_ROLE" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="S_ROLE" type="VARCHAR(255)" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_ROLE" incrementBy="1" startWith="1"
+			tableName="TBL_ROLES" />
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-003">
+		<!-- REL_USER_ROLE -->
+		<createTable tableName="REL_USER_ROLE">
+			<column name="N_ID_ROLE" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_USER" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+		</createTable>
+		<addForeignKeyConstraint 
+            baseTableName="REL_USER_ROLE"
+			baseColumnNames="N_ID_ROLE"
+            constraintName="CONSTRAINT_FK_USER_ROLE_ROLE"
+            referencedTableName="TBL_ROLES"
+            referencedColumnNames="N_ID_ROLE"/>
+		<addForeignKeyConstraint
+            baseTableName="REL_USER_ROLE"
+			baseColumnNames="N_ID_USER"
+            constraintName="CONSTRAINT_FK_USER_ROLE_USER"
+            referencedTableName="TBL_USERS"
+            referencedColumnNames="N_ID_USER"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-004">
+		<!-- ROLES -->
+		<createTable tableName="TBL_CONTEST">
+			<column name="N_ID_CONTEST" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="S_DESCRIPTION" type="VARCHAR(255)" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_CONTEST" incrementBy="1" startWith="1"
+			tableName="TBL_CONTEST" />
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-005">
+		<!-- TBL_EDITION -->
+		<createTable tableName="TBL_EDITION">
+			<column name="N_ID_EDITION" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_CONTEST" type="INT" />
+			<column name="S_DESCRIPTION" type="VARCHAR(255)" />
+			<column name="N_YEAR" type="INT" />
+			<column name="T_START_UTC" type="DATETIME" />
+			<column name="T_END_UTC" type="DATETIME" />
+			<column name="N_ID_EMAIL_START" type="INT" />
+			<column name="N_ID_EMAIL_END" type="INT" />
+			<column name="N_ACTIVE" type="BOOLEAN" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_EDITION" incrementBy="1" startWith="1"
+			tableName="TBL_EDITION" />
+		<addForeignKeyConstraint
+            baseTableName="TBL_EDITION"
+			baseColumnNames="N_ID_CONTEST"
+            constraintName="CONSTRAINT_FK_EDITION_CONTEST"
+            referencedTableName="TBL_CONTEST"
+            referencedColumnNames="N_ID_CONTEST"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-006">
+		<!-- ROLES -->
+		<createTable tableName="TBL_EMAIL_ACCOUNT">
+			<column name="N_ID_EMAIL_ACCOUNT" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_CONTEST" type="INT" />
+			<column name="S_HOST" type="VARCHAR(255)" />
+			<column name="S_EMAIL_ADDRESS" type="VARCHAR(255)" />
+			<column name="S_USERNAME" type="VARCHAR(255)" />
+			<column name="S_PASSWORD" type="VARCHAR(255)" />
+			<column name="N_PORT" type="INT" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_EDITION" incrementBy="1" startWith="1"
+			tableName="TBL_EDITION" />
+		<addForeignKeyConstraint
+            baseTableName="TBL_EMAIL_ACCOUNT"
+			baseColumnNames="N_ID_CONTEST"
+            constraintName="CONSTRAINT_FK_EMAIL_CONTEST"
+            referencedTableName="TBL_CONTEST"
+            referencedColumnNames="N_ID_CONTEST"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-007">
+		<!-- TBL_ATTACHED_FILE -->
+		<createTable tableName="CAT_EMAIL_STATUS">
+			<column name="N_ID_EMAIL_STATUS" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="STATUS" type="VARCHAR(255)" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_EMAIL_STATUS" incrementBy="1" startWith="1"
+			tableName="CAT_EMAIL_STATUS" />
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-008">
+		<!-- TBL_EMAIL -->
+		<createTable tableName="TBL_EMAIL">
+			<column name="N_ID_EMAIL" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_EMAIL_COUNT" type="INT" />
+			<column name="N_ID_EDITION" type="INT" />
+			<column name="S_RECIPIENTS_FROM_NAME" type="VARCHAR(255)" />
+			<column name="S_RECIPIENTS_FROM_ADDRESS" type="VARCHAR(255)" />
+			<column name="D_RECEIVED_DATE" type="DATETIME" />
+			<column name="S_RECIPIENTS_TO" type="VARCHAR(255)" />
+			<column name="D_SENT_DATE" type="DATETIME" />
+			<column name="S_SUBJECT" type="VARCHAR(255)" />
+			<column name="N_ID_EMAIL_STATUS" type="INT" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_EMAIL" incrementBy="1" startWith="1"
+			tableName="TBL_EMAIL" />
+		<addForeignKeyConstraint
+            baseTableName="TBL_EMAIL"
+			baseColumnNames="N_ID_EDITION"
+            constraintName="CONSTRAINT_FK_TBL_EDITION"
+            referencedTableName="TBL_EDITION"
+            referencedColumnNames="N_ID_EDITION"/>
+		<addForeignKeyConstraint
+            baseTableName="TBL_EMAIL"
+			baseColumnNames="N_ID_EMAIL_STATUS"
+            constraintName="CONSTRAINT_FK_CAT_EMAIL_STATUS"
+            referencedTableName="CAT_EMAIL_STATUS"
+            referencedColumnNames="N_ID_EMAIL_STATUS"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-009">
+		<!-- TBL_ATTACHED_FILE -->
+		<createTable tableName="TBL_ATTACHED_FILE">
+			<column name="N_ID_ATTACHED_FILE" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_EMAIL" type="INT" />
+			<column name="S_FILENAME" type="VARCHAR(255)" />
+			<column name="S_CONTENT_TYPE" type="VARCHAR(255)" />
+			<column name="N_LENGHT" type="INT" />
+			<column name="S_MD5_HASH" type="VARCHAR(255)" />
+			<column name="S_PATH" type="VARCHAR(255)" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_ATTACHED_FILE" incrementBy="1" startWith="1"
+			tableName="TBL_ATTACHED_FILE" />
+		<addForeignKeyConstraint
+            baseTableName="TBL_ATTACHED_FILE"
+			baseColumnNames="N_ID_EMAIL"
+            constraintName="CONSTRAINT_FK_TBL_EMAIL"
+            referencedTableName="TBL_EMAIL"
+            referencedColumnNames="N_ID_EMAIL"/>
+	</changeSet>
+</databaseChangeLog>
