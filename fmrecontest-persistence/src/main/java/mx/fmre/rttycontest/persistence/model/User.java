@@ -45,6 +45,6 @@ public class User {
 	private int active;
 	@ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
 	@JoinTable(name = "REL_USER_ROLE", joinColumns = @JoinColumn(name = "N_ID_USER"), inverseJoinColumns = @JoinColumn(name = "N_ID_ROLE"))
-	private Set<UserRole> userRoles;
+	private Set<Role> userRoles;
 
 }

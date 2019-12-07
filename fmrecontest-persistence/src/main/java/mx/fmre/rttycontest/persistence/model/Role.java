@@ -12,7 +12,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "TBL_ROLES")
-public class UserRole {
+public class Role {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
