@@ -4,7 +4,7 @@ LABEL maintainer="eduardo_gd@hotmail.com"
 
 VOLUME /tmp
 
-#EXPOSE 8082
+EXPOSE 8080
 
 ARG EXT_JAR_FILE=${EXT_JAR_FILE}
 ARG JAR_FILE=${EXT_JAR_FILE}
