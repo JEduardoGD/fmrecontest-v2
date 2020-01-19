@@ -17,7 +17,6 @@ import mx.fmre.rttycontest.recibir.services.IMailService;
 @EnableJpaRepositories(basePackages = { "mx.fmre.rttycontest.persistence.repository" })
 @EntityScan(basePackages = "mx.fmre.rttycontest.persistence.model")
 @ComponentScan({ 
-	"mx.fmre.rttycontest.persistence.service", 
 	"mx.fmre.rttycontest.recibir.services",
 	"mx.fmre.rttycontest.recibir.helper" })
 @Slf4j

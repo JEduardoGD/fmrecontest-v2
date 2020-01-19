@@ -1,4 +1,4 @@
-package mx.fmre.rttycontest.api.service;
+package mx.fmre.rttycontest.api.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.api.dto.ContestDTO;
+import mx.fmre.rttycontest.api.service.ContestService;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 
 @Service
