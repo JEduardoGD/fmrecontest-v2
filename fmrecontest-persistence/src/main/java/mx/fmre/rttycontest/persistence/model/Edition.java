@@ -33,7 +33,7 @@ public class Edition implements Serializable {
 	@Column(name = "N_ID_EDITION")
 	private Integer id;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST")
 	private Contest contest;
 
@@ -58,6 +58,6 @@ public class Edition implements Serializable {
 	@Column(name = "N_ACTIVE")
 	private Boolean active;
 
-	@OneToMany(mappedBy = "edition")
+	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();
 }

@@ -34,9 +34,9 @@ public class Contest implements Serializable {
 	@Column(name = "S_DESCRIPTION")
 	private String description;
 
-	@OneToMany(mappedBy = "contest")
+	@OneToMany(mappedBy = "contest", fetch = FetchType.LAZY)
     private List<Edition> editions = new ArrayList<>();
 
-	@OneToOne(mappedBy = "contest", fetch = FetchType.EAGER)
+	@OneToOne(mappedBy = "contest", fetch = FetchType.LAZY)
 	private EmailAccount emailAccount;
 }

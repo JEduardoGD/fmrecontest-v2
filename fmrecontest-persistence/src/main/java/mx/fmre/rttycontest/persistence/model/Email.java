@@ -36,7 +36,7 @@ public class Email implements Serializable {
 	@Column(name = "N_EMAIL_COUNT")
 	private Integer emailCount;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_EDITION")
 	private Edition edition;
 
@@ -61,7 +61,7 @@ public class Email implements Serializable {
 	@OneToMany(mappedBy = "email", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private List<AttachedFile> attachedFiles = new ArrayList<>();
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_EMAIL_STATUS")
 	private EmailStatus emailStatus;
 }

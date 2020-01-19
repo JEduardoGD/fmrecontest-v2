@@ -43,7 +43,7 @@ public class User {
 	private String lastName;
 	@Column(name = "B_ACTIVE")
 	private int active;
-	@ManyToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinTable(name = "REL_USER_ROLE", joinColumns = @JoinColumn(name = "N_ID_USER"), inverseJoinColumns = @JoinColumn(name = "N_ID_ROLE"))
 	private Set<Role> userRoles;
 

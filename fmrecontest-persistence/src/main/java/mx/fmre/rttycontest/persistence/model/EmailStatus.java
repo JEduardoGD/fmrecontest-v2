@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,6 +33,6 @@ public class EmailStatus implements Serializable {
 	@Column(name = "STATUS")
 	private String status;
 
-	@OneToMany(mappedBy = "emailStatus")
+	@OneToMany(mappedBy = "emailStatus", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();
 }
