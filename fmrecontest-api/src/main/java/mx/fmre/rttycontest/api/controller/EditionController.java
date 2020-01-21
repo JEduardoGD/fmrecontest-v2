@@ -21,7 +21,7 @@ public class EditionController extends BaseController {
 	 */
 	private static final long serialVersionUID = 111790517521089930L;
 	
-	@Autowired private IEditionService editionServiceAPIImpl;
+	@Autowired private IEditionService editionService;
 
 	@GetMapping
 	public ResponseEntity<StdResponse> getAll() {
@@ -31,7 +31,7 @@ public class EditionController extends BaseController {
 
 	@GetMapping("/bycontestid/{contestid}")
 	public ResponseEntity<StdResponse> getAllByContestId(@PathVariable("contestid") Integer contestId) {
-		getResponseServiceVo().setData(editionServiceAPIImpl.getAllByContestId(contestId));
+		getResponseServiceVo().setData(editionService.getAllByContestId(contestId));
 		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
 	}
 

@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.api.dto.ContestDTO;
-import mx.fmre.rttycontest.api.service.ContestService;
+import mx.fmre.rttycontest.api.service.IContestService;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 
 @Service
-public class ContestServiceImpl implements ContestService {
+public class ContestServiceImpl implements IContestService {
 
 	@Autowired
 	IContestRepository contestRepository;

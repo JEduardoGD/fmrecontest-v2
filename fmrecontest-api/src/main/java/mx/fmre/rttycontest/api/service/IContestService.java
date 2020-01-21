@@ -4,6 +4,6 @@ import java.util.List;
 
 import mx.fmre.rttycontest.api.dto.ContestDTO;
 
-public interface ContestService {
+public interface IContestService {
 	public List<ContestDTO> getAll();
 }

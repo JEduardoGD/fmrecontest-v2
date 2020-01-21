@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import mx.fmre.rttycontest.api.common.BaseController;
 import mx.fmre.rttycontest.api.common.StdResponse;
-import mx.fmre.rttycontest.api.service.ContestService;
+import mx.fmre.rttycontest.api.service.IContestService;
 
 @RestController
 @RequestMapping("/contest")
@@ -18,7 +18,7 @@ public class ContestController extends BaseController {
 	 * 
 	 */
 	private static final long serialVersionUID = -4333639451115849458L;
-	@Autowired private ContestService contestService;
+	@Autowired private IContestService contestService;
 
 	@GetMapping
 	public ResponseEntity<StdResponse> getAll() {
