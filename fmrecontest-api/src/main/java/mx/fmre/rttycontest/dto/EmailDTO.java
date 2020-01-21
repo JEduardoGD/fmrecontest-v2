@@ -1,8 +1,10 @@
 package mx.fmre.rttycontest.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
+import mx.fmre.rttycontest.api.dto.AttachedFileDTO;
 
 @Data
 public class EmailDTO implements Serializable {
@@ -16,4 +18,5 @@ public class EmailDTO implements Serializable {
 	private String recipientsFromName;
 	private String recipientsFromAddress;
 	private String emailStatus;
+	private List<AttachedFileDTO> atachedFiles;
 }
