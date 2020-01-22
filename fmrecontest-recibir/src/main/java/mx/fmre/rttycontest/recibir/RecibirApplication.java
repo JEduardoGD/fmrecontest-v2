@@ -32,7 +32,7 @@ public class RecibirApplication {
 	@Scheduled(cron = "${cron.expression}")
 	public void scheduleTaskUsingCronExpression() {
 
-		long now = System.currentTimeMillis() / 1000;
+		long now = System.currentTimeMillis() / 5000;
 		
 		log.info("schedule tasks using cron jobs - {}", now);
 

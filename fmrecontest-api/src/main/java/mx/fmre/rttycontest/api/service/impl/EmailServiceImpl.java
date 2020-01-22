@@ -51,6 +51,7 @@ public class EmailServiceImpl implements IEmailService {
 			EmailDTO emailDTO = new EmailDTO();
 			emailDTO.setSubject(e.getSubject());
 			emailDTO.setSentDate(df.format(e.getSentDate()));
+			emailDTO.setReceivedDate(df.format(e.getReceivedDate()));
 			emailDTO.setId(e.getId());
 			emailDTO.setRecipientsFromAddress(e.getRecipientsFromAddress());
 			emailDTO.setRecipientsFromName(e.getRecipientsFromName());
