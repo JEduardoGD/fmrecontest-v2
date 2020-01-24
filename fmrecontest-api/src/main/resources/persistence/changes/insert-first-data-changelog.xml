@@ -64,39 +64,39 @@
 	
 	<changeSet id="INSERT-007" author="Eduardo Gutierrez">
 	<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="2" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="3" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="4" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="5" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="6" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="7" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="8" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="9" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="10" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="11" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="12" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="13" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="14" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="15" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="16" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="17" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="18" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="19" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="20" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="21" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="22" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="23" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="24" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="25" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="26" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="27" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="28" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="29" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="30" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="31" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="32" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="33" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="34" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="35" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="3" /><column name="S_DESCRIPTION" value="1 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="4" /><column name="S_DESCRIPTION" value="2 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="5" /><column name="S_DESCRIPTION" value="3 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="6" /><column name="S_DESCRIPTION" value="4 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="7" /><column name="S_DESCRIPTION" value="5 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="8" /><column name="S_DESCRIPTION" value="6 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="9" /><column name="S_DESCRIPTION" value="7 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="10" /><column name="S_DESCRIPTION" value="8 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="11" /><column name="S_DESCRIPTION" value="9 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="12" /><column name="S_DESCRIPTION" value="10 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="13" /><column name="S_DESCRIPTION" value="11 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="14" /><column name="S_DESCRIPTION" value="12 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="15" /><column name="S_DESCRIPTION" value="13 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="16" /><column name="S_DESCRIPTION" value="14 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="17" /><column name="S_DESCRIPTION" value="15 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="18" /><column name="S_DESCRIPTION" value="16 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="19" /><column name="S_DESCRIPTION" value="17 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="20" /><column name="S_DESCRIPTION" value="18 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="21" /><column name="S_DESCRIPTION" value="19 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="22" /><column name="S_DESCRIPTION" value="20 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="23" /><column name="S_DESCRIPTION" value="21 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="24" /><column name="S_DESCRIPTION" value="22 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="25" /><column name="S_DESCRIPTION" value="23 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="26" /><column name="S_DESCRIPTION" value="24 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="27" /><column name="S_DESCRIPTION" value="25 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="28" /><column name="S_DESCRIPTION" value="26 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="29" /><column name="S_DESCRIPTION" value="27 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="30" /><column name="S_DESCRIPTION" value="28 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="31" /><column name="S_DESCRIPTION" value="29 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="32" /><column name="S_DESCRIPTION" value="30 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="33" /><column name="S_DESCRIPTION" value="31 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="34" /><column name="S_DESCRIPTION" value="32 International RTTY Contest FMRE" /></insert>
+<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="35" /><column name="S_DESCRIPTION" value="33 International RTTY Contest FMRE" /></insert>
 	</changeSet>
 	
 	<changeSet author="Eduardo Gutierrez" id="INSERT-008">
@@ -111,6 +111,24 @@
 	    <insert tableName="CAT_EMAIL_STATUS">
 	    	<column name="N_ID_EMAIL_STATUS" value="3" />
 			<column name="STATUS" value="PARSED" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-009">
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="1" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_SUBJECT" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="2" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_ATTACHED_FILES" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="3" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="SUBJECT_NOT_EQUALS_SENDER" />
 	    </insert>
 	</changeSet>
 </databaseChangeLog>

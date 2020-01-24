@@ -189,4 +189,49 @@
             referencedTableName="TBL_EMAIL"
             referencedColumnNames="N_ID_EMAIL"/>
 	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-010">
+		<!-- CAT_EMAIL_ERROR -->
+		<createTable tableName="CAT_EMAIL_ERROR">
+			<column name="N_ID_CAT_EMAIL_ERROR" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_EDITION" type="INT" />
+			<column name="S_DESCRIPCION" type="VARCHAR(255)" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_CAT_EMAIL_ERROR" incrementBy="1" startWith="1"
+			tableName="CAT_EMAIL_ERROR" />
+		<addForeignKeyConstraint
+            baseTableName="CAT_EMAIL_ERROR"
+			baseColumnNames="N_ID_EDITION"
+            constraintName="CONSTRAINT_FK_CAT_EMAIL_ERROR"
+            referencedTableName="TBL_EDITION"
+            referencedColumnNames="N_ID_EDITION"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-011">
+		<!-- CAT_EMAIL_ERROR -->
+		<createTable tableName="REL_EMAIL_EMAIL_ERROR">
+			<column name="N_ID_CAT_EMAIL_ERROR" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_EMAIL" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="D_FECHA_REGISTRO" type="DATE" />
+		</createTable>
+		<addForeignKeyConstraint
+            baseTableName="REL_EMAIL_EMAIL_ERROR"
+			baseColumnNames="N_ID_CAT_EMAIL_ERROR"
+            constraintName="CONSTRAINT_FK_REL_EMAIL_EMAIL_ERROR_CAT_EMAIL_ERROR"
+            referencedTableName="CAT_EMAIL_ERROR"
+            referencedColumnNames="N_ID_CAT_EMAIL_ERROR"/>
+		<addForeignKeyConstraint
+            baseTableName="REL_EMAIL_EMAIL_ERROR"
+			baseColumnNames="N_ID_EMAIL"
+            constraintName="CONSTRAINT_FK_REL_EMAIL_EMAIL_ERROR_TBL_EMAIL"
+            referencedTableName="TBL_EMAIL"
+            referencedColumnNames="N_ID_EMAIL"/>
+	</changeSet>
 </databaseChangeLog>
