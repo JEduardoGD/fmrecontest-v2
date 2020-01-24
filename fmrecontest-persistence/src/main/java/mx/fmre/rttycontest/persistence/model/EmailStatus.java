@@ -30,8 +30,11 @@ public class EmailStatus implements Serializable {
 	@Column(name = "N_ID_EMAIL_STATUS")
 	private Integer id;
 
-	@Column(name = "STATUS")
+	@Column(name = "S_STATUS")
 	private String status;
+	
+	@Column(name = "S_DESCRIPTION")
+	private String description;
 
 	@OneToMany(mappedBy = "emailStatus", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();

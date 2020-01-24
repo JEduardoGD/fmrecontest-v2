@@ -44,7 +44,7 @@
 			<column name="N_YEAR" value="2019" />
 			<column name="T_START_UTC" value="2011-08-05 00:00:00" />
 			<column name="T_END_UTC" value="2011-08-15 00:00:00" />
-			<column name="N_ID_EMAIL_START" value="3629" />
+			<column name="N_ID_EMAIL_START" value="3529" />
 			<!-- <column name="N_ID_EMAIL_END" value="3646" /> -->
 			<column name="N_ACTIVE" valueBoolean="true" />
 	    </insert>
@@ -102,15 +102,33 @@
 	<changeSet author="Eduardo Gutierrez" id="INSERT-008">
 	    <insert tableName="CAT_EMAIL_STATUS">
 	    	<column name="N_ID_EMAIL_STATUS" value="1" />
-			<column name="STATUS" value="RECIVED" />
+			<column name="S_STATUS" value="RECIVED" />
+			<column name="S_DESCRIPTION" value="When email has recived is setted with this status" />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
 	    	<column name="N_ID_EMAIL_STATUS" value="2" />
-			<column name="STATUS" value="VERIFIED" />
+			<column name="S_STATUS" value="IDENTIFIED" />
+			<column name="S_DESCRIPTION" value="The email contains a file identified as a logfile" />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
 	    	<column name="N_ID_EMAIL_STATUS" value="3" />
-			<column name="STATUS" value="PARSED" />
+			<column name="S_STATUS" value="NO_IDENTIFIED" />
+			<column name="S_DESCRIPTION" value="The logfile cannot be identified as a logfile" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="4" />
+			<column name="S_STATUS" value="PARSED" />
+			<column name="S_DESCRIPTION" value="The logfile was succesfully parsed into log and qsos registers" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="5" />
+			<column name="S_STATUS" value="NO_PARSED" />
+			<column name="S_DESCRIPTION" value="The logfile cannot exists or cannot be parsed into log and qsos registers" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="6" />
+			<column name="S_STATUS" value="ANSWERED" />
+			<column name="S_DESCRIPTION" value="Email answered (with successfully or error message)" />
 	    </insert>
 	</changeSet>
 	
@@ -127,6 +145,16 @@
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="3" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="CANT_IDENTIFY_LOGFILE" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="4" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="MANY_POSSIBLE_LOGFILE" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="5" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="SUBJECT_NOT_EQUALS_SENDER" />
 	    </insert>

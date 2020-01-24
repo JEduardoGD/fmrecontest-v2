@@ -17,11 +17,12 @@ import javax.mail.internet.InternetAddress;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
+import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
+import mx.fmre.rttycontest.bs.util.FileUtil;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
-import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 
 public class MailHelper {
 	private MailHelper() {
@@ -66,6 +67,7 @@ public class MailHelper {
 		attachedFile.setLenght(attachedFileDTO.getLenght());
 		attachedFile.setMd5Hash(attachedFileDTO.getHash());
 		attachedFile.setPath(attachedFileDTO.getPath());
+		attachedFile.setLogFile(false);
 		return attachedFile;
 	}
 

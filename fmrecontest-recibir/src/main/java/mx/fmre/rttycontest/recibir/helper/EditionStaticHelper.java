@@ -1,8 +1,8 @@
 package mx.fmre.rttycontest.recibir.helper;
 
+import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
-import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 
 public class EditionStaticHelper {
 	private EditionStaticHelper() {

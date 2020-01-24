@@ -46,4 +46,7 @@ public class AttachedFile implements Serializable {
 	
 	@Column(name = "S_PATH")
 	private String path;
+	
+	@Column(name = "D_ISLOGFILE")
+	private boolean isLogFile;
 }

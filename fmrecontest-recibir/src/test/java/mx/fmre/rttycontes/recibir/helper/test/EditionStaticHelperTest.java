@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.persistence.model.Contest;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
-import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.recibir.helper.EditionStaticHelper;
 
 @SpringBootTest(classes = EditionStaticHelperTest.class )

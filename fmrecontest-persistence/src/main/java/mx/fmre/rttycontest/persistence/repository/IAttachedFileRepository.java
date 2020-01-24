@@ -10,5 +10,5 @@ import mx.fmre.rttycontest.persistence.model.Email;
 
 @Repository
 public interface IAttachedFileRepository extends JpaRepository<AttachedFile, Integer> {
-	public List<AttachedFile> getByEmail(Email email);
+	public List<AttachedFile> findByEmail(Email email);
 }

@@ -26,6 +26,12 @@
 			<artifactId>fmrecontest-persistence</artifactId>
 			<version>${global.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>mx.fmre.rttycontest</groupId>
+			<artifactId>fmrecontest-bs</artifactId>
+			<version>${global.version}</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
 		<dependency>

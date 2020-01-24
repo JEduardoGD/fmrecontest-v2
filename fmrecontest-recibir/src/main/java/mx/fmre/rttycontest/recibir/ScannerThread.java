@@ -18,6 +18,7 @@ import javax.mail.Store;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Contest;
@@ -27,7 +28,6 @@ import mx.fmre.rttycontest.persistence.model.EmailAccount;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
-import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
 import mx.fmre.rttycontest.recibir.helper.MailHelper;
 import mx.fmre.rttycontest.recibir.services.IFileManagerService;

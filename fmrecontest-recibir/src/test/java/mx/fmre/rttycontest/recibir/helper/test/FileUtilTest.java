@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import mx.fmre.rttycontest.recibir.helper.FileUtil;
+import mx.fmre.rttycontest.bs.util.FileUtil;
+
 @SpringBootTest(classes = FileUtilTest.class)
 @TestPropertySource(locations = "classpath:application.properties")
 public class FileUtilTest {

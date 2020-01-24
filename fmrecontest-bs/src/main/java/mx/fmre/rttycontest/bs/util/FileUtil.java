@@ -1,17 +1,25 @@
-package mx.fmre.rttycontest.recibir.helper;
+package mx.fmre.rttycontest.bs.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
+import java.util.List;
 
-public class FileUtil {
-	
+import org.apache.commons.io.IOUtils;
+import org.springframework.util.DigestUtils;
+
+public abstract class FileUtil {
+
 	private FileUtil() {
-		//not called
+		// not called
 	}
-	
+
 	public static byte[] inputStreamToByteArray(InputStream is) throws IOException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		int nRead;
@@ -34,8 +42,19 @@ public class FileUtil {
 	}
 
 	public static String getMd5Hash(byte[] byteArray) throws IOException {
-		try (InputStream is = byteArrayToInputStream(byteArray)) {
-			return org.apache.commons.codec.digest.DigestUtils.md5Hex(is);
-		}
+		return DigestUtils.md5DigestAsHex(byteArray);
+	}
+
+	public static List<String> pathToListString(Path filePath) throws IOException {
+		Charset charset = Charset.forName("UTF8");
+		return Files.readAllLines(filePath, charset);
+	}
+
+	public static byte[] pathToArrayBytes(Path filePath) throws IOException {
+		return Files.readAllBytes(filePath);
+	}
+	
+	public static String inputStreamToString(InputStream inputStream) throws IOException {
+		return IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
 	}
 }

@@ -36,4 +36,13 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 	public List<Email> findByEdition(Edition edition);
 
 	public List<Email> findByEditionAndEmailStatus(Edition edition, EmailStatus emailStatus);
+	
+	@Query(value = "" +
+			"SELECT E.emailCount " +
+			"FROM Email E " +
+			"WHERE E.edition = :edition and " +
+			"      E.emailStatus in :statuses")
+	public List<Email> findByEditionAndEmailStatuses(
+			@Param("edition") Edition edition, 
+			@Param("statuses") List<EmailStatus> statuses);
 }

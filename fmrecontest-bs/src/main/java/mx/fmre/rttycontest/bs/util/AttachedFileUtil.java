@@ -1,9 +1,9 @@
-package mx.fmre.rttycontest.api.util;
+package mx.fmre.rttycontest.bs.util;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import mx.fmre.rttycontest.api.dto.AttachedFileDTO;
+import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 
 public class AttachedFileUtil {

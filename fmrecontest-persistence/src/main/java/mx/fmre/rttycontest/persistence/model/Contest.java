@@ -27,7 +27,7 @@ public class Contest implements Serializable {
 	private static final long serialVersionUID = 8685550122948241889L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "N_ID_CONTEST")
 	private Integer id;
 

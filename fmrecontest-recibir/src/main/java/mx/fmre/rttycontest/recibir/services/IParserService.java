@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.recibir.services;
 
 public interface IParserService {
-	public void verifyRecivedEmails();
+	public void identifyLogFiles();
+	public void parseRecivedEmails();
 }
