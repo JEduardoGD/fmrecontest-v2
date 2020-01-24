@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
+import mx.fmre.rttycontest.persistence.model.EmailStatus;
 
 @Repository
 public interface IEmailRepository extends JpaRepository<Email, Integer> {
@@ -33,4 +34,6 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			@Param("idEdition") Integer idEdition);
 	
 	public List<Email> findByEdition(Edition edition);
+
+	public List<Email> findByEditionAndEmailStatus(Edition edition, EmailStatus emailStatus);
 }

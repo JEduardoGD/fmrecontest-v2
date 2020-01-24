@@ -60,4 +60,7 @@ public class Edition implements Serializable {
 
 	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();
+
+	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
+    private List<CatEmailError> catErrors = new ArrayList<>();
 }
