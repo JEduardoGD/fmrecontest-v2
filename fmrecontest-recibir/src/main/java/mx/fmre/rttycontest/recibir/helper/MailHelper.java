@@ -2,9 +2,7 @@ package mx.fmre.rttycontest.recibir.helper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.mail.Address;
