@@ -77,7 +77,7 @@ public class VerificacionEmailRtty2020 implements IVerificacionEmail {
 				listCatEmailError.add(x);
 			}
 		} else
-			throw new FmreContestException("The test \"" + SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN + "\" is not found for editon with ID " + editionId);
+			throw new FmreContestException("The test \"" + EMAIL_WITHOUT_CONTSTLOG + "\" is not found for editon with ID " + editionId);
 
 		return listCatEmailError;
 	}
@@ -97,7 +97,7 @@ public class VerificacionEmailRtty2020 implements IVerificacionEmail {
 			return false;
 		String contestLogCallsign = contestLog.getCallsign().toUpperCase();
 		String subject = email.getSubject().toUpperCase();
-		return contestLogCallsign.equals(subject);
+		return !contestLogCallsign.equals(subject);
 	}
 
 	private boolean verify_EMAIL_WITHOUT_CONTSTLOG(Email email, Edition edition, List<AttachedFile> attachedFiles) {
