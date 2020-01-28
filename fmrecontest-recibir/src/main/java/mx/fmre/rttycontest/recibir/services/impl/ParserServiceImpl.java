@@ -37,7 +37,7 @@ public class ParserServiceImpl implements IParserService {
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotAnswered(
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(
 					edition, 
 					Arrays.asList(emailEstatusRecived));
 			for (Email email : emails) {
@@ -64,7 +64,7 @@ public class ParserServiceImpl implements IParserService {
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotAnswered(
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(
 					edition, 
 					Arrays.asList(emailEstatusIdentified));
 			for (Email email : emails) {
