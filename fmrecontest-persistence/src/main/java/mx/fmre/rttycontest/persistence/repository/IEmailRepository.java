@@ -50,7 +50,7 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			"FROM Email E " +
 			"WHERE E.edition = :edition and " +
 			"      E.emailStatus in :statuses and " +
-			"      E.verifiedAt IS NOT NULL " +
+			"      E.verifiedAt IS NOT NULL AND " +
 			"      E.answeredAt IS NULL ")
 	public List<Email> findByEditionAndEmailStatusesAndVerifiedAndNotAnswered(
 			@Param("edition") Edition edition, 
