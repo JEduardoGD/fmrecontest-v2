@@ -2,7 +2,9 @@ package mx.fmre.rttycontest.recibir.helper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.mail.Address;
@@ -44,9 +46,13 @@ public class MailHelper {
 				try (InputStream is = bodyPart.getInputStream()) {
 					byte[] byteArray = FileUtil.inputStreamToByteArray(is);
 					String contentType = bodyPart.getContentType();
-
+					
+					String filename = bodyPart.getFileName();//=?UTF-8?b?ZHUzbGEgeGUgcnR0eSAyMDE5?=
+					if(filename.startsWith("=?UTF-8?b?"))
+						filename = FileUtil.base64ToString(filename.replace("=?UTF-8?b?", "").replace("MDE5?=", ""));
+					
 					AttachedFileDTO attachedFileDTO = new AttachedFileDTO();
-					attachedFileDTO.setFilename(bodyPart.getFileName());
+					attachedFileDTO.setFilename(filename);
 					attachedFileDTO.setByteArray(byteArray);
 					attachedFileDTO.setContenyType(contentType);
 					attachedFileDTO.setLenght(bodyPart.getSize());

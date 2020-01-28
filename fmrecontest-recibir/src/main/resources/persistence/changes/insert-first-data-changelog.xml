@@ -44,8 +44,7 @@
 			<column name="N_YEAR" value="2019" />
 			<column name="T_START_UTC" value="2011-08-05 00:00:00" />
 			<column name="T_END_UTC" value="2011-08-15 00:00:00" />
-			<!-- <column name="N_ID_EMAIL_START" value="3529" /> -->
-			<column name="N_ID_EMAIL_START" value="3544" />
+			<column name="N_ID_EMAIL_START" value="3529" />
 			<column name="N_ACTIVE" valueBoolean="true" />
 	    </insert>
 	</changeSet>

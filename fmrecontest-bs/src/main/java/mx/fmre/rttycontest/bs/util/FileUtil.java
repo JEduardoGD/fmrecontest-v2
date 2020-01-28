@@ -37,6 +37,11 @@ public abstract class FileUtil {
 		return new String(encoded);
 	}
 
+	public static String base64ToString(String s) {
+		byte[] encoded = Base64.getDecoder().decode(s);
+		return new String(encoded);
+	}
+
 	public static InputStream byteArrayToInputStream(byte[] byteArray) {
 		return new ByteArrayInputStream(byteArray);
 	}
