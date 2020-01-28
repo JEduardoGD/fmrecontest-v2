@@ -84,6 +84,8 @@ public class MailHelper {
 		email.setSentDate(message.getSentDate());
 		email.setSubject(message.getSubject());
 		email.setEmailStatus(emailStatus);
+		email.setVerifiedAt(null);
+		email.setAnsweredAt(null);
 		return email;
 	}
 

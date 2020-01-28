@@ -28,7 +28,7 @@ import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 
 @Slf4j
 @Service
-public class ParserEmailServiceRtty2019Impl implements IParserEmail {
+public class ParserEmailServiceRtty2020Impl implements IParserEmail {
 	
 	@Autowired private IAttachedFileRepository attachedFileRepository;
 	@Autowired private ApplicationContext appContext;

@@ -35,26 +35,26 @@ public class RecibirApplication {
 		SpringApplication.run(RecibirApplication.class);
 	}
 
-//	@Scheduled(cron = "${cron.scanner.expression}")
-//	public void crontScanContest() {
-//		log.debug("starting mailService.scanContest()...");
-//		mailService.scanContest();
-//		log.debug("ending mailService.scanContest()");
-//	}
-//
-//	@Scheduled(cron = "${cron.identify.expression}")
-//	public void crontIdentifyLogFiles() {
-//		log.debug("starting mailService.identifyLogFiles()...");
-//        parserService.identifyLogFiles();
-//		log.debug("ending mailService.identifyLogFiles()");
-//	}
-//
-//	@Scheduled(cron = "${cron.parse.expression}")
-//	public void cronParseRecivedEmails() {
-//		log.debug("starting mailService.parseRecivedEmails()...");
-//        parserService.parseRecivedEmails();
-//		log.debug("ending mailService.parseRecivedEmails()");
-//	}
+	@Scheduled(cron = "${cron.scanner.expression}")
+	public void crontScanContest() {
+		log.debug("starting mailService.scanContest()...");
+		mailService.scanContest();
+		log.debug("ending mailService.scanContest()");
+	}
+
+	@Scheduled(cron = "${cron.identify.expression}")
+	public void crontIdentifyLogFiles() {
+		log.debug("starting mailService.identifyLogFiles()...");
+        parserService.identifyLogFiles();
+		log.debug("ending mailService.identifyLogFiles()");
+	}
+
+	@Scheduled(cron = "${cron.parse.expression}")
+	public void cronParseRecivedEmails() {
+		log.debug("starting mailService.parseRecivedEmails()...");
+        parserService.parseRecivedEmails();
+		log.debug("ending mailService.parseRecivedEmails()");
+	}
 
 	@Scheduled(cron = "${cron.verify.expression}")
 	public void cronVerifyService() {

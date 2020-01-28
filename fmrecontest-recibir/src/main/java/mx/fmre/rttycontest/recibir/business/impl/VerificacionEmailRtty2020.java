@@ -9,26 +9,27 @@ import org.springframework.stereotype.Service;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
+import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.repository.IAttachedFileRepository;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
+import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.recibir.business.IVerificacionEmail;
 
 @Service("verificacionEmailRtty2019")
-public class VerificacionEmailRtty2019 implements IVerificacionEmail {
+public class VerificacionEmailRtty2020 implements IVerificacionEmail {
 
-	@Autowired
-	private IEditionRepository editionRepository;
-	@Autowired
-	private IAttachedFileRepository attachedFileRepository;
-	@Autowired
-	private ICatEmailErrorRepository catEmailErrorRepository;
+	@Autowired private IEditionRepository editionRepository;
+	@Autowired private IAttachedFileRepository attachedFileRepository;
+	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;
+	@Autowired private IContestLogRepository contestLogRepository;
 
 	private final String EMAIL_WITHOUT_SUBJECT = "EMAIL_WITHOUT_SUBJECT";
 	private final String EMAIL_WITHOUT_ATTACHED_FILES = "EMAIL_WITHOUT_ATTACHED_FILES";
-//	private final String SUBJECT_NOT_EQUALS_SENDER = "SUBJECT_NOT_EQUALS_SENDER";
+	private final String SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN = "SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN";
+	private final String EMAIL_WITHOUT_CONTSTLOG = "EMAIL_WITHOUT_CONTSTLOG";
 
 	@Override
 	public List<CatEmailError> verify(Email email) throws FmreContestException {
@@ -50,7 +51,7 @@ public class VerificacionEmailRtty2019 implements IVerificacionEmail {
 			throw new FmreContestException(
 					"The test \"" + EMAIL_WITHOUT_SUBJECT + "\" is not found for editon with ID " + editionId);
 
-		/* SUBJECT_NOT_EQUALS_SENDER */
+		/* EMAIL_WITHOUT_ATTACHED_FILES */
 		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, EMAIL_WITHOUT_ATTACHED_FILES);
 		if (x != null) {
 			if (this.verify_EMAIL_WITHOUT_ATTACHED_FILES(email, edition, attachedFiles)) {
@@ -60,14 +61,23 @@ public class VerificacionEmailRtty2019 implements IVerificacionEmail {
 			throw new FmreContestException(
 					"The test \"" + EMAIL_WITHOUT_ATTACHED_FILES + "\" is not found for editon with ID " + editionId);
 
-//		/*EMAIL_WITHOUT_ATTACHED_FILES*/
-//		x = catEmailErrorRepository.findByEditionAndDescription(edition, SUBJECT_NOT_EQUALS_SENDER);
-//		if(x != null) {
-//			if(this.verify_SUBJECT_NOT_EQUALS_SENDER(email, edition, attachedFiles)) {
-//				listCatEmailError.add(x);
-//			}
-//		} else
-//			throw new FmreContestException("The test \"" + SUBJECT_NOT_EQUALS_SENDER + "\" is not found for editon with ID " + editionId);
+		/*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
+		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN);
+		if(x != null) {
+			if(this.verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(email, edition, attachedFiles)) {
+				listCatEmailError.add(x);
+			}
+		} else
+			throw new FmreContestException("The test \"" + SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN + "\" is not found for editon with ID " + editionId);
+
+		/*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
+		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, EMAIL_WITHOUT_CONTSTLOG);
+		if(x != null) {
+			if(this.verify_EMAIL_WITHOUT_CONTSTLOG(email, edition, attachedFiles)) {
+				listCatEmailError.add(x);
+			}
+		} else
+			throw new FmreContestException("The test \"" + SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN + "\" is not found for editon with ID " + editionId);
 
 		return listCatEmailError;
 	}
@@ -78,10 +88,33 @@ public class VerificacionEmailRtty2019 implements IVerificacionEmail {
 
 	private boolean verify_EMAIL_WITHOUT_ATTACHED_FILES(Email email, Edition edition,
 			List<AttachedFile> attachedFiles) {
-		return (attachedFiles != null && attachedFiles.size() > 0);
+		return (attachedFiles == null || attachedFiles.size() <= 0);
 	}
 
-//	private boolean verify_SUBJECT_NOT_EQUALS_SENDER(Email email, Edition edition, List<AttachedFile> attachedFiles) {
-//		return (email != null && email.getSubject() != null && email.getSubject() );
-//	}
+	private boolean verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(Email email, Edition edition, List<AttachedFile> attachedFiles) {
+		ContestLog contestLog = contestLogRepository.findByEmail(email);
+		if(contestLog == null)
+			return false;
+		String contestLogCallsign = contestLog.getCallsign().toUpperCase();
+		String subject = email.getSubject().toUpperCase();
+		return contestLogCallsign.equals(subject);
+	}
+
+	private boolean verify_EMAIL_WITHOUT_CONTSTLOG(Email email, Edition edition, List<AttachedFile> attachedFiles) {
+		ContestLog contestLog = contestLogRepository.findByEmail(email);
+		if(contestLog == null)
+			return true;
+		return false;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+

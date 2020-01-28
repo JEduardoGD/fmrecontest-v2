@@ -44,8 +44,8 @@
 			<column name="N_YEAR" value="2019" />
 			<column name="T_START_UTC" value="2011-08-05 00:00:00" />
 			<column name="T_END_UTC" value="2011-08-15 00:00:00" />
-			<column name="N_ID_EMAIL_START" value="3529" />
-			<!-- <column name="N_ID_EMAIL_END" value="3646" /> -->
+			<!-- <column name="N_ID_EMAIL_START" value="3529" /> -->
+			<column name="N_ID_EMAIL_START" value="3544" />
 			<column name="N_ACTIVE" valueBoolean="true" />
 	    </insert>
 	</changeSet>
@@ -127,6 +127,11 @@
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
 	    	<column name="N_ID_EMAIL_STATUS" value="6" />
+			<column name="S_STATUS" value="VERIFIED" />
+			<column name="S_DESCRIPTION" value="Email verified to check errors" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="7" />
 			<column name="S_STATUS" value="ANSWERED" />
 			<column name="S_DESCRIPTION" value="Email answered (with successfully or error message)" />
 	    </insert>
@@ -156,7 +161,12 @@
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="5" />
 			<column name="N_ID_EDITION" value="1" />
-			<column name="S_DESCRIPCION" value="SUBJECT_NOT_EQUALS_SENDER" />
+			<column name="S_DESCRIPCION" value="SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="6" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_CONTSTLOG" />
 	    </insert>
 	</changeSet>
 </databaseChangeLog>

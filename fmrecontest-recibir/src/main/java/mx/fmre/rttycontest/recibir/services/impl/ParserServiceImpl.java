@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.recibir.services.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,9 @@ public class ParserServiceImpl implements IParserService {
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<Email> emails = emailRepository.findByEditionAndEmailStatus(edition, emailEstatusRecived);
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotAnswered(
+					edition, 
+					Arrays.asList(emailEstatusRecived));
 			for (Email email : emails) {
 				List<AttachedFile> listAttachedFiles = parserEmail.identifyLogFile(email);
 				if(listAttachedFiles != null && listAttachedFiles.size() == 1) {
@@ -61,7 +64,9 @@ public class ParserServiceImpl implements IParserService {
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<Email> emails = emailRepository.findByEditionAndEmailStatus(edition, emailEstatusIdentified);
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotAnswered(
+					edition, 
+					Arrays.asList(emailEstatusIdentified));
 			for (Email email : emails) {
 				ContestLog contestLog = parserEmail.parse(email);
 				if(contestLog != null) {

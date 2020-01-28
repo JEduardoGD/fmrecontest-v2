@@ -60,6 +60,12 @@ public class Email implements Serializable {
 
 	@OneToMany(mappedBy = "email", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private List<AttachedFile> attachedFiles = new ArrayList<>();
+
+	@Column(name = "VERIFIED_AT")
+	private Date verifiedAt;
+
+	@Column(name = "ANSWERED_AT")
+	private Date answeredAt;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_EMAIL_STATUS")

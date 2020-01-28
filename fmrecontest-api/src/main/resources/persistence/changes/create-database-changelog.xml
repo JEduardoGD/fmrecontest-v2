@@ -149,6 +149,8 @@
 			<column name="D_SENT_DATE" type="DATETIME" />
 			<column name="S_SUBJECT" type="VARCHAR(255)" />
 			<column name="N_ID_EMAIL_STATUS" type="INT" />
+			<column name="VERIFIED_AT" type="DATETIME" />
+			<column name="ANSWERED_AT" type="DATETIME" />
 		</createTable>
 		<addAutoIncrement columnDataType="INT"
 			columnName="N_ID_EMAIL" incrementBy="1" startWith="1"
@@ -221,7 +223,7 @@
 			<column name="N_ID_EMAIL" type="INT" autoIncrement="false">
 				<constraints primaryKey="true" nullable="false" />
 			</column>
-			<column name="D_FECHA_REGISTRO" type="DATE" />
+			<column name="D_FECHA_REGISTRO" type="DATETIME" />
 		</createTable>
 		<addForeignKeyConstraint
             baseTableName="REL_EMAIL_EMAIL_ERROR"
