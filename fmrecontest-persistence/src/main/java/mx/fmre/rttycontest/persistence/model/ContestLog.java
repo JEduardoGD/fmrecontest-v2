@@ -44,19 +44,24 @@ public class ContestLog implements Serializable {
 	@Column(name = "S_ADDRESS_STATE_PROVINCE")
 	private String addressStateProvince;
 
-	@Column(name = "S_ADDRESS_CALLSIGN")
+//	@Column(name = "S_ADDRESS_CALLSIGN")
+	@Column(name = "S_CALLSIGN")
 	private String callsign;
 
-	@Column(name = "S_ADDRESS_CATEGORY_BAND")
+//	@Column(name = "S_ADDRESS_CATEGORY_BAND")
+	@Column(name = "S_CATEGORY_BAND")
 	private String categoryBand;
 
-	@Column(name = "S_ADDRESS_CATEGORY_MODE")
+//	@Column(name = "S_ADDRESS_CATEGORY_MODE")
+	@Column(name = "S_CATEGORY_MODE")
 	private String categoryMode;
 
-	@Column(name = "S_ADDRESS_CATEGORY_OPERATOR")
+//	@Column(name = "S_ADDRESS_CATEGORY_OPERATOR")
+	@Column(name = "S_CATEGORY_OPERATOR")
 	private String categoryOperator;
 
-	@Column(name = "S_ADDRESS_CATEGORY_POWER")
+//	@Column(name = "S_ADDRESS_CATEGORY_POWER")
+	@Column(name = "S_CATEGORY_POWER")
 	private String categoryPower;
 
 	@Column(name = "D_CLAIMED_SCORE")

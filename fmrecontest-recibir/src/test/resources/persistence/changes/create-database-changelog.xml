@@ -121,12 +121,13 @@
 	</changeSet>
 	
 	<changeSet author="Eduardo Gutierrez" id="CREATE-007">
-		<!-- TBL_ATTACHED_FILE -->
+		<!-- CAT_EMAIL_STATUS -->
 		<createTable tableName="CAT_EMAIL_STATUS">
 			<column name="N_ID_EMAIL_STATUS" type="INT" autoIncrement="false">
 				<constraints primaryKey="true" nullable="false" />
 			</column>
-			<column name="STATUS" type="VARCHAR(255)" />
+			<column name="S_STATUS" type="VARCHAR(255)" />
+			<column name="S_DESCRIPTION" type="VARCHAR(255)" />
 		</createTable>
 		<addAutoIncrement columnDataType="INT"
 			columnName="N_ID_EMAIL_STATUS" incrementBy="1" startWith="1"
@@ -148,6 +149,8 @@
 			<column name="D_SENT_DATE" type="DATETIME" />
 			<column name="S_SUBJECT" type="VARCHAR(255)" />
 			<column name="N_ID_EMAIL_STATUS" type="INT" />
+			<column name="VERIFIED_AT" type="DATETIME" />
+			<column name="ANSWERED_AT" type="DATETIME" />
 		</createTable>
 		<addAutoIncrement columnDataType="INT"
 			columnName="N_ID_EMAIL" incrementBy="1" startWith="1"
@@ -178,6 +181,7 @@
 			<column name="N_LENGHT" type="INT" />
 			<column name="S_MD5_HASH" type="VARCHAR(255)" />
 			<column name="S_PATH" type="VARCHAR(255)" />
+			<column name="D_ISLOGFILE" type="INT" />
 		</createTable>
 		<addAutoIncrement columnDataType="INT"
 			columnName="N_ID_ATTACHED_FILE" incrementBy="1" startWith="1"
@@ -188,5 +192,116 @@
             constraintName="CONSTRAINT_FK_TBL_EMAIL"
             referencedTableName="TBL_EMAIL"
             referencedColumnNames="N_ID_EMAIL"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-010">
+		<!-- CAT_EMAIL_ERROR -->
+		<createTable tableName="CAT_EMAIL_ERROR">
+			<column name="N_ID_CAT_EMAIL_ERROR" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_EDITION" type="INT" />
+			<column name="S_DESCRIPCION" type="VARCHAR(255)" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_CAT_EMAIL_ERROR" incrementBy="1" startWith="1"
+			tableName="CAT_EMAIL_ERROR" />
+		<addForeignKeyConstraint
+            baseTableName="CAT_EMAIL_ERROR"
+			baseColumnNames="N_ID_EDITION"
+            constraintName="CONSTRAINT_FK_CAT_EMAIL_ERROR"
+            referencedTableName="TBL_EDITION"
+            referencedColumnNames="N_ID_EDITION"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-011">
+		<!-- CAT_EMAIL_ERROR -->
+		<createTable tableName="REL_EMAIL_EMAIL_ERROR">
+			<column name="N_ID_CAT_EMAIL_ERROR" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="N_ID_EMAIL" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="D_FECHA_REGISTRO" type="DATETIME" />
+		</createTable>
+		<addForeignKeyConstraint
+            baseTableName="REL_EMAIL_EMAIL_ERROR"
+			baseColumnNames="N_ID_CAT_EMAIL_ERROR"
+            constraintName="CONSTRAINT_FK_REL_EMAIL_EMAIL_ERROR_CAT_EMAIL_ERROR"
+            referencedTableName="CAT_EMAIL_ERROR"
+            referencedColumnNames="N_ID_CAT_EMAIL_ERROR"/>
+		<addForeignKeyConstraint
+            baseTableName="REL_EMAIL_EMAIL_ERROR"
+			baseColumnNames="N_ID_EMAIL"
+            constraintName="CONSTRAINT_FK_REL_EMAIL_EMAIL_ERROR_TBL_EMAIL"
+            referencedTableName="TBL_EMAIL"
+            referencedColumnNames="N_ID_EMAIL"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-012">
+		<!-- CAT_EMAIL_ERROR -->
+		<createTable tableName="TBL_CONTEST_LOG">
+			<column name="N_ID_CONTEST_LOG" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="S_ADDRESS" type="VARCHAR(255)" />
+			<column name="S_ADDRESS_CITY" type="VARCHAR(255)" />
+			<column name="S_ADDRESS_COUNTRY" type="VARCHAR(255)" />
+			<column name="S_ADDRESS_STATE_PROVINCE" type="VARCHAR(255)" />
+			<column name="S_CALLSIGN" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_BAND" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_MODE" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_OPERATOR" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_POWER" type="VARCHAR(255)" />
+			<column name="D_CLAIMED_SCORE" type="INT" />
+			<column name="S_CLUB" type="VARCHAR(255)" />
+			<column name="S_CONTEST" type="VARCHAR(255)" />
+			<column name="S_CREATED_BY" type="VARCHAR(255)" />
+			<column name="S_EMAIL_ADDRESS" type="VARCHAR(255)" />
+			<column name="S_NAME" type="VARCHAR(255)" />
+			<column name="S_OPERATORS" type="VARCHAR(255)" />
+			<column name="S_SOAPBOX" type="VARCHAR(255)" />
+			<column name="D_IS_CHECKLOG" type="INT" />
+			<column name="N_ID_EMAIL" type="INT" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_CONTEST_LOG" incrementBy="1" startWith="1"
+			tableName="TBL_CONTEST_LOG" />
+		<addForeignKeyConstraint
+            baseTableName="TBL_CONTEST_LOG"
+			baseColumnNames="N_ID_EMAIL"
+            constraintName="CONSTRAINT_FK_TBL_CONTEST_LOG_TBL_EMAIL"
+            referencedTableName="TBL_EMAIL"
+            referencedColumnNames="N_ID_EMAIL"/>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="CREATE-013">
+		<!-- CAT_EMAIL_ERROR -->
+		<createTable tableName="TBL_CONTEST_QSO">
+			<column name="N_ID_CONTEST_QSO" type="INT" autoIncrement="false">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="S_CALLSIGN_EMISOR" type="VARCHAR(255)" />
+			<column name="S_CALLSIGN_RECEPTOR" type="VARCHAR(255)" />
+			<column name="D_DATETIME" type="DATETIME" />
+			<column name="S_EXCHANGE_EMMITED" type="VARCHAR(255)" />
+			<column name="S_EXCHANGE_RECEIVED" type="VARCHAR(255)" />
+			<column name="N_FREQUENCY" type="INT" />
+			<column name="S_CATEGORY_OPERATOR" type="VARCHAR(255)" />
+			<column name="S_MODE" type="VARCHAR(255)" />
+			<column name="S_RST_EMMITED" type="VARCHAR(255)" />
+			<column name="S_RST_RECEIVED" type="VARCHAR(255)" />
+			<column name="N_ID_CONTEST_LOG" type="INT" />
+		</createTable>
+		<addAutoIncrement columnDataType="INT"
+			columnName="N_ID_CONTEST_QSO" incrementBy="1" startWith="1"
+			tableName="TBL_CONTEST_QSO" />
+		<addForeignKeyConstraint
+            baseTableName="TBL_CONTEST_QSO"
+			baseColumnNames="N_ID_CONTEST_LOG"
+            constraintName="CONSTRAINT_FK_TBL_CONTEST_QSO_TBL_CONTEST_LOG"
+            referencedTableName="TBL_CONTEST_LOG"
+            referencedColumnNames="N_ID_CONTEST_LOG"/>
 	</changeSet>
 </databaseChangeLog>

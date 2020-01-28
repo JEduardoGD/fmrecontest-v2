@@ -249,11 +249,11 @@
 			<column name="S_ADDRESS_CITY" type="VARCHAR(255)" />
 			<column name="S_ADDRESS_COUNTRY" type="VARCHAR(255)" />
 			<column name="S_ADDRESS_STATE_PROVINCE" type="VARCHAR(255)" />
-			<column name="S_ADDRESS_CALLSIGN" type="VARCHAR(255)" />
-			<column name="S_ADDRESS_CATEGORY_BAND" type="VARCHAR(255)" />
-			<column name="S_ADDRESS_CATEGORY_MODE" type="VARCHAR(255)" />
-			<column name="S_ADDRESS_CATEGORY_OPERATOR" type="VARCHAR(255)" />
-			<column name="S_ADDRESS_CATEGORY_POWER" type="VARCHAR(255)" />
+			<column name="S_CALLSIGN" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_BAND" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_MODE" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_OPERATOR" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_POWER" type="VARCHAR(255)" />
 			<column name="D_CLAIMED_SCORE" type="INT" />
 			<column name="S_CLUB" type="VARCHAR(255)" />
 			<column name="S_CONTEST" type="VARCHAR(255)" />
@@ -288,7 +288,7 @@
 			<column name="S_EXCHANGE_EMMITED" type="VARCHAR(255)" />
 			<column name="S_EXCHANGE_RECEIVED" type="VARCHAR(255)" />
 			<column name="N_FREQUENCY" type="INT" />
-			<column name="S_ADDRESS_CATEGORY_OPERATOR" type="VARCHAR(255)" />
+			<column name="S_CATEGORY_OPERATOR" type="VARCHAR(255)" />
 			<column name="S_MODE" type="VARCHAR(255)" />
 			<column name="S_RST_EMMITED" type="VARCHAR(255)" />
 			<column name="S_RST_RECEIVED" type="VARCHAR(255)" />
