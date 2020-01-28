@@ -40,7 +40,7 @@ public class VerifierServiceImpl implements IVerifierService {
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotAnswered(edition, listEstatuses);
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(edition, listEstatuses);
 			for (Email email : emails) {
 				try {
 					List<CatEmailError> result = verificacionEmail.verify(email);

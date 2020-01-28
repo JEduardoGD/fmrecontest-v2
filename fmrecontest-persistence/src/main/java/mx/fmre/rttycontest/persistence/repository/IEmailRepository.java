@@ -40,8 +40,19 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			"FROM Email E " +
 			"WHERE E.edition = :edition and " +
 			"      E.emailStatus in :statuses and " +
-			"      E.answeredAt IS NULL")
-	public List<Email> findByEditionAndEmailStatusesAndNotAnswered(
+			"      E.verifiedAt IS NULL")
+	public List<Email> findByEditionAndEmailStatusesAndNotVerified(
+			@Param("edition") Edition edition, 
+			@Param("statuses") List<EmailStatus> statuses);
+
+	@Query(value = "" +
+			"SELECT E " +
+			"FROM Email E " +
+			"WHERE E.edition = :edition and " +
+			"      E.emailStatus in :statuses and " +
+			"      E.verifiedAt IS NOT NULL " +
+			"      E.answeredAt IS NULL ")
+	public List<Email> findByEditionAndEmailStatusesAndVerifiedAndNotAnswered(
 			@Param("edition") Edition edition, 
 			@Param("statuses") List<EmailStatus> statuses);
 }
