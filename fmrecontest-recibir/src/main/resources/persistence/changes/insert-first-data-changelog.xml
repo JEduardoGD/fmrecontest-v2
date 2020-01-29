@@ -111,31 +111,36 @@
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
 	    	<column name="N_ID_EMAIL_STATUS" value="2" />
+			<column name="S_STATUS" value="IGNORED" />
+			<column name="S_DESCRIPTION" value="The subject contains the word 'Undelivered' because that this email will be ignored" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="3" />
 			<column name="S_STATUS" value="IDENTIFIED" />
 			<column name="S_DESCRIPTION" value="The email contains a file identified as a logfile" />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
-	    	<column name="N_ID_EMAIL_STATUS" value="3" />
+	    	<column name="N_ID_EMAIL_STATUS" value="4" />
 			<column name="S_STATUS" value="NO_IDENTIFIED" />
 			<column name="S_DESCRIPTION" value="The logfile cannot be identified as a logfile" />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
-	    	<column name="N_ID_EMAIL_STATUS" value="4" />
+	    	<column name="N_ID_EMAIL_STATUS" value="5" />
 			<column name="S_STATUS" value="PARSED" />
 			<column name="S_DESCRIPTION" value="The logfile was succesfully parsed into log and qsos registers" />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
-	    	<column name="N_ID_EMAIL_STATUS" value="5" />
+	    	<column name="N_ID_EMAIL_STATUS" value="6" />
 			<column name="S_STATUS" value="NO_PARSED" />
 			<column name="S_DESCRIPTION" value="The logfile cannot exists or cannot be parsed into log and qsos registers" />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
-	    	<column name="N_ID_EMAIL_STATUS" value="6" />
+	    	<column name="N_ID_EMAIL_STATUS" value="7" />
 			<column name="S_STATUS" value="VERIFIED" />
 			<column name="S_DESCRIPTION" value="Email verified to check errors" />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_STATUS">
-	    	<column name="N_ID_EMAIL_STATUS" value="7" />
+	    	<column name="N_ID_EMAIL_STATUS" value="8" />
 			<column name="S_STATUS" value="ANSWERED" />
 			<column name="S_DESCRIPTION" value="Email answered (with successfully or error message)" />
 	    </insert>

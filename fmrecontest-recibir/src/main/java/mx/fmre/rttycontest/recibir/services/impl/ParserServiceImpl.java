@@ -34,6 +34,7 @@ public class ParserServiceImpl implements IParserService {
 		EmailStatus emailEstatusRecived = emailEstatusRepository.findByStatus("RECIVED");
 		EmailStatus emailEstatusIdentified = emailEstatusRepository.findByStatus("IDENTIFIED");
 		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
+		EmailStatus emailEstatusIgnored = emailEstatusRepository.findByStatus("IGNORED");
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
@@ -41,6 +42,12 @@ public class ParserServiceImpl implements IParserService {
 					edition, 
 					Arrays.asList(emailEstatusRecived));
 			for (Email email : emails) {
+				String subject = email.getSubject();
+				if(subject != null && subject.toLowerCase().contains("undelivered")) {
+					email.setEmailStatus(emailEstatusIgnored);
+					emailRepository.save(email);
+					continue;
+				}
 				List<AttachedFile> listAttachedFiles = parserEmail.identifyLogFile(email);
 				if(listAttachedFiles != null && listAttachedFiles.size() == 1) {
 					AttachedFile logFile = listAttachedFiles.get(0);

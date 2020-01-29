@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
+import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
 import mx.fmre.rttycontest.persistence.model.Contest;
@@ -89,7 +90,10 @@ public class ResponderServiceImpl implements IResponderService {
 				
 				JavaMailSender jsm = this.getJsm(emailAccount);
 				try {
-					this.prepareAndSend(emailDataDTO, jsm);
+					if(this.prepareAndSend(emailDataDTO, jsm)) {
+						email.setAnsweredAt(DateTimeUtil.getUtcTimeDate());
+						emailRepository.save(email);
+					}
 					
 				} catch (FmreContestException e) {
 					e.printStackTrace();
