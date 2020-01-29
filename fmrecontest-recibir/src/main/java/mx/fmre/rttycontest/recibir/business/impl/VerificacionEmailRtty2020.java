@@ -30,6 +30,7 @@ public class VerificacionEmailRtty2020 implements IVerificacionEmail {
 	private final String EMAIL_WITHOUT_ATTACHED_FILES = "EMAIL_WITHOUT_ATTACHED_FILES";
 	private final String SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN = "SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN";
 	private final String EMAIL_WITHOUT_CONTSTLOG = "EMAIL_WITHOUT_CONTSTLOG";
+	private final String SUBJECT_WITH_MORE_THAN_ONE_WORD = "SUBJECT_WITH_MORE_THAN_ONE_WORD"; 
 
 	@Override
 	public List<CatEmailError> verify(Email email) throws FmreContestException {
@@ -61,6 +62,16 @@ public class VerificacionEmailRtty2020 implements IVerificacionEmail {
 			throw new FmreContestException(
 					"The test \"" + EMAIL_WITHOUT_ATTACHED_FILES + "\" is not found for editon with ID " + editionId);
 
+		/* SUBJECT_WITH_MORE_THAN_ONE_WORD */
+		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, SUBJECT_WITH_MORE_THAN_ONE_WORD);
+		if (x != null) {
+			if (this.verify_SUBJECT_WITH_MORE_THAN_ONE_WORD(email, edition, attachedFiles)) {
+				listCatEmailError.add(x);
+			}
+		} else
+			throw new FmreContestException(
+					"The test \"" + SUBJECT_WITH_MORE_THAN_ONE_WORD + "\" is not found for editon with ID " + editionId);
+
 		/*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
 		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN);
 		if(x != null) {
@@ -89,6 +100,16 @@ public class VerificacionEmailRtty2020 implements IVerificacionEmail {
 	private boolean verify_EMAIL_WITHOUT_ATTACHED_FILES(Email email, Edition edition,
 			List<AttachedFile> attachedFiles) {
 		return (attachedFiles == null || attachedFiles.size() <= 0);
+	}
+
+	private boolean verify_SUBJECT_WITH_MORE_THAN_ONE_WORD(Email email, Edition edition,
+			List<AttachedFile> attachedFiles) {
+		String subject = email.getSubject();
+		if(subject != null && !"".equals(subject)) {
+			String[] arr = subject.split("\\s");
+			return arr.length > 1;
+		}
+		return false;
 	}
 
 	private boolean verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(Email email, Edition edition, List<AttachedFile> attachedFiles) {
