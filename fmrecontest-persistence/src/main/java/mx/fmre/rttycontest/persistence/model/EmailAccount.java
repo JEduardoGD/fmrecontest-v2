@@ -32,8 +32,11 @@ public class EmailAccount implements Serializable {
 	@JoinColumn(name = "N_ID_CONTEST")
 	private Contest contest;
 
-	@Column(name = "S_HOST")
-	private String smtpServer;
+	@Column(name = "S_IN_HOST")
+	private String inHost;
+
+	@Column(name = "S_OUT_HOST")
+	private String outHost;
 
 	@Column(name = "S_EMAIL_ADDRESS")
 	private String emailAddress;
@@ -44,6 +47,18 @@ public class EmailAccount implements Serializable {
 	@Column(name = "S_PASSWORD")
 	private String password;
 
-	@Column(name = "N_PORT")
-	private Integer port;
+	@Column(name = "N_IN_PORT")
+	private Integer inPort;
+	
+	@Column(name = "N_OUT_PORT")
+	private Integer outPort;
+	
+	@Column(name = "SUCCESSFULLY_RESPONSE_MSG")
+	private String successfullyMsg;
+	
+	@Column(name = "ERROR_RESPONSE_MSG")
+	private String errorMsg;
+	
+	@Column(name = "S_SMTP_PROPERTIES")
+	private String smtpProperties;
 }

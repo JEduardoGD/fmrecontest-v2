@@ -103,11 +103,16 @@
 				<constraints primaryKey="true" nullable="false" />
 			</column>
 			<column name="N_ID_CONTEST" type="INT" />
-			<column name="S_HOST" type="VARCHAR(255)" />
+			<column name="S_IN_HOST" type="VARCHAR(255)" />
+			<column name="S_OUT_HOST" type="VARCHAR(255)" />
 			<column name="S_EMAIL_ADDRESS" type="VARCHAR(255)" />
 			<column name="S_USERNAME" type="VARCHAR(255)" />
 			<column name="S_PASSWORD" type="VARCHAR(255)" />
-			<column name="N_PORT" type="INT" />
+			<column name="N_IN_PORT" type="INT" />
+			<column name="N_OUT_PORT" type="INT" />
+			<column name="SUCCESSFULLY_RESPONSE_MSG" type="VARCHAR(255)" />
+			<column name="ERROR_RESPONSE_MSG" type="VARCHAR(255)" />
+			<column name="S_SMTP_PROPERTIES" type="VARCHAR(600)" />
 		</createTable>
 		<addAutoIncrement columnDataType="INT"
 			columnName="N_ID_EDITION" incrementBy="1" startWith="1"

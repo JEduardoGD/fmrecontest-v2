@@ -103,7 +103,8 @@
 				<constraints primaryKey="true" nullable="false" />
 			</column>
 			<column name="N_ID_CONTEST" type="INT" />
-			<column name="S_HOST" type="VARCHAR(255)" />
+			<column name="S_IN_HOST" type="VARCHAR(255)" />
+			<column name="S_OUT_HOST" type="VARCHAR(255)" />
 			<column name="S_EMAIL_ADDRESS" type="VARCHAR(255)" />
 			<column name="S_USERNAME" type="VARCHAR(255)" />
 			<column name="S_PASSWORD" type="VARCHAR(255)" />

@@ -53,11 +53,16 @@
 	    <insert tableName="TBL_EMAIL_ACCOUNT">
 	    	<column name="N_ID_EMAIL_ACCOUNT" value="1" />
 			<column name="N_ID_CONTEST" value="1" />
-			<column name="S_host" value="imap.fmre.mx" />
+			<column name="S_IN_HOST" value="imap.fmre.mx" />
+			<column name="S_OUT_HOST" value="just101.justhost.com" />
 			<column name="S_EMAIL_ADDRESS" value="rtty@fmre.mx" />
 			<column name="S_USERNAME" value="rtty@fmre.mx" />
 			<column name="S_PASSWORD" value="aJX24Yxiljgg16SmL6YJyA==" />
-			<column name="N_PORT" value="993" />
+			<column name="N_IN_PORT" value="993" />
+			<column name="N_OUT_PORT" value="465" />
+			<column name="SUCCESSFULLY_RESPONSE_MSG" value="Correo recibido correctamente / Email received correctly" />
+			<column name="ERROR_RESPONSE_MSG" value="Email recibido con errores / Email received with errors" />
+			<column name="S_SMTP_PROPERTIES" value="mail.transport.protocol:smtp;mail.smtp.auth:true;mail.debug:true;mail.smtp.socketFactory.port:465;mail.smtp.socketFactory.class:javax.net.ssl.SSLSocketFactory;mail.smtp.socketFactory.fallback:false" />
 	    </insert>
 	</changeSet>
 	

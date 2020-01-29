@@ -64,7 +64,7 @@ public class ScannerThread {
 
 		Session session = Session.getDefaultInstance(new Properties());
 		Store store = session.getStore("imaps");
-		store.connect(emailAccount.getSmtpServer(), emailAccount.getPort(), emailAccount.getEmailAddress(),
+		store.connect(emailAccount.getInHost(), emailAccount.getInPort(), emailAccount.getEmailAddress(),
 				encryptDecryptStringHelper.decrypt(emailAccount.getPassword()));
 		Folder inbox = store.getFolder("INBOX");
 		inbox.open(Folder.READ_ONLY);

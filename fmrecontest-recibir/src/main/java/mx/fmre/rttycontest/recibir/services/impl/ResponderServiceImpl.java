@@ -1,14 +1,35 @@
 package mx.fmre.rttycontest.recibir.services.impl;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
+import mx.fmre.rttycontest.exception.FmreContestException;
+import mx.fmre.rttycontest.persistence.model.CatEmailError;
+import mx.fmre.rttycontest.persistence.model.Contest;
+import mx.fmre.rttycontest.persistence.model.Edition;
+import mx.fmre.rttycontest.persistence.model.Email;
+import mx.fmre.rttycontest.persistence.model.EmailAccount;
+import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
+import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
+import mx.fmre.rttycontest.persistence.repository.IEmailAccountRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
+import mx.fmre.rttycontest.recibir.dto.EmailDataDTO;
+import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
 import mx.fmre.rttycontest.recibir.services.IResponderService;
-import mx.fmre.rttycontest.recibir.services.MailClient;
+import mx.fmre.rttycontest.recibir.services.MailContentBuilder;
 
 @Service
 public class ResponderServiceImpl implements IResponderService {
@@ -17,31 +38,116 @@ public class ResponderServiceImpl implements IResponderService {
 	@Autowired private IEditionRepository editionRepository;
 	@Autowired private IEmailRepository emailRepository;
 	@Autowired private ICatEmailErrorRepository emailErrorRepository;
-	@Autowired private MailClient mailClient;
+	@Autowired private IContestRepository contestRepository;
+	@Autowired private IEmailAccountRepository emailAccountRepository;
 
+	@Value("${email.password.encodingkey}")
+	private String emailPasswordEncodingkey;
+	
+	@Value("${email.responder.testmode}")
+	private boolean emailResponderTestmode;
+	
+	@Value("${email.responder.testemail}")
+	private String emailResponderTestmail;
+	
+	@Value("${email.responder.co}")
+	private String emailResponderCopiaoculta;
+	
+	@Autowired MailContentBuilder mailContentBuilder;
+	
 	@Override
 	public void responseParsedEmail() {
-		String recipient = "eduardo_gd@hotmail.com";
-        String message = "Test message content";
-        mailClient.prepareAndSend(recipient, message);
+		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
+		EmailStatus emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
+		EmailStatus emailEstatusNoParsed = emailEstatusRepository.findByStatus("NO_PARSED");
+		List<EmailStatus> listEstatuses = Arrays.asList(
+				emailEstatusNoIdentified, 
+				emailEstatusParsed, 
+				emailEstatusNoParsed);
+		
+		List<Edition> editions = editionRepository.getActiveEditionOfContest();
+		for (Edition edition : editions) {
+			Integer idContest = edition.getContest().getId();
+			Contest contest = contestRepository.findById(idContest).orElse(null);
+			EmailAccount emailAccount = emailAccountRepository.findByContest(contest);
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndVerifiedAndNotAnswered(edition, listEstatuses);
+			for (Email email : emails) {
+				EmailDataDTO emailDataDTO = new EmailDataDTO();
+				
+				emailDataDTO.setRecipientFrom(emailAccount.getEmailAddress());
+				
+				List<CatEmailError> errors = emailErrorRepository.getErrorsOfEmail(email);
+				emailDataDTO.setErrors(errors);
+				
+				emailDataDTO.setRecipientTo(email.getRecipientsFromAddress());
+				
+				if(errors.isEmpty()) {
+					emailDataDTO.setSubject(emailAccount.getSuccessfullyMsg());
+				} else {
+					emailDataDTO.setSubject(emailAccount.getErrorMsg());	
+				}
+				
+				JavaMailSender jsm = this.getJsm(emailAccount);
+				try {
+					this.prepareAndSend(emailDataDTO, jsm);
+					
+				} catch (FmreContestException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private JavaMailSender getJsm(EmailAccount emailAccount) {
+		EncryptDecryptStringHelper encryptDecryptStringHelper = null;
+		try {
+			encryptDecryptStringHelper = new EncryptDecryptStringHelper(emailPasswordEncodingkey);
+		} catch (FmreContestException e) {
+			e.printStackTrace();
+		}
 
-//		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
-//		EmailStatus emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
-//		EmailStatus emailEstatusNoParsed = emailEstatusRepository.findByStatus("NO_PARSED");
-//		List<EmailStatus> listEstatuses = Arrays.asList(emailEstatusNoIdentified, emailEstatusParsed, emailEstatusNoParsed);
-//		
-//		List<Edition> editions = editionRepository.getActiveEditionOfContest();
-//		for (Edition edition : editions) {
-//			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndVerifiedAndNotAnswered(edition, listEstatuses);
-//			for (Email email : emails) {
-//				@SuppressWarnings("unused")
-//				List<CatEmailError> errors = emailErrorRepository.getErrorsOfEmail(email);
-//				if(errors.isEmpty()) {
-//					
-//				} else {
-//					
-//				}
-//			}
-//		}
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost(emailAccount.getOutHost());
+		mailSender.setPort(emailAccount.getOutPort());
+
+		mailSender.setUsername(emailAccount.getUsername());
+		try {
+			mailSender.setPassword(encryptDecryptStringHelper.decrypt(emailAccount.getPassword()));
+		} catch (FmreContestException e) {
+			e.printStackTrace();
+		}
+
+		Properties props = mailSender.getJavaMailProperties();
+		String smtpProperties = emailAccount.getSmtpProperties();
+		List<String> listProperties = Arrays.asList(smtpProperties.split("\\;"));
+		for (String s : listProperties) {
+			String[] arr = s.split("\\:");
+			props.put(arr[0], arr[1]);
+		}
+
+		JavaMailSender jsm = (JavaMailSender) mailSender;
+		return jsm;
+	}
+
+	public boolean prepareAndSend(EmailDataDTO emailDataDTO, JavaMailSender mailSender) throws FmreContestException {
+		MimeMessagePreparator messagePreparator = mimeMessage -> {
+			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
+			messageHelper.setFrom(emailDataDTO.getRecipientFrom());
+			if (emailResponderTestmode)
+				messageHelper.setTo(emailResponderTestmail);
+			else
+				messageHelper.setTo(emailDataDTO.getRecipientTo());
+			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta))
+				messageHelper.setBcc(emailResponderCopiaoculta);
+			messageHelper.setSubject(emailDataDTO.getSubject());
+			String content = mailContentBuilder.build("mensaje");
+			messageHelper.setText(content, true);
+		};
+		try {
+			mailSender.send(messagePreparator);
+		} catch (MailException e) {
+			throw new FmreContestException(e.getLocalizedMessage());
+		}
+		return true;
 	}
 }
