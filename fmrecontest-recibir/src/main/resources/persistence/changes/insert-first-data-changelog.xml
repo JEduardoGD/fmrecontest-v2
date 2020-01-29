@@ -67,40 +67,7 @@
 	</changeSet>
 	
 	<changeSet id="INSERT-007" author="Eduardo Gutierrez">
-	<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="2" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="3" /><column name="S_DESCRIPTION" value="1 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="4" /><column name="S_DESCRIPTION" value="2 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="5" /><column name="S_DESCRIPTION" value="3 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="6" /><column name="S_DESCRIPTION" value="4 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="7" /><column name="S_DESCRIPTION" value="5 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="8" /><column name="S_DESCRIPTION" value="6 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="9" /><column name="S_DESCRIPTION" value="7 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="10" /><column name="S_DESCRIPTION" value="8 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="11" /><column name="S_DESCRIPTION" value="9 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="12" /><column name="S_DESCRIPTION" value="10 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="13" /><column name="S_DESCRIPTION" value="11 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="14" /><column name="S_DESCRIPTION" value="12 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="15" /><column name="S_DESCRIPTION" value="13 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="16" /><column name="S_DESCRIPTION" value="14 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="17" /><column name="S_DESCRIPTION" value="15 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="18" /><column name="S_DESCRIPTION" value="16 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="19" /><column name="S_DESCRIPTION" value="17 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="20" /><column name="S_DESCRIPTION" value="18 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="21" /><column name="S_DESCRIPTION" value="19 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="22" /><column name="S_DESCRIPTION" value="20 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="23" /><column name="S_DESCRIPTION" value="21 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="24" /><column name="S_DESCRIPTION" value="22 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="25" /><column name="S_DESCRIPTION" value="23 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="26" /><column name="S_DESCRIPTION" value="24 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="27" /><column name="S_DESCRIPTION" value="25 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="28" /><column name="S_DESCRIPTION" value="26 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="29" /><column name="S_DESCRIPTION" value="27 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="30" /><column name="S_DESCRIPTION" value="28 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="31" /><column name="S_DESCRIPTION" value="29 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="32" /><column name="S_DESCRIPTION" value="30 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="33" /><column name="S_DESCRIPTION" value="31 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="34" /><column name="S_DESCRIPTION" value="32 International RTTY Contest FMRE" /></insert>
-<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="35" /><column name="S_DESCRIPTION" value="33 International RTTY Contest FMRE" /></insert>
+		<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="2" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
 	</changeSet>
 	
 	<changeSet author="Eduardo Gutierrez" id="INSERT-008">
@@ -151,37 +118,50 @@
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="1" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_SUBJECT" />
+			<column name="S_SUGGESTION_EN" value="Your email don't contains subject, please remember include the subject of your email (that should be only your callsign) and resend." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico no contiene asunto, recuerde incluir el asunto de su correo electrónico (que debería ser solo su indicativo) y reenvie." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="2" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_ATTACHED_FILES" />
+			<column name="S_SUGGESTION_EN" value="Your email don't contains any attached file, please remember attach your logfile and resend i.t" />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico no contiene ningún archivo adjunto, recuerde adjuntar su archivo de registro y reenvie." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="3" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="CANT_IDENTIFY_LOGFILE" />
+			<column name="S_SUGGESTION_EN" value="Your email contains some attached files but we cant to determine wich one is your logfile, remember that your log file should be named with a .txt, .log or .cbr extension, please rename and attach your logfile an resend it again." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico contiene algunos archivos adjuntos pero no podemos determinar cuál es su archivo de registro, recuerde que su archivo de registro debe nombrarse con una extensión .txt, .log o .cbr, cambie el nombre y adjunte su archivo de registro y vuelva a envielo." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="4" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="MANY_POSSIBLE_LOGFILE" />
+			<column name="S_SUGGESTION_EN" value="Your email contains some attached files but we cant to determine wich one is your logfile because many of that can be, remember that your log file should be named with a .txt, .log or .cbr extension, please rename and attach your logfile an resend again." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico contiene algunos archivos adjuntos, pero no podemos determinar cuál es su archivo de registro porque muchos de ellos pueden ser, recuerde que su archivo de registro debe nombrarse con una extensión .txt, .log o .cbr, cambie el nombre y adjunte un archivo de registro. reenviar de nuevo." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="5" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN" />
+			<column name="S_SUGGESTION_EN" value="The subject on your email is not equals than the callsign on your log (that was taked from your logfile), remember that your subject should be equals than your callsign on your log. Please, correct it and resend it." />
+			<column name="S_SUGGESTION_ES" value="El asunto en su correo electrónico no es igual al indicativo en su registro (que fue tomado de su archivo de registro), recuerde que su asunto debe ser igual a su indicativo en su registro. Por favor, corríjalo y reenvíelo." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="6" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_CONTSTLOG" />
+			<column name="S_SUGGESTION_EN" value="We were able to find your log file but we can't to parse it into a log. Please check that your logfile was generated on cabrillo format and resend it." />
+			<column name="S_SUGGESTION_ES" value="Pudimos encontrar su archivo de registro pero no podemos analizarlo en un registro. Compruebe que su archivo de registro se generó en formato cabrillo y vuelva a enviarlo." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="7" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="SUBJECT_WITH_MORE_THAN_ONE_WORD" />
+			<column name="S_SUGGESTION_EN" value="Your subject contains more than one word please remember include the subject of your email (that should be only your callsign) and resend it." />
+			<column name="S_SUGGESTION_ES" value="Su asunto contiene más de una palabra, recuerde incluir el asunto de su correo electrónico (que debería ser solo su indicativo) y vuelva a enviarlo." />
 	    </insert>
-	    
 	</changeSet>
 </databaseChangeLog>
