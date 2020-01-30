@@ -40,7 +40,7 @@
 	    <insert tableName="TBL_EDITION">
 	    	<column name="N_ID_EDITION" value="1" />
 			<column name="N_ID_CONTEST" value="1" />
-			<column name="S_DESCRIPTION" value="Edición 2019" />
+			<column name="S_DESCRIPTION" value="Edición 2020" />
 			<column name="N_YEAR" value="2019" />
 			<column name="T_START_UTC" value="2011-08-05 00:00:00" />
 			<column name="T_END_UTC" value="2011-08-15 00:00:00" />
@@ -61,6 +61,8 @@
 			<column name="S_PASSWORD" value="aJX24Yxiljgg16SmL6YJyA==" />
 			<column name="N_IN_PORT" value="993" />
 			<column name="N_OUT_PORT" value="465" />
+			<column name="S_REPLY_TO_NAME" value="XE1EE" />
+			<column name="S_REPLY_TO_EMAIL" value="rttymanager@fmre.mx" />
 			<column name="SUCCESSFULLY_RESPONSE_MSG" value="Correo recibido correctamente / Email received correctly" />
 			<column name="ERROR_RESPONSE_MSG" value="Email recibido con errores / Email received with errors" />
 			<column name="S_SMTP_PROPERTIES" value="mail.transport.protocol:smtp;mail.smtp.auth:true;mail.debug:true;mail.smtp.socketFactory.port:465;mail.smtp.socketFactory.class:javax.net.ssl.SSLSocketFactory;mail.smtp.socketFactory.fallback:false" />
@@ -126,15 +128,15 @@
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="2" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_ATTACHED_FILES" />
-			<column name="S_SUGGESTION_EN" value="Your email don't contains any attached file, please remember attach your logfile and resend i.t" />
-			<column name="S_SUGGESTION_ES" value="Su correo electrónico no contiene ningún archivo adjunto, recuerde adjuntar su archivo de registro y reenvie." />
+			<column name="S_SUGGESTION_EN" value="Your email don't contains any attached file, please remember attach your logfile and resend it." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico no contiene ningún archivo adjunto, recuerde adjuntar su archivo de log y reenvie." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="3" />
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="CANT_IDENTIFY_LOGFILE" />
 			<column name="S_SUGGESTION_EN" value="Your email contains some attached files but we cant to determine wich one is your logfile, remember that your log file should be named with a .txt, .log or .cbr extension, please rename and attach your logfile an resend it again." />
-			<column name="S_SUGGESTION_ES" value="Su correo electrónico contiene algunos archivos adjuntos pero no podemos determinar cuál es su archivo de log, recuerde que su archivo de log debe nombrarse con una extensión .txt, .log o .cbr, cambie el nombre y adjunte su archivo de registro y vuelva a envielo." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico contiene algunos archivos adjuntos pero no podemos determinar cuál es su archivo de log, recuerde que su archivo de log debe nombrarse con una extensión .txt, .log o .cbr, cambie el nombre y adjunte su archivo de log y vuelva a envielo." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="4" />
@@ -148,7 +150,7 @@
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN" />
 			<column name="S_SUGGESTION_EN" value="The subject on your email is not equals than the callsign on your log (that was taked from your logfile), remember that your subject should be equals than your callsign on your log. Please, correct it and resend it." />
-			<column name="S_SUGGESTION_ES" value="El asunto en su correo electrónico no es igual al indicativo en su registro (que fue tomado de su archivo de registro), recuerde que su asunto debe ser igual a su indicativo en su log Por favor, corríjalo y reenvíelo." />
+			<column name="S_SUGGESTION_ES" value="El asunto en su correo electrónico no es igual al indicativo en su log (que fue tomado de su archivo de log) recuerde que su asunto debe ser igual a su indicativo en su log Por favor, corríjalo y reenvíelo." />
 	    </insert>
 	    <insert tableName="CAT_EMAIL_ERROR">
 	    	<column name="N_ID_CAT_EMAIL_ERROR" value="6" />
@@ -162,7 +164,7 @@
 			<column name="N_ID_EDITION" value="1" />
 			<column name="S_DESCRIPCION" value="SUBJECT_WITH_MORE_THAN_ONE_WORD" />
 			<column name="S_SUGGESTION_EN" value="Your email subject contains more than one word please remember include the subject of your email (that should be only your callsign) and resend it." />
-			<column name="S_SUGGESTION_ES" value="Su asunto de su correo contiene más de una palabra, recuerde incluir el asunto de su correo electrónico (que debería ser solo su indicativo) y vuelva a enviarlo." />
+			<column name="S_SUGGESTION_ES" value="El asunto de su correo contiene más de una palabra, recuerde incluir el asunto de su correo electrónico (que debería ser solo su indicativo) y vuelva a enviarlo." />
 	    </insert>
 	</changeSet>
 </databaseChangeLog>

@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.persistence.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,4 +56,15 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 	public List<Email> findByEditionAndEmailStatusesAndVerifiedAndNotAnswered(
 			@Param("edition") Edition edition, 
 			@Param("statuses") List<EmailStatus> statuses);
+
+	@Query(value = "" +
+			"SELECT E " +
+			"FROM Email E " +
+			"WHERE upper(E.subject) = upper(:subject) and " +
+			"            E.edition = :edition and " +
+			"            E.sentDate <= :d ")
+	public List<Email> getAllBySubjectAndEditionBeforeDate(
+			@Param("subject") String subject, 
+			@Param("edition") Edition edition,
+			@Param("d") Date d);
 }

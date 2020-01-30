@@ -36,6 +36,7 @@ import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.recibir.dto.EmailDataDTO;
 import mx.fmre.rttycontest.recibir.dto.ErrorDTO;
+import mx.fmre.rttycontest.recibir.dto.OthersLogs;
 import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
 import mx.fmre.rttycontest.recibir.services.IResponderService;
 import mx.fmre.rttycontest.recibir.services.MailContentBuilder;
@@ -91,6 +92,7 @@ public class ResponderServiceImpl implements IResponderService {
 						.map(x -> new ErrorDTO(x.getSuggestionEs(), x.getSuggestionEn()))
 						.collect(Collectors.toList());
 				emailDataDTO.setErrors(errorsDto);
+				emailDataDTO.setOthersLogs(this.createOthersLogs(email, edition));
 				
 				emailDataDTO.setEmailSubject(email.getSubject());
 				emailDataDTO.setFromName(email.getRecipientsFromName());
@@ -115,7 +117,7 @@ public class ResponderServiceImpl implements IResponderService {
 				
 				JavaMailSender jsm = this.getJsm(emailAccount);
 				try {
-					if(this.prepareAndSend(emailDataDTO, jsm)) {
+					if(this.prepareAndSend(emailAccount, emailDataDTO, jsm)) {
 						email.setAnsweredAt(DateTimeUtil.getUtcTimeDate());
 						emailRepository.save(email);
 					}
@@ -125,6 +127,24 @@ public class ResponderServiceImpl implements IResponderService {
 				}
 			}
 		}
+	}
+	
+	private List<OthersLogs> createOthersLogs(Email email, Edition edition) {
+		List<Email> listEmails = emailRepository.getAllBySubjectAndEditionBeforeDate(email.getSubject(), edition, email.getSentDate());
+		return listEmails
+				.stream()
+				.filter(e -> !e.equals(email))
+				.map(e -> {
+			ContestLog contestLog = contestLogRepository.findByEmail(email);
+			List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+			List<CatEmailError> listErrors = emailErrorRepository.getErrorsOfEmail(email);
+			OthersLogs othersLogs = new OthersLogs();
+			othersLogs.setFromName(e.getRecipientsFromName());
+			othersLogs.setDateOfSend(e.getSentDate());
+			othersLogs.setNoQsos(qsos.size());
+			othersLogs.setHasErrors(listErrors.size() > 0);
+			return othersLogs;
+		}).collect(Collectors.toList());
 	}
 	
 	private JavaMailSender getJsm(EmailAccount emailAccount) {
@@ -158,10 +178,13 @@ public class ResponderServiceImpl implements IResponderService {
 		return jsm;
 	}
 
-	public boolean prepareAndSend(EmailDataDTO emailDataDTO, JavaMailSender mailSender) throws FmreContestException {
+	public boolean prepareAndSend(EmailAccount emailAccount, EmailDataDTO emailDataDTO, JavaMailSender mailSender) throws FmreContestException {
 		MimeMessagePreparator messagePreparator = mimeMessage -> {
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
-			messageHelper.setFrom(new InternetAddress(emailDataDTO.getToAddress(), emailDataDTO.getToName()));
+			
+			messageHelper.setFrom(emailAccount.getEmailAddress(), emailDataDTO.getToName());
+			messageHelper.setReplyTo(new InternetAddress(emailAccount.getReplyToEmail(), emailAccount.getReplyToName()));
+			
 			if (emailResponderTestmode)
 				messageHelper.setTo(new InternetAddress(emailResponderTestmail, emailDataDTO.getFromName()));
 			else

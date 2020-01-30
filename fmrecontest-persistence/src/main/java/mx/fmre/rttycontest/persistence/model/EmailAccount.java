@@ -61,4 +61,10 @@ public class EmailAccount implements Serializable {
 	
 	@Column(name = "S_SMTP_PROPERTIES")
 	private String smtpProperties;
+	
+	@Column(name = "S_REPLY_TO_NAME")
+	private String replyToName;
+	
+	@Column(name = "S_REPLY_TO_EMAIL")
+	private String replyToEmail;
 }

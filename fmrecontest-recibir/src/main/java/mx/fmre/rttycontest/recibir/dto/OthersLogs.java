@@ -13,5 +13,7 @@ public class OthersLogs implements Serializable {
 	private static final long serialVersionUID = 2953660485131167468L;
 	private String fromName;
 	private Date dateOfSend;
+	private String sDateOfSend;
 	private int noQsos;
+	private boolean hasErrors;
 }

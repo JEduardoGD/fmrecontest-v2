@@ -111,6 +111,8 @@
 			<column name="S_PASSWORD" type="VARCHAR(255)" />
 			<column name="N_IN_PORT" type="INT" />
 			<column name="N_OUT_PORT" type="INT" />
+			<column name="S_REPLY_TO_NAME" type="VARCHAR(255)" />
+			<column name="S_REPLY_TO_EMAIL" type="VARCHAR(255)" />
 			<column name="SUCCESSFULLY_RESPONSE_MSG" type="VARCHAR(255)" />
 			<column name="ERROR_RESPONSE_MSG" type="VARCHAR(255)" />
 			<column name="S_SMTP_PROPERTIES" type="VARCHAR(600)" />

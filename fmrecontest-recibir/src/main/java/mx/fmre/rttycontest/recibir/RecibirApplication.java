@@ -20,19 +20,20 @@ import mx.fmre.rttycontest.recibir.services.IVerifierService;
 @EnableScheduling
 @EnableJpaRepositories(basePackages = { "mx.fmre.rttycontest.persistence.repository" })
 @EntityScan(basePackages = "mx.fmre.rttycontest.persistence.model")
-@ComponentScan({ 
-	"mx.fmre.rttycontest.recibir.services",
-	"mx.fmre.rttycontest.recibir.helper",
-	"mx.fmre.rttycontest.recibir.business.impl",
-	"mx.fmre.rttycontest.bs.parsers.rtty2020",
-	"mx.fmre.rttycontest.bs.services"})
+@ComponentScan({ "mx.fmre.rttycontest.recibir.services", "mx.fmre.rttycontest.recibir.helper",
+		"mx.fmre.rttycontest.recibir.business.impl", "mx.fmre.rttycontest.bs.parsers.rtty2020",
+		"mx.fmre.rttycontest.bs.services" })
 @Slf4j
 public class RecibirApplication {
 
-	@Autowired private IMailService mailService;
-	@Autowired private IVerifierService verifierService;
-	@Autowired private IParserService parserService;
-	@Autowired private IResponderService responderService;
+	@Autowired
+	private IMailService mailService;
+	@Autowired
+	private IVerifierService verifierService;
+	@Autowired
+	private IParserService parserService;
+	@Autowired
+	private IResponderService responderService;
 
 	@Value("${email.password.encodingkey}")
 	private String emailPasswordEncodingkey;
@@ -51,21 +52,21 @@ public class RecibirApplication {
 	@Scheduled(cron = "${cron.identify.expression}")
 	public void crontIdentifyLogFiles() {
 		log.debug("starting mailService.identifyLogFiles()...");
-        parserService.identifyLogFiles();
+		parserService.identifyLogFiles();
 		log.debug("ending mailService.identifyLogFiles()");
 	}
 
 	@Scheduled(cron = "${cron.parse.expression}")
 	public void cronParseRecivedEmails() {
 		log.debug("starting mailService.parseRecivedEmails()...");
-        parserService.parseRecivedEmails();
+		parserService.parseRecivedEmails();
 		log.debug("ending mailService.parseRecivedEmails()");
 	}
 
 	@Scheduled(cron = "${cron.verify.expression}")
 	public void cronVerifyService() {
 		log.debug("starting mailService.verifyRecivedEmails()...");
-        verifierService.verifyRecivedEmails();
+		verifierService.verifyRecivedEmails();
 		log.debug("ending mailService.verifyRecivedEmails()");
 	}
 
