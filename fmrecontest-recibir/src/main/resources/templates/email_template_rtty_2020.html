@@ -3,6 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8">
     <title>Simple Transactional Email</title>
     <style>
       /* -------------------------------------
@@ -351,20 +352,25 @@
                       <td>
                         <p>Hola,</p>
                         <p>Gracias por haber enviado tu log al concurso RTTY 2020.</p>
-                       	<p>La informacion que pudimos encontrar es la siguiente:</p>
-                       	<table>
-                       		<tr>
-                       			<td>Asunto</td><td th:text="${callsign}"></td>
-                       		</tr>
-                       		<tr>
-                       			<td>Fecha de envío</td><td th:text="${dateOfSend}"></td>
-                       		</tr>
-                       		<tr>
-                       			<td>Dirección de envío</td><td th:text="${recipientFrom}"></td>
-                       		</tr>
-                       	</table>
                         <div th:if="${#lists.isEmpty(errors)}">
-                        	<p>Hemos encontrado <strong th:text="${noQsos}">0</strong> QSO's en tu log</p>
+                       		<p>La informacion que pudimos encontrar en el correo electronico es la siguiente:</p>
+	                       	<table>
+	                       		<tr>
+	                       			<td>Asunto</td><td th:text="${subject}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Fecha de envío </td><td th:text="${dateOfSend}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Dirección de envío</td><td th:text="${recipientFromAddress}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Nombre de envío</td><td th:text="${recipientFromName}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Numero de QSO's encontrados</td><td th:text="${noQsos}"></td>
+	                       		</tr>
+	                       	</table>
                         </div>
                         <div th:if="${not #lists.isEmpty(errors)}">
                         	<p>Desafortunadamene hemos encontrado algunas errores:</p>
@@ -374,6 +380,7 @@
 						    	</li>
 						    </ul>
                         </div>
+                        <p>Recuerde que usted puede enviar su log la cantidad de veces que desee pero solo se tomara en cuenta el ultimo que haya sido recibido correctamente.</p>
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                           <tbody>
                             <tr>

@@ -43,7 +43,8 @@ public class ParserServiceImpl implements IParserService {
 					Arrays.asList(emailEstatusRecived));
 			for (Email email : emails) {
 				String subject = email.getSubject();
-				if(subject != null && subject.toLowerCase().contains("undelivered")) {
+				if(subject != null && 
+						(subject.toLowerCase().contains("undelivered") || subject.toLowerCase().contains("spam"))) {
 					email.setEmailStatus(emailEstatusIgnored);
 					emailRepository.save(email);
 					continue;

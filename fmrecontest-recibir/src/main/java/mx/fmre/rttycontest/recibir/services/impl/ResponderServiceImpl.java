@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.mail.internet.InternetAddress;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -90,8 +92,13 @@ public class ResponderServiceImpl implements IResponderService {
 						.collect(Collectors.toList());
 				emailDataDTO.setErrors(errorsDto);
 				
-				emailDataDTO.setRecipientFrom(email.getRecipientsFromAddress());
-				emailDataDTO.setRecipientTo(email.getRecipientsTo());
+				emailDataDTO.setEmailSubject(email.getSubject());
+				emailDataDTO.setFromName(email.getRecipientsFromName());
+				emailDataDTO.setFromAddress(email.getRecipientsFromAddress());
+				emailDataDTO.setToName(email.getRecipientsTo());
+				emailDataDTO.setToName(contest.getDescription() + " " + edition.getDescription());
+				emailDataDTO.setToAddress(email.getRecipientsTo());
+				
 				emailDataDTO.setTemplate(edition.getTemplate());
 				emailDataDTO.setDateOfSend(email.getSentDate());
 				emailDataDTO.setCallsign(email.getSubject());
@@ -154,16 +161,19 @@ public class ResponderServiceImpl implements IResponderService {
 	public boolean prepareAndSend(EmailDataDTO emailDataDTO, JavaMailSender mailSender) throws FmreContestException {
 		MimeMessagePreparator messagePreparator = mimeMessage -> {
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
-			messageHelper.setFrom(emailDataDTO.getRecipientTo());
+			messageHelper.setFrom(new InternetAddress(emailDataDTO.getToAddress(), emailDataDTO.getToName()));
 			if (emailResponderTestmode)
-				messageHelper.setTo(emailResponderTestmail);
+				messageHelper.setTo(new InternetAddress(emailResponderTestmail, emailDataDTO.getFromName()));
 			else
-				messageHelper.setTo(emailDataDTO.getRecipientTo());
+				messageHelper.setTo(new InternetAddress(emailDataDTO.getFromAddress(), emailDataDTO.getFromName()));
+			
+			
 			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta))
 				messageHelper.setBcc(emailResponderCopiaoculta);
 			messageHelper.setSubject(emailDataDTO.getSubject());
 			String content = mailContentBuilder.build(emailDataDTO);
 			messageHelper.setText(content, true);
+
 		};
 		try {
 			mailSender.send(messagePreparator);

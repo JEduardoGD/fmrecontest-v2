@@ -17,7 +17,8 @@ public class MailContentBuilder {
     private TemplateEngine templateEngine;
     
     private DateFormat df_es_MX = new SimpleDateFormat("dd 'de' MMMM 'de' yyyy HH:mm:ss",  new Locale("es", "MX"));
-    private DateFormat df_en = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss",  Locale.ENGLISH);
+    @SuppressWarnings("unused")
+	private DateFormat df_en = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss",  Locale.ENGLISH);
 
     @Autowired
     public MailContentBuilder(TemplateEngine templateEngine) {
@@ -27,10 +28,12 @@ public class MailContentBuilder {
     public String build(EmailDataDTO emailDataDTO) {
         Context context = new Context();
         context.setVariable("subject", emailDataDTO.getSubject());
+        context.setVariable("emailSubject", emailDataDTO.getSubject());
         context.setVariable("errors", emailDataDTO.getErrors());
         context.setVariable("dateOfSend", df_es_MX.format(emailDataDTO.getDateOfSend()));
         context.setVariable("callsign", emailDataDTO.getCallsign());
-        context.setVariable("recipientFrom", emailDataDTO.getRecipientFrom());
+        context.setVariable("recipientFromName", emailDataDTO.getFromName());
+        context.setVariable("recipientFromAddress", emailDataDTO.getFromAddress());
         context.setVariable("noQsos", emailDataDTO.getNoQsos());
         return templateEngine.process(emailDataDTO.getTemplate(), context);
     }
