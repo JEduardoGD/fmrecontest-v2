@@ -1,4 +1,5 @@
 env.conf
+initdata/initdb.sql
 target/
 .attach_pid*
 opt/*
