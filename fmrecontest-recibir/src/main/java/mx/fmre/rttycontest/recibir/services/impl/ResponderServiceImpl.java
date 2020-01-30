@@ -3,6 +3,7 @@ package mx.fmre.rttycontest.recibir.services.impl;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,17 +18,22 @@ import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
 import mx.fmre.rttycontest.persistence.model.Contest;
+import mx.fmre.rttycontest.persistence.model.ContestLog;
+import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailAccount;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
+import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
+import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailAccountRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.recibir.dto.EmailDataDTO;
+import mx.fmre.rttycontest.recibir.dto.ErrorDTO;
 import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
 import mx.fmre.rttycontest.recibir.services.IResponderService;
 import mx.fmre.rttycontest.recibir.services.MailContentBuilder;
@@ -41,7 +47,9 @@ public class ResponderServiceImpl implements IResponderService {
 	@Autowired private ICatEmailErrorRepository emailErrorRepository;
 	@Autowired private IContestRepository contestRepository;
 	@Autowired private IEmailAccountRepository emailAccountRepository;
-
+	@Autowired private IContestLogRepository contestLogRepository;
+	@Autowired private IContestQsoRepository contestQsoRepository;
+	
 	@Value("${email.password.encodingkey}")
 	private String emailPasswordEncodingkey;
 	
@@ -61,6 +69,7 @@ public class ResponderServiceImpl implements IResponderService {
 		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
 		EmailStatus emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
 		EmailStatus emailEstatusNoParsed = emailEstatusRepository.findByStatus("NO_PARSED");
+		
 		List<EmailStatus> listEstatuses = Arrays.asList(
 				emailEstatusNoIdentified, 
 				emailEstatusParsed, 
@@ -75,12 +84,21 @@ public class ResponderServiceImpl implements IResponderService {
 			for (Email email : emails) {
 				EmailDataDTO emailDataDTO = new EmailDataDTO();
 				
-				emailDataDTO.setRecipientFrom(emailAccount.getEmailAddress());
-				
 				List<CatEmailError> errors = emailErrorRepository.getErrorsOfEmail(email);
-				emailDataDTO.setErrors(errors);
+				List<ErrorDTO> errorsDto = errors.stream()
+						.map(x -> new ErrorDTO(x.getSuggestionEs(), x.getSuggestionEn()))
+						.collect(Collectors.toList());
+				emailDataDTO.setErrors(errorsDto);
 				
-				emailDataDTO.setRecipientTo(email.getRecipientsFromAddress());
+				emailDataDTO.setRecipientFrom(email.getRecipientsFromAddress());
+				emailDataDTO.setRecipientTo(email.getRecipientsTo());
+				emailDataDTO.setTemplate(edition.getTemplate());
+				emailDataDTO.setDateOfSend(email.getSentDate());
+				emailDataDTO.setCallsign(email.getSubject());
+				
+				ContestLog contestLog = contestLogRepository.findByEmail(email);
+				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+				emailDataDTO.setNoQsos(qsos.size());
 				
 				if(errors.isEmpty()) {
 					emailDataDTO.setSubject(emailAccount.getSuccessfullyMsg());
@@ -136,7 +154,7 @@ public class ResponderServiceImpl implements IResponderService {
 	public boolean prepareAndSend(EmailDataDTO emailDataDTO, JavaMailSender mailSender) throws FmreContestException {
 		MimeMessagePreparator messagePreparator = mimeMessage -> {
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
-			messageHelper.setFrom(emailDataDTO.getRecipientFrom());
+			messageHelper.setFrom(emailDataDTO.getRecipientTo());
 			if (emailResponderTestmode)
 				messageHelper.setTo(emailResponderTestmail);
 			else
@@ -144,7 +162,7 @@ public class ResponderServiceImpl implements IResponderService {
 			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta))
 				messageHelper.setBcc(emailResponderCopiaoculta);
 			messageHelper.setSubject(emailDataDTO.getSubject());
-			String content = mailContentBuilder.build("mensaje");
+			String content = mailContentBuilder.build(emailDataDTO);
 			messageHelper.setText(content, true);
 		};
 		try {

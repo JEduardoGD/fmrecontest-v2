@@ -35,4 +35,10 @@ public class CatEmailError implements Serializable {
 	@Column(name = "S_DESCRIPCION")
 	private String descripcion;
 
+	@Column(name = "S_SUGGESTION_ES")
+	private String suggestionEs;
+
+	@Column(name = "S_SUGGESTION_EN")
+	private String suggestionEn;
+
 }

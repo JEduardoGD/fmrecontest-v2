@@ -58,6 +58,9 @@ public class Edition implements Serializable {
 	@Column(name = "N_ACTIVE")
 	private Boolean active;
 
+	@Column(name = "S_TEMPLATE")
+	private String template;
+
 	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();
 
