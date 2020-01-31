@@ -53,5 +53,70 @@
     "name": "contest.pagination.rowsperpage",
     "type": "java.lang.String",
     "description": "A description for 'contest.pagination.rowsperpage'"
+  },
+  {
+    "name": "cron.scanner.expression",
+    "type": "java.lang.String",
+    "description": "A description for 'cron.scanner.expression'"
+  },
+  {
+    "name": "cron.parse.expression",
+    "type": "java.lang.String",
+    "description": "A description for 'cron.parse.expression'"
+  },
+  {
+    "name": "cron.identify.expression",
+    "type": "java.lang.String",
+    "description": "A description for 'cron.identify.expression'"
+  },
+  {
+    "name": "cron.verify.expression",
+    "type": "java.lang.String",
+    "description": "A description for 'cron.verify.expression'"
+  },
+  {
+    "name": "cron.responder.expression",
+    "type": "java.lang.String",
+    "description": "A description for 'cron.responder.expression'"
+  },
+  {
+    "name": "fileManagerImpl",
+    "type": "java.lang.String",
+    "description": "A description for 'fileManagerImpl'"
+  },
+  {
+    "name": "qsoParserServiceName",
+    "type": "java.lang.String",
+    "description": "A description for 'qsoParserServiceName'"
+  },
+  {
+    "name": "email.responder.testmode",
+    "type": "java.lang.String",
+    "description": "A description for 'email.responder.testmode'"
+  },
+  {
+    "name": "email.responder.testemail",
+    "type": "java.lang.String",
+    "description": "A description for 'email.responder.testemail'"
+  },
+  {
+    "name": "email.responder.co",
+    "type": "java.lang.String",
+    "description": "A description for 'email.responder.co'"
+  },
+  {
+    "name": "fileManagerImpl",
+    "type": "java.lang.String",
+    "description": "A description for 'fileManagerImpl'"
+  },
+  {
+    "name": "fileManagerImpl",
+    "type": "java.lang.String",
+    "description": "A description for 'fileManagerImpl'"
+  },
+  {
+    "name": "file.manager.impl",
+    "type": "java.lang.String",
+    "description": "A description for 'file.manager.impl'"
   }
 ]}

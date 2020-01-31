@@ -39,7 +39,7 @@ public class MailServiceImpl implements IMailService {
 	@Autowired
     private ApplicationContext appContext;
 	
-	@Value("${fileManagerImpl}")
+	@Value("${file.manager.impl}")
 	private String fileManagerImpl;
 	
 	@Autowired private IEmailEstatusRepository emailEstatusRepository;

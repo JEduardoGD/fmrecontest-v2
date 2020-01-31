@@ -61,6 +61,9 @@ public class Edition implements Serializable {
 	@Column(name = "S_TEMPLATE")
 	private String template;
 
+	@Column(name = "S_QSO_PARSER_IMPL")
+	private String qsoParserImpl;
+	
 	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();
 

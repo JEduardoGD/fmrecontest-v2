@@ -21,8 +21,10 @@ import mx.fmre.rttycontest.bs.util.FileUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
+import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.repository.IAttachedFileRepository;
+import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.recibir.business.IParserEmail;
 import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 
@@ -32,12 +34,13 @@ public class ParserEmailServiceRtty2020Impl implements IParserEmail {
 	
 	@Autowired private IAttachedFileRepository attachedFileRepository;
 	@Autowired private ApplicationContext appContext;
+	@Autowired private IEditionRepository editionRepository;
 	
-	@Value("${fileManagerImpl}")
+	@Value("${file.manager.impl}")
 	private String fileManagerImpl;
 	
-	@Value("${qsoParserServiceName}")
-	private String qsoParserServiceName;
+//	@Value("${qsoParserServiceName}")
+//	private String qsoParserServiceName;
 	
 	private final String logFileNamePattern = "^[\\w,\\s-]+\\.(([tT][xX][tT])|([lL][oO][gG])|([cC][bB][rR]))$";
 
@@ -69,7 +72,8 @@ public class ParserEmailServiceRtty2020Impl implements IParserEmail {
 	
 	private ContestLog parse(Email email, AttachedFile attachedLogFile) throws FmreContestException {
 		IFileManagerService fileManagerService = appContext.getBean(fileManagerImpl, IFileManagerService.class);
-		IQsoParserService qsoParser = appContext.getBean(qsoParserServiceName, IQsoParserService.class);
+		Edition edition = editionRepository.findById(email.getEdition().getId()).orElse(null);
+		IQsoParserService qsoParser = appContext.getBean(edition.getQsoParserImpl(), IQsoParserService.class);
 		
 		AttachedFileUtil attachedFileUtil = new AttachedFileUtil();
 		AttachedFileDTO attachedFileDTOMapped = attachedFileUtil.map(attachedLogFile);

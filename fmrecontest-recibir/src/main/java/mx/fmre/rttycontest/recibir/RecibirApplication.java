@@ -70,7 +70,7 @@ public class RecibirApplication {
 		log.debug("ending mailService.verifyRecivedEmails()");
 	}
 
-	@Scheduled(cron = "${cron.verify.expression}")
+	@Scheduled(cron = "${cron.responder.expression}")
 	public void cronResponderService() {
 		log.debug("starting mailService.responseParsedEmail()...");
 		responderService.responseParsedEmail();
