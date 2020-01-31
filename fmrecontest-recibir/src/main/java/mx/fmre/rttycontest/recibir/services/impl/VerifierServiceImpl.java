@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
@@ -30,6 +31,9 @@ public class VerifierServiceImpl implements IVerifierService {
 	@Autowired private IEmailRepository emailRepository;
 	@Autowired private IVerificacionEmail verificacionEmail;
 	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
+	
+	@Value("${messages.perminute}")
+	private Integer messagesPerminute;
 
 	@Override
 	public void verifyRecivedEmails() {
@@ -41,6 +45,8 @@ public class VerifierServiceImpl implements IVerifierService {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(edition, listEstatuses);
+			if (emails.size() > messagesPerminute)
+				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
 				try {
 					List<CatEmailError> result = verificacionEmail.verify(email);

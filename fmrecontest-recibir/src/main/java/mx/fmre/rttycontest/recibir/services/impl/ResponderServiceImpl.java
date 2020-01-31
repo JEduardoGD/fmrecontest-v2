@@ -65,6 +65,9 @@ public class ResponderServiceImpl implements IResponderService {
 	@Value("${email.responder.co}")
 	private String emailResponderCopiaoculta;
 	
+	@Value("${messages.perminute}")
+	private Integer messagesPerminute;
+	
 	@Autowired MailContentBuilder mailContentBuilder;
 	
 	@Override
@@ -84,6 +87,8 @@ public class ResponderServiceImpl implements IResponderService {
 			Contest contest = contestRepository.findById(idContest).orElse(null);
 			EmailAccount emailAccount = emailAccountRepository.findByContest(contest);
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndVerifiedAndNotAnswered(edition, listEstatuses);
+			if (emails.size() > messagesPerminute)
+				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
 				EmailDataDTO emailDataDTO = new EmailDataDTO();
 				

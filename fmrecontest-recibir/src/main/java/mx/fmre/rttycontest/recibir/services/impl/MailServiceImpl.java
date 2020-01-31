@@ -42,6 +42,9 @@ public class MailServiceImpl implements IMailService {
 	@Value("${file.manager.impl}")
 	private String fileManagerImpl;
 	
+	@Value("${messages.perminute}")
+	private Integer messagesPerminute;
+	
 	@Autowired private IEmailEstatusRepository emailEstatusRepository;
 
 	@Override
@@ -58,7 +61,8 @@ public class MailServiceImpl implements IMailService {
 					emailRepository,
 					emailFieldsToLenght, 
 					fileManagerService,
-					emailEstatusRecived);
+					emailEstatusRecived,
+					messagesPerminute);
 			st.run();
 		});
 	}

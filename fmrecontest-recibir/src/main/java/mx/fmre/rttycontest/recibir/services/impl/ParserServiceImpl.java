@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
@@ -28,6 +29,9 @@ public class ParserServiceImpl implements IParserService {
 	@Autowired private IParserEmail parserEmail;
 	@Autowired private IAttachedFileRepository attachedFileRepository;
 	@Autowired private IContestLogRepository contestLogRepository;
+	
+	@Value("${messages.perminute}")
+	private Integer messagesPerminute;
 
 	@Override
 	public void identifyLogFiles() {
@@ -41,6 +45,8 @@ public class ParserServiceImpl implements IParserService {
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(
 					edition, 
 					Arrays.asList(emailEstatusRecived));
+			if (emails.size() > messagesPerminute)
+				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
 				String subject = email.getSubject();
 				if(subject != null && 
@@ -75,6 +81,8 @@ public class ParserServiceImpl implements IParserService {
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(
 					edition, 
 					Arrays.asList(emailEstatusIdentified));
+			if (emails.size() > messagesPerminute)
+				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
 				ContestLog contestLog = parserEmail.parse(email);
 				if(contestLog != null) {

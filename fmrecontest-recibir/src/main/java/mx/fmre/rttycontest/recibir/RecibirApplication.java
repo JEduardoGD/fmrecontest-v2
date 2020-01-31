@@ -1,7 +1,6 @@
 package mx.fmre.rttycontest.recibir;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -26,17 +25,10 @@ import mx.fmre.rttycontest.recibir.services.IVerifierService;
 @Slf4j
 public class RecibirApplication {
 
-	@Autowired
-	private IMailService mailService;
-	@Autowired
-	private IVerifierService verifierService;
-	@Autowired
-	private IParserService parserService;
-	@Autowired
-	private IResponderService responderService;
-
-	@Value("${email.password.encodingkey}")
-	private String emailPasswordEncodingkey;
+	@Autowired private IMailService mailService;
+	@Autowired private IVerifierService verifierService;
+	@Autowired private IParserService parserService;
+	@Autowired private IResponderService responderService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RecibirApplication.class);

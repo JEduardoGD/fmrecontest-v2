@@ -43,6 +43,7 @@ public class ScannerThread {
 	private int emailFieldsToLenght;
 	private IFileManagerService fileManagerService;
 	private EmailStatus emailEstatusRecived;
+	private Integer messagesPerminute;
 
 	public void run() {
 		try {
@@ -94,7 +95,7 @@ public class ScannerThread {
 		if(shouldBeSaved.isEmpty())
 			return;
 		
-		int upperLimit = 10 < shouldBeSaved.size() ? 10 : shouldBeSaved.size();
+		int upperLimit = messagesPerminute < shouldBeSaved.size() ? messagesPerminute : shouldBeSaved.size();
 		List<Integer> listToDownload = shouldBeSaved.subList(0, upperLimit);
 		int[] intArray = new int[listToDownload.size()];
 		for (int i = 0; i < listToDownload.size(); i++) {
