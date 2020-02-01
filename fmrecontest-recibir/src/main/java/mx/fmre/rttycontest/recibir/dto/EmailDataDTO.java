@@ -26,4 +26,5 @@ public class EmailDataDTO implements Serializable {
 	private Date dateOfSend;
 	private String callsign;
 	private int noQsos;
+	private String debugData;
 }
