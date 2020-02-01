@@ -199,9 +199,7 @@ public class ResponderServiceImpl implements IResponderService {
 			
 			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta)) {
 				String[] arrEmailBcc = emailResponderCopiaoculta.split("\\,");
-				for (String emailBcc : arrEmailBcc) {
-					messageHelper.setBcc(emailBcc);
-				}
+				messageHelper.setBcc(arrEmailBcc);
 			}
 			messageHelper.setSubject(emailDataDTO.getSubject());
 			String content = mailContentBuilder.build(emailDataDTO);
