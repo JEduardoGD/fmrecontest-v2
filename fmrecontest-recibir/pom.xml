@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>mx.fmre.rttycontest</groupId>
-		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../fmrecontest-parent</relativePath>
+		<artifactId>fmrecontest-parent</artifactId>
+		<version>${global.version}</version>
+		<relativePath>../</relativePath>
 	</parent>
 
-	<artifactId>recibir</artifactId>
-	<name>rttycontest-recibir</name>
+	<artifactId>fmrecontest-recibir</artifactId>
+	<name>fmrecontest-recibir</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -23,15 +23,20 @@
 	<dependencies>
 		<dependency>
 			<groupId>mx.fmre.rttycontest</groupId>
-			<artifactId>persistence</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>fmrecontest-persistence</artifactId>
+			<version>${global.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mx.fmre.rttycontest</groupId>
+			<artifactId>fmrecontest-bs</artifactId>
+			<version>${global.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
-			<!-- <version>1.6.2</version> -->
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3 -->
@@ -40,7 +45,35 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<version>1.11.628</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>tomcat-embed-el</artifactId>
+					<groupId>org.apache.tomcat.embed</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>tomcat-embed-core</artifactId>
+					<groupId>org.apache.tomcat.embed</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>tomcat-embed-websocket</artifactId>
+					<groupId>org.apache.tomcat.embed</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -49,7 +82,34 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.2</version>
+				<executions>
+					<execution>
+						<id>agent-for-ut</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<append>true</append>
+							<destFile>${sonar.jacoco.reportPaths}</destFile>
+						</configuration>
+					</execution>
+					<execution>
+						<id>agent-for-it</id>
+						<phase>test</phase>
+						<goals>
+							<goal>prepare-agent-integration</goal>
+						</goals>
+						<configuration>
+							<append>true</append>
+							<destFile>${sonar.jacoco.itReportPath}</destFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>

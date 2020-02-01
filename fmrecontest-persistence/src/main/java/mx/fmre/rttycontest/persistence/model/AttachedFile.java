@@ -28,7 +28,7 @@ public class AttachedFile implements Serializable {
 	@Column(name = "N_ID_ATTACHED_FILE")
 	private Integer id;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_EMAIL")
 	private Email email;
 
@@ -46,4 +46,7 @@ public class AttachedFile implements Serializable {
 	
 	@Column(name = "S_PATH")
 	private String path;
+	
+	@Column(name = "D_ISLOGFILE")
+	private boolean isLogFile;
 }

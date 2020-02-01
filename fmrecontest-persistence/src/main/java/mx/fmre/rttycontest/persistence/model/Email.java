@@ -36,28 +36,65 @@ public class Email implements Serializable {
 	@Column(name = "N_EMAIL_COUNT")
 	private Integer emailCount;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_EDITION")
 	private Edition edition;
-	
+
 	@Column(name = "S_RECIPIENTS_FROM_NAME")
 	private String recipientsFromName;
-	
+
 	@Column(name = "S_RECIPIENTS_FROM_ADDRESS")
 	private String recipientsFromAddress;
-	
+
 	@Column(name = "D_RECEIVED_DATE")
 	private Date receivedDate;
-	
+
 	@Column(name = "S_RECIPIENTS_TO")
 	private String recipientsTo;
-	
+
 	@Column(name = "D_SENT_DATE")
 	private Date sentDate;
-	
+
 	@Column(name = "S_SUBJECT")
 	private String subject;
 
 	@OneToMany(mappedBy = "email", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	private List<AttachedFile> attachedFiles = new ArrayList<>();
+
+	@Column(name = "VERIFIED_AT")
+	private Date verifiedAt;
+
+	@Column(name = "ANSWERED_AT")
+	private Date answeredAt;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "N_ID_EMAIL_STATUS")
+	private EmailStatus emailStatus;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Email other = (Email) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+	
+	
 }

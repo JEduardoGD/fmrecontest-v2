@@ -7,5 +7,7 @@ import mx.fmre.rttycontest.persistence.model.User;
 
 @Repository
 public interface IUserRepository extends JpaRepository<User, Long> {
-	User findByEmail(String email);
+	public User findByEmail(String email);
+
+	public User findByEmailAndPassword(String email, String password);
 }

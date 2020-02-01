@@ -17,20 +17,24 @@ import javax.mail.Session;
 import javax.mail.Store;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
+import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Contest;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailAccount;
+import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
-import mx.fmre.rttycontest.recibir.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
 import mx.fmre.rttycontest.recibir.helper.MailHelper;
 import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 
+@Slf4j
 @AllArgsConstructor
-public class ScannerThread implements Runnable{
+public class ScannerThread {
 
 	private Edition edition;
 	private IContestRepository contestRepository;
@@ -38,20 +42,20 @@ public class ScannerThread implements Runnable{
 	private IEmailRepository emailRepository;
 	private int emailFieldsToLenght;
 	private IFileManagerService fileManagerService;
+	private EmailStatus emailEstatusRecived;
+	private Integer messagesPerminute;
 
-	@Override
 	public void run() {
 		try {
 			this.scan();
 		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | MessagingException
-				| IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				| IOException | FmreContestException e) {
+			log.error(e.getLocalizedMessage());
 		}
 	}
 
 	private void scan() throws MessagingException, IOException, InvalidKeyException, NoSuchAlgorithmException,
-			NoSuchPaddingException {
+			NoSuchPaddingException, FmreContestException {
 		Contest contest = contestRepository.findById(edition.getContest().getId()).orElse(null);
 		EncryptDecryptStringHelper encryptDecryptStringHelper = null;
 		if (contest == null)
@@ -61,7 +65,7 @@ public class ScannerThread implements Runnable{
 
 		Session session = Session.getDefaultInstance(new Properties());
 		Store store = session.getStore("imaps");
-		store.connect(emailAccount.getSmtpServer(), emailAccount.getPort(), emailAccount.getEmailAddress(),
+		store.connect(emailAccount.getInHost(), emailAccount.getInPort(), emailAccount.getEmailAddress(),
 				encryptDecryptStringHelper.decrypt(emailAccount.getPassword()));
 		Folder inbox = store.getFolder("INBOX");
 		inbox.open(Folder.READ_ONLY);
@@ -77,7 +81,6 @@ public class ScannerThread implements Runnable{
 			      .mapToInt(v -> v)
 			      .max()
 			      .orElse(0);
-			      //.orElseThrow(NoSuchElementException::new);
 		int messageCount = inbox.getMessageCount();
 		
 		int maxIdEmail = messageCount > maxIdEmailSaved ? messageCount : maxIdEmailSaved;
@@ -89,10 +92,10 @@ public class ScannerThread implements Runnable{
 				.collect(Collectors.toList());
 		shouldBeSaved.removeAll(saved);
 		
-		if(shouldBeSaved.size() <= 0)
+		if(shouldBeSaved.isEmpty())
 			return;
 		
-		int upperLimit = 10 < shouldBeSaved.size() ? 10 : shouldBeSaved.size();
+		int upperLimit = messagesPerminute < shouldBeSaved.size() ? messagesPerminute : shouldBeSaved.size();
 		List<Integer> listToDownload = shouldBeSaved.subList(0, upperLimit);
 		int[] intArray = new int[listToDownload.size()];
 		for (int i = 0; i < listToDownload.size(); i++) {
@@ -106,11 +109,12 @@ public class ScannerThread implements Runnable{
 
 		for (Message message : messages) {
 			List<AttachedFileDTO> attachedFilesDTO = MailHelper.getAttachedFiles(message);
-			Email email = MailHelper.messageToEmailMapper(edition, message, emailFieldsToLenght);
+			Email email = MailHelper.messageToEmailMapper(edition, message, emailFieldsToLenght, emailEstatusRecived);
 			List<AttachedFile> attachedFiles = new ArrayList<>();
 			for (AttachedFileDTO attachedFileDTO : attachedFilesDTO) {
 				AttachedFile attachedFile = MailHelper.attachedFileDTOToAttachedFile(attachedFileDTO);
 				attachedFile.setEmail(email);
+				
 				String bucketPath = fileManagerService.saveFile(email, attachedFileDTO);
 				attachedFile.setPath(bucketPath);
 				attachedFiles.add(attachedFile);

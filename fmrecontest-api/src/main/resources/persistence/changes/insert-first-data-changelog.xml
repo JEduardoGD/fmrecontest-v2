@@ -1,0 +1,170 @@
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<include file="classpath:persistence/changes/create-database-changelog.xml" />
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-001">
+	    <insert tableName="TBL_USERS">
+	    	<column name="N_ID_USER" value="1" />
+			<column name="S_EMAIL" value="admin@admin.com" />
+			<column name="S_PASSWORD" value="$2a$10$jLpHkSywOB9WhE5Se3nLH.KfC2Pi6H7wHblaya0xx34nK970o6qYa" />
+			<column name="S_NAME" value="adminname" />
+			<column name="S_LAST_NAME" value="adminlastname" />
+			<column name="B_ACTIVE" valueBoolean="true" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-002">
+	    <insert tableName="TBL_ROLES">
+	    	<column name="N_ID_ROLE" value="1" />
+			<column name="S_ROLE" value="USER" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-003">
+	    <insert tableName="REL_USER_ROLE">
+	    	<column name="N_ID_ROLE" value="1" />
+			<column name="N_ID_USER" value="1" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-004">
+	    <insert tableName="TBL_CONTEST">
+	    	<column name="N_ID_CONTEST" value="1" />
+			<column name="S_DESCRIPTION" value="International RTTY Contest FMRE" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-005">
+	    <insert tableName="TBL_EDITION">
+	    	<column name="N_ID_EDITION" value="1" />
+			<column name="N_ID_CONTEST" value="1" />
+			<column name="S_DESCRIPTION" value="Edición 2020" />
+			<column name="N_YEAR" value="2019" />
+			<column name="T_START_UTC" value="2011-08-05 00:00:00" />
+			<column name="T_END_UTC" value="2011-08-15 00:00:00" />
+			<column name="N_ID_EMAIL_START" value="3529" />
+			<column name="N_ACTIVE" valueBoolean="true" />
+			<column name="S_TEMPLATE" value="email_template_rtty_2020" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-006">
+	    <insert tableName="TBL_EMAIL_ACCOUNT">
+	    	<column name="N_ID_EMAIL_ACCOUNT" value="1" />
+			<column name="N_ID_CONTEST" value="1" />
+			<column name="S_IN_HOST" value="imap.fmre.mx" />
+			<column name="S_OUT_HOST" value="just101.justhost.com" />
+			<column name="S_EMAIL_ADDRESS" value="rtty@fmre.mx" />
+			<column name="S_USERNAME" value="rtty@fmre.mx" />
+			<column name="S_PASSWORD" value="aJX24Yxiljgg16SmL6YJyA==" />
+			<column name="N_IN_PORT" value="993" />
+			<column name="N_OUT_PORT" value="465" />
+			<column name="S_REPLY_TO_NAME" value="XE1EE" />
+			<column name="S_REPLY_TO_EMAIL" value="rttymanager@fmre.mx" />
+			<column name="SUCCESSFULLY_RESPONSE_MSG" value="Correo recibido correctamente / Email received correctly" />
+			<column name="ERROR_RESPONSE_MSG" value="Email recibido con errores / Email received with errors" />
+			<column name="S_SMTP_PROPERTIES" value="mail.transport.protocol:smtp;mail.smtp.auth:true;mail.debug:true;mail.smtp.socketFactory.port:465;mail.smtp.socketFactory.class:javax.net.ssl.SSLSocketFactory;mail.smtp.socketFactory.fallback:false" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet id="INSERT-007" author="Eduardo Gutierrez">
+		<insert tableName="TBL_CONTEST"><column name="N_ID_CONTEST" value="2" /><column name="S_DESCRIPTION" value="International RTTY Contest FMRE" /></insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-008">
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="1" />
+			<column name="S_STATUS" value="RECIVED" />
+			<column name="S_DESCRIPTION" value="When email has recived is setted with this status" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="2" />
+			<column name="S_STATUS" value="IGNORED" />
+			<column name="S_DESCRIPTION" value="The subject contains the word 'Undelivered' because that this email will be ignored" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="3" />
+			<column name="S_STATUS" value="IDENTIFIED" />
+			<column name="S_DESCRIPTION" value="The email contains a file identified as a logfile" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="4" />
+			<column name="S_STATUS" value="NO_IDENTIFIED" />
+			<column name="S_DESCRIPTION" value="The logfile cannot be identified as a logfile" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="5" />
+			<column name="S_STATUS" value="PARSED" />
+			<column name="S_DESCRIPTION" value="The logfile was succesfully parsed into log and qsos registers" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="6" />
+			<column name="S_STATUS" value="NO_PARSED" />
+			<column name="S_DESCRIPTION" value="The logfile cannot exists or cannot be parsed into log and qsos registers" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="7" />
+			<column name="S_STATUS" value="VERIFIED" />
+			<column name="S_DESCRIPTION" value="Email verified to check errors" />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_STATUS">
+	    	<column name="N_ID_EMAIL_STATUS" value="8" />
+			<column name="S_STATUS" value="ANSWERED" />
+			<column name="S_DESCRIPTION" value="Email answered (with successfully or error message)" />
+	    </insert>
+	</changeSet>
+	
+	<changeSet author="Eduardo Gutierrez" id="INSERT-009">
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="1" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_SUBJECT" />
+			<column name="S_SUGGESTION_EN" value="Your email don't contains subject, please remember include the subject of your email (that should be only your callsign) and resend." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico no contiene asunto, recuerde incluir el asunto de su correo electrónico (que debería ser solo su indicativo) y reenvie." />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="2" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_ATTACHED_FILES" />
+			<column name="S_SUGGESTION_EN" value="Your email don't contains any attached file, please remember attach your logfile and resend it." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico no contiene ningún archivo adjunto, recuerde adjuntar su archivo de log y reenvie." />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="3" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="CANT_IDENTIFY_LOGFILE" />
+			<column name="S_SUGGESTION_EN" value="Your email contains some attached files but we cant to determine wich one is your logfile, remember that your log file should be named with a .txt, .log or .cbr extension, please rename and attach your logfile an resend it again." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico contiene algunos archivos adjuntos pero no podemos determinar cuál es su archivo de log, recuerde que su archivo de log debe nombrarse con una extensión .txt, .log o .cbr, cambie el nombre y adjunte su archivo de log y vuelva a envielo." />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="4" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="MANY_POSSIBLE_LOGFILE" />
+			<column name="S_SUGGESTION_EN" value="Your email contains some attached files but we cant to determine wich one is your logfile because many of that can be, remember that your log file should be named with a .txt, .log or .cbr extension, please rename and attach your logfile an resend again." />
+			<column name="S_SUGGESTION_ES" value="Su correo electrónico contiene algunos archivos adjuntos, pero no podemos determinar cuál es su archivo de log porque mas de uno de ellos podría ser, recuerde que su archivo de log debe nombrarse con una extensión .txt, .log o .cbr, por favor verifique esto y reenvie." />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="5" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN" />
+			<column name="S_SUGGESTION_EN" value="The subject on your email is not equals than the callsign on your log (that was taked from your logfile), remember that your subject should be equals than your callsign on your log. Please, correct it and resend it." />
+			<column name="S_SUGGESTION_ES" value="El asunto en su correo electrónico no es igual al indicativo en su log (que fue tomado de su archivo de log) recuerde que su asunto debe ser igual a su indicativo en su log Por favor, corríjalo y reenvíelo." />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="6" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="EMAIL_WITHOUT_CONTSTLOG" />
+			<column name="S_SUGGESTION_EN" value="We were able to find your file but we can't to parse it into a log. Please check that your logfile was generated on cabrillo format and resend it." />
+			<column name="S_SUGGESTION_ES" value="Pudimos encontrar un posible archivo de log pero no pudimos analizarlo. Compruebe que su archivo de log se generó en formato cabrillo y vuelva a enviarlo." />
+	    </insert>
+	    <insert tableName="CAT_EMAIL_ERROR">
+	    	<column name="N_ID_CAT_EMAIL_ERROR" value="7" />
+			<column name="N_ID_EDITION" value="1" />
+			<column name="S_DESCRIPCION" value="SUBJECT_WITH_MORE_THAN_ONE_WORD" />
+			<column name="S_SUGGESTION_EN" value="Your email subject contains more than one word please remember include the subject of your email (that should be only your callsign) and resend it." />
+			<column name="S_SUGGESTION_ES" value="El asunto de su correo contiene más de una palabra, recuerde incluir el asunto de su correo electrónico (que debería ser solo su indicativo) y vuelva a enviarlo." />
+	    </insert>
+	</changeSet>
+</databaseChangeLog>
