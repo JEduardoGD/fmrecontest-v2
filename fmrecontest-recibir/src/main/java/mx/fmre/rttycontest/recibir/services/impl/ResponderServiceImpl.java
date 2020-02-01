@@ -109,6 +109,7 @@ public class ResponderServiceImpl implements IResponderService {
 				emailDataDTO.setTemplate(edition.getTemplate());
 				emailDataDTO.setDateOfSend(email.getSentDate());
 				emailDataDTO.setCallsign(email.getSubject());
+				emailDataDTO.setDebugData(email.getId() + "");
 				
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
@@ -196,8 +197,12 @@ public class ResponderServiceImpl implements IResponderService {
 				messageHelper.setTo(new InternetAddress(emailDataDTO.getFromAddress(), emailDataDTO.getFromName()));
 			
 			
-			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta))
-				messageHelper.setBcc(emailResponderCopiaoculta);
+			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta)) {
+				String[] arrEmailBcc = emailResponderCopiaoculta.split("\\,");
+				for (String emailBcc : arrEmailBcc) {
+					messageHelper.setBcc(emailBcc);
+				}
+			}
 			messageHelper.setSubject(emailDataDTO.getSubject());
 			String content = mailContentBuilder.build(emailDataDTO);
 			messageHelper.setText(content, true);
