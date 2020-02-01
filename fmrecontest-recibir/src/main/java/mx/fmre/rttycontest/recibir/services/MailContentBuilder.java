@@ -39,6 +39,7 @@ public class MailContentBuilder {
         context.setVariable("recipientFromAddress", emailDataDTO.getFromAddress());
         context.setVariable("noQsos", emailDataDTO.getNoQsos());
         context.setVariable("listOthersLogs", this.parseOthersLogs(emailDataDTO.getOthersLogs()));
+        context.setVariable("debugData", emailDataDTO.getDebugData());
         return templateEngine.process(emailDataDTO.getTemplate(), context);
     }
     
