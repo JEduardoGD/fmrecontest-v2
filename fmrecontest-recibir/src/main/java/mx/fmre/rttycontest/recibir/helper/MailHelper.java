@@ -45,9 +45,14 @@ public class MailHelper {
 					byte[] byteArray = FileUtil.inputStreamToByteArray(is);
 					String contentType = bodyPart.getContentType();
 					
-					String filename = bodyPart.getFileName();//=?UTF-8?b?ZHUzbGEgeGUgcnR0eSAyMDE5?=
-					if(filename.startsWith("=?UTF-8?b?"))
-						filename = FileUtil.base64ToString(filename.replace("=?UTF-8?b?", "").replace("MDE5?=", ""));
+					String filename = bodyPart.getFileName();
+					if (filename.startsWith("=?UTF-8?b?"))
+						try {
+							filename = FileUtil
+									.base64ToString(filename.replace("=?UTF-8?b?", "").replace("MDE5?=", ""));
+						} catch (IllegalArgumentException iae) {
+							filename = FileUtil.getMd5Hash(byteArray) + ".log";
+						}
 					
 					AttachedFileDTO attachedFileDTO = new AttachedFileDTO();
 					attachedFileDTO.setFilename(filename);
