@@ -76,9 +76,10 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 		
 		for (String l : qsoLines) {
 			ContestQso contestQso = parseLine(l.trim());
-			contestQso.setContestLog(contestlog);
-			if(contestQso != null)
+			if (contestQso != null) {
+				contestQso.setContestLog(contestlog);
 				listContest.add(contestQso);
+			}
 		}
 		contestlog.setContestqsos(listContest);
 
