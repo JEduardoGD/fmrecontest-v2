@@ -50,7 +50,9 @@ public class ParserServiceImpl implements IParserService {
 			for (Email email : emails) {
 				String subject = email.getSubject();
 				if(subject != null && 
-						(subject.toLowerCase().contains("undelivered") || subject.toLowerCase().contains("spam"))) {
+						(       subject.toLowerCase().contains("undelivered") || 
+								subject.toLowerCase().contains("spam") ||
+								subject.toLowerCase().startsWith("mail delivery deferred"))) {
 					email.setEmailStatus(emailEstatusIgnored);
 					emailRepository.save(email);
 					continue;
