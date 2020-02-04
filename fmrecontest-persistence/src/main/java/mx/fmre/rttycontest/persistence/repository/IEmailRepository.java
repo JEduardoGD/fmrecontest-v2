@@ -67,4 +67,12 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			@Param("subject") String subject, 
 			@Param("edition") Edition edition,
 			@Param("d") Date d);
+	
+	@Query(value = "" +
+			"SELECT E " +
+			"FROM Email E " +
+			"JOIN AttachedFile AF on AF.email.id = E.id " +
+			"WHERE E.edition = :edition and " +
+			"      AF.isLogFile = true ")
+	public List<Email>getAllWithLogfileByEdition(@Param("edition") Edition edition);
 }
