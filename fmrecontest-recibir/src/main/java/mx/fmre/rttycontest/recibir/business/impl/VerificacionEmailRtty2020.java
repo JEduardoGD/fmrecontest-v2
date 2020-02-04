@@ -114,7 +114,7 @@ public class VerificacionEmailRtty2020 implements IVerificacionEmail {
 
 	private boolean verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(Email email, Edition edition, List<AttachedFile> attachedFiles) {
 		ContestLog contestLog = contestLogRepository.findByEmail(email);
-		if(contestLog == null || email.getSubject() == null)
+		if(contestLog == null || contestLog.getCallsign() == null || email.getSubject() == null)
 			return false;
 		String contestLogCallsign = contestLog.getCallsign().toUpperCase();
 		String subject = email.getSubject().toUpperCase();
