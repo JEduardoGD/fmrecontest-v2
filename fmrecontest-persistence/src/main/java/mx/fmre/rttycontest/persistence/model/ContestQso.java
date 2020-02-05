@@ -62,7 +62,7 @@ public class ContestQso implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST_LOG")
 	private ContestLog contestLog;
-	
+
 	@OneToOne
 	@JoinColumn(name = "N_ID_DXCC_ENTITY")
 	private DxccEntity dxccEntity;

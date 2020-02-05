@@ -13,28 +13,32 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
 import mx.fmre.rttycontest.bs.dxcc.util.MyNamespaceFilter;
 import mx.fmre.rttycontest.exception.FmreContestException;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
+import mx.fmre.rttycontest.persistence.model.DxccSession;
 
 public class QrzUtil {
 
 	private static final String QRZ_URL = "http://xmldata.qrz.com/xml/1.31";
-	private static final String username = "username";
-	private static final String password = "password";
 
-	public static QrzSessionDAO getNewQrzSession() throws FmreContestException {
+	public static QrzSessionDAO getNewQrzSession(String username, String password) throws FmreContestException {
 		QRZDatabaseDAO qrzdatabase = null;
 
 		String url = String.format(QRZ_URL + "/?username=%s;password=%s", username, password);
 
 		qrzdatabase = callToQrz(url);
-
-		if (qrzdatabase == null)
-			return null;
-
-		return qrzdatabase.getSession();
+		
+		if(     qrzdatabase.getSession() != null &&
+				qrzdatabase.getSession().getKey() != null &&
+				qrzdatabase.getSession().getError() == null
+				) {
+			return qrzdatabase.getSession();
+		}
+		throw new FmreContestException(qrzdatabase.getSession().getError());
 	}
 
 	public static QRZDatabaseDAO callToQrz(String url) throws FmreContestException {
@@ -65,6 +69,26 @@ public class QrzUtil {
 
 		QRZDatabaseDAO qrzDatabase = (QRZDatabaseDAO) unmarshaller.unmarshal(source);
 		return qrzDatabase;
+	}
+	
+	public static DxccEntity parse(CallsignDAO callsignDAO) {
+		DxccEntity dxccEntity = new DxccEntity();
+		dxccEntity.setEntityCode(callsignDAO.getDxcc());
+		dxccEntity.setCont(null);
+		dxccEntity.setItu(callsignDAO.getItuzone());
+		dxccEntity.setCq(callsignDAO.getCqzone());
+		return dxccEntity;
+	}
+	
+	public static DxccSession parse(QrzSessionDAO qrzSessionDAO) {
+		DxccSession dxccSession = new DxccSession();
+		dxccSession.setKey(qrzSessionDAO.getKey());
+		dxccSession.setCount(qrzSessionDAO.getCount());
+		dxccSession.setSubExp(qrzSessionDAO.getSubExp());
+		dxccSession.setGmTime(qrzSessionDAO.getGmTime());
+		dxccSession.setRemark(qrzSessionDAO.getRemark());
+		dxccSession.setError(qrzSessionDAO.getError());
+		return dxccSession;
 	}
 
 }

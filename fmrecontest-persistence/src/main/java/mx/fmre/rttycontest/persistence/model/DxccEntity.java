@@ -13,8 +13,8 @@ import javax.persistence.Table;
 
 import lombok.Data;
 
-@Entity
 @Data
+@Entity
 @Table(name = "TBL_DXCC_ENTITY")
 public class DxccEntity implements Serializable {
 	/**
@@ -24,7 +24,7 @@ public class DxccEntity implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name = "N_ID_CONTEST_QSO")
+	@Column(name = "N_ID_DXCC_ENTITY")
 	private Long id;
 	
 	@Column(name = "D_ENTITY_CODE")

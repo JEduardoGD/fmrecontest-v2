@@ -16,7 +16,8 @@ import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 @EntityScan(basePackages = "mx.fmre.rttycontest.persistence.model")
 @ComponentScan({
 	"mx.fmre.rttycontest.persistence.repository",
-	"mx.fmre.rttycontest.evaluate.services"})
+	"mx.fmre.rttycontest.evaluate.services",
+	"mx.fmre.rttycontest.bs.dxcc.service"})
 public class EvaluateApp implements CommandLineRunner {
 	
 	@Autowired ICompleteDxccService completeDxccService;
