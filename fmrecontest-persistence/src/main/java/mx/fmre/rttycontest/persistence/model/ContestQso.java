@@ -15,10 +15,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
 @Table(name = "TBL_CONTEST_QSO")
+@ToString
 public class ContestQso implements Serializable {
 	/**
 	 * 
