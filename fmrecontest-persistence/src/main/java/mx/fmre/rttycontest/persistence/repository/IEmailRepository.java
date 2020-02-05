@@ -70,9 +70,16 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 	
 	@Query(value = "" +
 			"SELECT E " +
-			"FROM Email E " +
+			"FROM ContestQso QSO " +
+			"JOIN ContestLog LOG on QSO.contestLog.id = LOG.id " +
+			"JOIN Email E ON LOG.email.id = E.id " +
 			"JOIN AttachedFile AF on AF.email.id = E.id " +
 			"WHERE E.edition = :edition and " +
-			"      AF.isLogFile = true ")
+			"      AF.isLogFile = true and " +
+			"      QSO.dxccEntity IS NULL")
 	public List<Email>getAllWithLogfileByEdition(@Param("edition") Edition edition);
 }
+
+
+
+
