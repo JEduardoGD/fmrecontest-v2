@@ -23,6 +23,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 		for (Edition edition : editions) {
 			@SuppressWarnings("unused")
 			List<Email> emails = emailRepository.getAllWithLogfileByEdition(edition);
+			
 			System.out.println();
 		}
 	}
