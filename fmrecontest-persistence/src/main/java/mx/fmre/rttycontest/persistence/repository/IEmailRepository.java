@@ -69,7 +69,7 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			@Param("d") Date d);
 	
 	@Query(value = "" +
-			"SELECT E " +
+			"SELECT DISTINCT(E) " +
 			"FROM ContestQso QSO " +
 			"JOIN ContestLog LOG on QSO.contestLog.id = LOG.id " +
 			"JOIN Email E ON LOG.email.id = E.id " +
