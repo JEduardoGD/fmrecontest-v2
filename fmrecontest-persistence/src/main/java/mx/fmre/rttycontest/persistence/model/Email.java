@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -70,7 +71,10 @@ public class Email implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_EMAIL_STATUS")
 	private EmailStatus emailStatus;
-
+	
+	@OneToOne(mappedBy = "email", fetch = FetchType.LAZY)
+	private ContestLog contestLog;
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
