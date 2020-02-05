@@ -29,7 +29,7 @@ public class ParserServiceImpl implements IParserService {
 	@Autowired private IParserEmail parserEmail;
 	@Autowired private IAttachedFileRepository attachedFileRepository;
 	@Autowired private IContestLogRepository contestLogRepository;
-	
+
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
 
@@ -39,26 +39,21 @@ public class ParserServiceImpl implements IParserService {
 		EmailStatus emailEstatusIdentified = emailEstatusRepository.findByStatus("IDENTIFIED");
 		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
 		EmailStatus emailEstatusIgnored = emailEstatusRepository.findByStatus("IGNORED");
-		
+
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(
-					edition, 
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(edition,
 					Arrays.asList(emailEstatusRecived));
 			if (emails.size() > messagesPerminute)
 				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
-				String subject = email.getSubject();
-				if(subject != null && 
-						(       subject.toLowerCase().contains("undelivered") || 
-								subject.toLowerCase().contains("spam") ||
-								subject.toLowerCase().startsWith("mail delivery deferred"))) {
+				if (this.doIgnore(email)) {
 					email.setEmailStatus(emailEstatusIgnored);
 					emailRepository.save(email);
 					continue;
 				}
 				List<AttachedFile> listAttachedFiles = parserEmail.identifyLogFile(email);
-				if(listAttachedFiles != null && listAttachedFiles.size() == 1) {
+				if (listAttachedFiles != null && listAttachedFiles.size() == 1) {
 					AttachedFile logFile = listAttachedFiles.get(0);
 					logFile.setLogFile(true);
 					attachedFileRepository.save(logFile);
@@ -72,22 +67,33 @@ public class ParserServiceImpl implements IParserService {
 		}
 	}
 
+	private boolean doIgnore(Email email) {
+		String subject = email.getSubject();
+		if (subject != null && (
+				subject.toLowerCase().contains("undelivered") || 
+				subject.toLowerCase().contains("spam") || 
+				subject.toLowerCase().startsWith("mail delivery deferred")))
+			return true;
+		if(email.getRecipientsFromAddress().toLowerCase().contains("rtty@fmre.mx"))
+			return true;
+		return false;
+	}
+
 	@Override
 	public void parseRecivedEmails() {
 		EmailStatus emailEstatusIdentified = emailEstatusRepository.findByStatus("IDENTIFIED");
 		EmailStatus emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
 		EmailStatus emailEstatusNotParsed = emailEstatusRepository.findByStatus("NO_PARSED");
-		
+
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(
-					edition, 
+			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(edition,
 					Arrays.asList(emailEstatusIdentified));
 			if (emails.size() > messagesPerminute)
 				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
 				ContestLog contestLog = parserEmail.parse(email);
-				if(contestLog != null) {
+				if (contestLog != null) {
 					contestLogRepository.save(contestLog);
 					email.setEmailStatus(emailEstatusParsed);
 					emailRepository.save(email);
