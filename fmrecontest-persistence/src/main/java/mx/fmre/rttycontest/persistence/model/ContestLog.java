@@ -96,7 +96,7 @@ public class ContestLog implements Serializable {
 	private Email email;
 
 	// bi-directional many-to-one association to Contestqso
-	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<ContestQso> contestqsos;
 
 	@OneToMany(mappedBy = "contest", fetch = FetchType.LAZY)
