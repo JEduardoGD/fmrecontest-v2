@@ -19,9 +19,12 @@ import mx.fmre.rttycontest.recibir.services.IVerifierService;
 @EnableScheduling
 @EnableJpaRepositories(basePackages = { "mx.fmre.rttycontest.persistence.repository" })
 @EntityScan(basePackages = "mx.fmre.rttycontest.persistence.model")
-@ComponentScan({ "mx.fmre.rttycontest.recibir.services", "mx.fmre.rttycontest.recibir.helper",
-		"mx.fmre.rttycontest.recibir.business.impl", "mx.fmre.rttycontest.bs.parsers.rtty2020",
-		"mx.fmre.rttycontest.bs.services" })
+@ComponentScan({ 
+	"mx.fmre.rttycontest.recibir.services", 
+	"mx.fmre.rttycontest.recibir.helper",
+	"mx.fmre.rttycontest.recibir.business.impl", 
+	"mx.fmre.rttycontest.bs.parsers.rtty2020",
+	"mx.fmre.rttycontest.bs.services" })
 @Slf4j
 public class RecibirApplication {
 
