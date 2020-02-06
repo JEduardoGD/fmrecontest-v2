@@ -73,7 +73,8 @@ public class QrzUtil {
 	
 	public static DxccEntity parse(CallsignDAO callsignDAO) {
 		DxccEntity dxccEntity = new DxccEntity();
-		dxccEntity.setEntityCode(callsignDAO.getDxcc());
+		dxccEntity.setId(callsignDAO.getDxcc());
+		dxccEntity.setEntity(callsignDAO.getCountry());
 		dxccEntity.setCont(null);
 		dxccEntity.setItu(callsignDAO.getItuzone());
 		dxccEntity.setCq(callsignDAO.getCqzone());

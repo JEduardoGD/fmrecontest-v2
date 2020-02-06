@@ -22,7 +22,7 @@ public class CallsignDAO implements Serializable {
 	private static final long serialVersionUID = -7680150326926931491L;
 	private String call;
 	private String aliases;
-	private Integer dxcc;
+	private Long dxcc;
 	private String fname;
 	private String name;
 	private String addr1;

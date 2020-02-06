@@ -71,6 +71,6 @@ public class DxccServiceQrzImpl implements IDxccService {
 			return null;
 		}
 
-		return qrzdatabase.getCallsign();
+		return callsignQuery;
 	}
 }
