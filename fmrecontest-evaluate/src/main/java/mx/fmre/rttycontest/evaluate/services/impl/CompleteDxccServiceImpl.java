@@ -40,6 +40,9 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
 	
+	private static final String QRZ_ORIGEN = "QRZ.com";
+	private static final String PUEBLA_DX_ORIGEN = "Puebla DX";
+	
 	@Override
 	public void complete() {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
@@ -106,13 +109,14 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			}
 			if (dxccEntity == null && resQrz != null) {
 				dxccEntity = QrzUtil.parse(resQrz);
+				dxccEntity.setOrigen(QRZ_ORIGEN);
 				dxccEntity = dxccEntityRepository.save(dxccEntity);
 				map.put(callsign, dxccEntity);
 				return dxccEntity;
 			}
 		}
 		
-		// 3rd attempt, from QRZ
+		// 3rd attempt, from Puebla DX
 		IDxccService dxccServicePueblaDx = appContext.getBean("dxccServicePueblaDx", IDxccService.class);
 		CallsignDAO resPueblaDx = dxccServicePueblaDx.getDxccFromCallsign(callsign);
 		if (resPueblaDx != null) {
@@ -124,6 +128,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			}
 			if (dxccEntity == null && resPueblaDx != null) {
 				dxccEntity = QrzUtil.parse(resPueblaDx);
+				dxccEntity.setOrigen(PUEBLA_DX_ORIGEN);
 				dxccEntity = dxccEntityRepository.save(dxccEntity);
 				map.put(callsign, dxccEntity);
 				return dxccEntity;

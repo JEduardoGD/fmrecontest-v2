@@ -25,7 +25,7 @@ public class DxccEntity implements Serializable {
 //	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "D_ENTITY_CODE")
 	private Long id;
-
+	
 	@Column(name = "S_ENTITY")
 	private String entity;
 
@@ -37,6 +37,9 @@ public class DxccEntity implements Serializable {
 
 	@Column(name = "D_CQ")
 	private Integer cq;
+
+	@Column(name = "S_ORIGEN")
+	private String origen;
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "dxccEntity", fetch = FetchType.LAZY)
