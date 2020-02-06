@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
@@ -17,8 +18,8 @@ import mx.fmre.rttycontest.persistence.model.DxccSession;
 import mx.fmre.rttycontest.persistence.repository.IDxccSessionRepository;
 
 @Slf4j
-@Service("dxccServiceQrzImpl")
-public class DxccServiceQrzImpl implements IDxccService {
+@Service("qrzDxccServiceQrzImpl")
+public class QrzDxccServiceQrzImpl implements IDxccService {
 	
 	@Autowired private IDxccSessionRepository dxccSessionRepository;
 
@@ -65,12 +66,12 @@ public class DxccServiceQrzImpl implements IDxccService {
 			return null;
 		}
 
-		CallsignDAO callsignQuery = qrzdatabase.getCallsign();
+		QrzCallsignDAO callsignQuery = qrzdatabase.getCallsign();
 
 		if (!callsignQuery.getCall().equalsIgnoreCase(callsign)) {
 			return null;
 		}
 
-		return callsignQuery;
+		return QrzUtil.parse(callsignQuery);
 	}
 }

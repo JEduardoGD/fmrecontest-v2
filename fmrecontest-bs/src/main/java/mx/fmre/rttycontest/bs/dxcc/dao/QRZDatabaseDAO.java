@@ -25,7 +25,7 @@ public class QRZDatabaseDAO implements Serializable {
 	private BigDecimal version;
 
 	@XmlElement(name = "Callsign")
-	private CallsignDAO callsign;
+	private QrzCallsignDAO callsign;
 
 	@XmlElement(name = "DXCC")
 	private DxccentityModelDAO dxcc;

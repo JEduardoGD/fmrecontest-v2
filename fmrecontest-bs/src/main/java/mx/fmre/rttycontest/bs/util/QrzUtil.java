@@ -15,6 +15,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
+import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
 import mx.fmre.rttycontest.bs.dxcc.util.MyNamespaceFilter;
 import mx.fmre.rttycontest.exception.FmreContestException;
@@ -75,7 +76,7 @@ public class QrzUtil {
 		DxccEntity dxccEntity = new DxccEntity();
 		dxccEntity.setId(callsignDAO.getDxcc());
 		dxccEntity.setEntity(callsignDAO.getCountry());
-		dxccEntity.setCont(null);
+		dxccEntity.setCont(callsignDAO.getCont());
 		dxccEntity.setItu(callsignDAO.getItuzone());
 		dxccEntity.setCq(callsignDAO.getCqzone());
 		return dxccEntity;
@@ -90,6 +91,18 @@ public class QrzUtil {
 		dxccSession.setRemark(qrzSessionDAO.getRemark());
 		dxccSession.setError(qrzSessionDAO.getError());
 		return dxccSession;
+	}
+	
+	public static CallsignDAO parse(QrzCallsignDAO qrzCallsignDAO) {
+		CallsignDAO callsignDAO = new CallsignDAO();
+		callsignDAO.setCall(qrzCallsignDAO.getCall());
+		callsignDAO.setDxcc(qrzCallsignDAO.getDxcc());
+		callsignDAO.setState(qrzCallsignDAO.getState());
+		callsignDAO.setItuzone(qrzCallsignDAO.getItuzone());
+		callsignDAO.setCqzone(qrzCallsignDAO.getCqzone());
+		callsignDAO.setCountry(qrzCallsignDAO.getCountry());
+		callsignDAO.setCont(null);
+		return callsignDAO;
 	}
 
 }

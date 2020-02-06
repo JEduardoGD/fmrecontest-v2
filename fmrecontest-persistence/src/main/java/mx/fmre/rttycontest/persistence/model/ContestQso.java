@@ -58,6 +58,10 @@ public class ContestQso implements Serializable {
 	@Column(name = "S_RST_RECEIVED")
 	private String rstr;
 
+	@Column(name = "D_DXCC_NOT_FOUND")
+	private Boolean dxccNotFound;
+	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST_LOG")
 	private ContestLog contestLog;

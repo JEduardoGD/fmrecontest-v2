@@ -76,7 +76,8 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			"JOIN AttachedFile AF on AF.email.id = E.id " +
 			"WHERE E.edition = :edition and " +
 			"      AF.isLogFile = true and " +
-			"      QSO.dxccEntity IS NULL")
+			"      QSO.dxccEntity IS NULL and " +
+			"      (QSO.dxccNotFound is null or QSO.dxccNotFound = 0)")
 	public List<Email>getAllWithLogfileByEdition(@Param("edition") Edition edition);
 }
 

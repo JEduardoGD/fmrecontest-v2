@@ -17,6 +17,7 @@ import mx.fmre.rttycontest.bs.dxcc.dao.XmlObjectPueblaDX;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
 import mx.fmre.rttycontest.bs.util.FileUtil;
 import mx.fmre.rttycontest.bs.util.HttpUtil;
+import mx.fmre.rttycontest.bs.util.PueblaDxUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
 
 @Slf4j
@@ -24,15 +25,25 @@ import mx.fmre.rttycontest.exception.FmreContestException;
 public class DxccServicePueblaDxImpl implements IDxccService {
 
 	private static final String PUEBLADX_URL = "http://logs.puebladx.org/DXCCinfo.php";
-//	private static final String USER_AGENT = "Mozilla/5.0";
 
 	@Override
 	public CallsignDAO getDxccFromCallsign(String callsign) throws FmreContestException {
-		// TODO Auto-generated method stub
-		return null;
+		XmlObjectPueblaDX xmlObjectPueblaDX = doRequest(callsign);
+		if (xmlObjectPueblaDX == null || xmlObjectPueblaDX.getCalls() == null || xmlObjectPueblaDX.getCalls().isEmpty()) {
+			return null;
+		}
+		
+		if (xmlObjectPueblaDX == null || xmlObjectPueblaDX.getCalls().size() > 1) {
+			throw new FmreContestException("more than 1 call eelement found on puebladx for " + callsign);
+		}
+		
+		CallsignDAO callsignDAO = PueblaDxUtil.parse(xmlObjectPueblaDX);
+		
+		
+		return callsignDAO;
 	}
 
-	public XmlObjectPueblaDX test(String callsign) throws FmreContestException {
+	public XmlObjectPueblaDX doRequest(String callsign) throws FmreContestException {
 		XmlObjectPueblaDX xmlObjectPueblaDX = null;
 
 		log.info("Info from PueblaDX para {}", callsign);
