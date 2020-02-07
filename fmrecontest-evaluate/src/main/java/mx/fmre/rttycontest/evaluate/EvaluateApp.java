@@ -17,7 +17,9 @@ import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 @ComponentScan({
 	"mx.fmre.rttycontest.persistence.repository",
 	"mx.fmre.rttycontest.evaluate.services",
-	"mx.fmre.rttycontest.bs.dxcc.service"})
+	"mx.fmre.rttycontest.bs.dxcc.service",
+	"mx.fmre.rttycontest.bs.frequency.service", 
+	"mx.fmre.rttycontest.bs.qsoevaluation.service"})
 public class EvaluateApp implements CommandLineRunner {
 	
 	@Autowired ICompleteDxccService completeDxccService;
@@ -28,7 +30,38 @@ public class EvaluateApp implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		completeDxccService.completeQsos();
-		completeDxccService.completeLogs();
+		completeDxccService.completeDxccEntityQsos();
+		completeDxccService.completeDxccEntityLogs();
+		completeDxccService.completeBandsOnQsos();
+		completeDxccService.findForErrorsOnQsos();
+		completeDxccService.setPointsForQssos();
+		completeDxccService.setMultipliesQsos();
+		completeDxccService.evaluateActiveEditions();
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

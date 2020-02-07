@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -63,10 +64,21 @@ public class Edition implements Serializable {
 
 	@Column(name = "S_QSO_PARSER_IMPL")
 	private String qsoParserImpl;
+
+	@Column(name = "S_QSO_VALIDATION_IMPL")
+	private String qsoValidationImpl;
 	
 	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();
 
 	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<CatEmailError> catErrors = new ArrayList<>();
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "edition", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	private List<CatQsoError> qsoErrors;
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "edition", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	private List<Conteo> conteos;
 }

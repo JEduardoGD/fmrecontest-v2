@@ -2,7 +2,9 @@ package mx.fmre.rttycontest.persistence.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -60,7 +63,6 @@ public class ContestQso implements Serializable {
 
 	@Column(name = "D_DXCC_NOT_FOUND")
 	private Boolean dxccNotFound;
-	
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST_LOG")
@@ -69,6 +71,14 @@ public class ContestQso implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "D_ENTITY_CODE")
 	private DxccEntity dxccEntity;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "N_ID_FREQUENCY_BAND")
+	private CatFrequencyBand frequencyBand;
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "contestQso", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	private List<RelQsoConteo> relQsoConteos;
 
 	@Override
 	public boolean equals(Object obj) {

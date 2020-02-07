@@ -109,4 +109,8 @@ public class ContestLog implements Serializable {
 
 	@OneToMany(mappedBy = "contest", fetch = FetchType.LAZY)
     private List<Edition> editions = new ArrayList<>();
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	private List<RelConteoContestLog> relConteoContestLogs;
 }

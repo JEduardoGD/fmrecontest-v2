@@ -13,7 +13,9 @@ import mx.fmre.rttycontest.persistence.model.Email;
 
 @Repository
 public interface IContestLogRepository extends JpaRepository<ContestLog, Integer> {
+	
 	public ContestLog findByEmail(Email email);
+	
 	@Query(value = "" +
 			"select LOG " +
 			"from ContestLog LOG " +
@@ -22,5 +24,12 @@ public interface IContestLogRepository extends JpaRepository<ContestLog, Integer
 			"      LOG.dxccEntity is null and " +
 			"      (LOG.dxccNotFound is null or LOG.dxccNotFound = 0) ")
 	public List<ContestLog> getContestLogWithoutDxccEntityByEdition(@Param("edition") Edition edition);
+	
+	@Query(value = "" +
+			"select LOG " +
+			"from ContestLog LOG " +
+			"JOIN Email E ON LOG.email.id = E.id " +
+			"WHERE E.edition = :edition ")
+	public List<ContestLog> findByEdition(@Param("edition") Edition edition);
 }
 

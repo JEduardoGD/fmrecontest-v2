@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -74,6 +77,10 @@ public class Email implements Serializable {
 	
 	@OneToOne(mappedBy = "email", fetch = FetchType.LAZY)
 	private ContestLog contestLog;
+
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "REL_EMAIL_EMAIL_ERROR", joinColumns = @JoinColumn(name = "N_ID_EMAIL"), inverseJoinColumns = @JoinColumn(name = "N_ID_CAT_EMAIL_ERROR"))
+	private Set<CatEmailError> emailErrors;
 	
 	@Override
 	public boolean equals(Object obj) {
