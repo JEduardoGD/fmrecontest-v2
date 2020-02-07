@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
 import mx.fmre.rttycontest.bs.util.QrzUtil;
@@ -21,13 +22,16 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
+import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
+import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
 
 @Service
+@Slf4j
 public class CompleteDxccServiceImpl implements ICompleteDxccService {
 
 	@Autowired private IEditionRepository    editionRepository;
@@ -36,6 +40,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Autowired private IContestQsoRepository contestQsoRepository;
 	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	@Autowired private ApplicationContext    appContext;
+	@Autowired private ILastEmailRepository lastEmailRepository;
 
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
@@ -44,15 +49,26 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	private static final String PUEBLA_DX_ORIGEN = "Puebla DX";
 	
 	@Override
-	public void complete() {
+	public void completeQsos() {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
+			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
+			List<Integer> lastEmailIdsList = lastEmails
+					.stream()
+					.map(LastEmail::getEmailId)
+					.collect(Collectors.toList());
+			
 			Map<String, DxccEntity> map = this.fillDxccMap(edition);
+			
 			List<Email> emails = emailRepository.getAllWithLogfileByEdition(edition);
-			if (emails.size() > messagesPerminute)
-				emails = emails.subList(0, messagesPerminute);
+			List<Email> filtered = emails
+					.stream()
+					.filter(e -> lastEmailIdsList.contains(e.getId()))
+					.collect(Collectors.toList());
+			if (filtered.size() > messagesPerminute)
+				filtered = filtered.subList(0, messagesPerminute);
 
-			for (Email email : emails) {
+			for (Email email : filtered) {
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
 				List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
 				List<ContestQso> newQsos = contestQsos.stream().map(qso -> {
@@ -86,12 +102,15 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 		
 		// 1st atempt, from de map.
 		dxccEntity = map.get(callsign);
-		if(dxccEntity != null)
+		if(dxccEntity != null) {
+			log.info("{} from map", callsign);
 			return dxccEntity;
+		}
 		
 		// 2nd attempt, from de db, others saved
 		List<DxccEntity> dxccEntities = dxccEntityRepository.getByCallsignOnEdition(callsign, edition);
 		if(!dxccEntities.isEmpty()) {
+			log.info("{} from db, others saved", callsign);
 			dxccEntity = dxccEntities.get(0);
 			map.put(callsign, dxccEntity);
 			return dxccEntity;
@@ -104,6 +123,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			Long dxccEntityNumber = resQrz.getDxcc();
 			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
 			if (dxccEntity != null) {
+				log.info("{} from qrz", callsign);
 				map.put(callsign, dxccEntity);
 				return dxccEntity;
 			}
@@ -127,6 +147,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 				return dxccEntity;
 			}
 			if (dxccEntity == null && resPueblaDx != null) {
+				log.info("{} from Puebla DX", callsign);
 				dxccEntity = QrzUtil.parse(resPueblaDx);
 				dxccEntity.setOrigen(PUEBLA_DX_ORIGEN);
 				dxccEntity = dxccEntityRepository.save(dxccEntity);

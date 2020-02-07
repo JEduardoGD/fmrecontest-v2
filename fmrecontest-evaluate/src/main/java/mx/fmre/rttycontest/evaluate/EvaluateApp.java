@@ -28,6 +28,6 @@ public class EvaluateApp implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		completeDxccService.complete();
+		completeDxccService.completeQsos();
 	}
 }

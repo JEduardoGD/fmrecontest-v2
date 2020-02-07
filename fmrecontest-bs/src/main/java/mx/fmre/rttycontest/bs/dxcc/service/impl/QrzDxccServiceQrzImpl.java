@@ -32,7 +32,7 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 
 	@Override
 	public CallsignDAO getDxccFromCallsign(String callsign) throws FmreContestException {
-		log.info("Info from QRZData para " + callsign);
+		log.debug("Info from QRZData para {}", callsign);
 		QRZDatabaseDAO qrzdatabase = null;
 		
 		DxccSession session;

@@ -46,7 +46,7 @@ public class DxccServicePueblaDxImpl implements IDxccService {
 	public XmlObjectPueblaDX doRequest(String callsign) throws FmreContestException {
 		XmlObjectPueblaDX xmlObjectPueblaDX = null;
 
-		log.info("Info from PueblaDX para {}", callsign);
+		log.debug("Info from PueblaDX para {}", callsign);
 		String url = String.format(PUEBLADX_URL + "?CALL=%s", callsign);
 
 		byte[] targetArray = null;
