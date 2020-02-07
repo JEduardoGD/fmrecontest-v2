@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 
 @AllArgsConstructor
@@ -15,7 +14,7 @@ public class DxccEntityCallsignDAO implements Serializable {
 	 */
 	private static final long serialVersionUID = 6877842963186952037L;
 	private DxccEntity dxccEntity;
-	private ContestQso qso;
+	private String callsign;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -26,15 +25,15 @@ public class DxccEntityCallsignDAO implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		DxccEntityCallsignDAO other = (DxccEntityCallsignDAO) obj;
+		if (callsign == null) {
+			if (other.callsign != null)
+				return false;
+		} else if (!callsign.equals(other.callsign))
+			return false;
 		if (dxccEntity == null) {
 			if (other.dxccEntity != null)
 				return false;
 		} else if (!dxccEntity.equals(other.dxccEntity))
-			return false;
-		if (qso == null) {
-			if (other.qso != null)
-				return false;
-		} else if (!qso.equals(other.qso))
 			return false;
 		return true;
 	}
@@ -43,8 +42,8 @@ public class DxccEntityCallsignDAO implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((callsign == null) ? 0 : callsign.hashCode());
 		result = prime * result + ((dxccEntity == null) ? 0 : dxccEntity.hashCode());
-		result = prime * result + ((qso == null) ? 0 : qso.hashCode());
 		return result;
 	}
 

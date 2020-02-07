@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.evaluate.services.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
 import mx.fmre.rttycontest.bs.util.QrzUtil;
+import mx.fmre.rttycontest.bs.util.TimeStamperUtil;
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.dxcc.dao.DxccEntityCallsignDAO;
@@ -30,8 +32,8 @@ import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
 
-@Service
 @Slf4j
+@Service
 public class CompleteDxccServiceImpl implements ICompleteDxccService {
 
 	@Autowired private IEditionRepository    editionRepository;
@@ -40,7 +42,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Autowired private IContestQsoRepository contestQsoRepository;
 	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	@Autowired private ApplicationContext    appContext;
-	@Autowired private ILastEmailRepository lastEmailRepository;
+	@Autowired private ILastEmailRepository  lastEmailRepository;
 
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
@@ -60,14 +62,17 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			
 			Map<String, DxccEntity> map = this.fillDxccMap(edition);
 			
-			List<Email> emails = emailRepository.getAllWithLogfileByEdition(edition);
+			List<Email> emails = emailRepository.getAllWithLogfileByEditionWithoutDxcc(edition);
 			List<Email> filtered = emails
 					.stream()
 					.filter(e -> lastEmailIdsList.contains(e.getId()))
 					.collect(Collectors.toList());
-			if (filtered.size() > messagesPerminute)
-				filtered = filtered.subList(0, messagesPerminute);
+//			if (filtered.size() > messagesPerminute)
+//				filtered = filtered.subList(0, messagesPerminute);
 
+			Date startDate = new Date();
+			int current = 1;
+			
 			for (Email email : filtered) {
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
 				List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
@@ -86,14 +91,57 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 					return qso;
 				}).collect(Collectors.toList());
 				contestQsoRepository.saveAll(newQsos);
+				log.info("{} de {}; time remaining: {}", current, filtered.size(),
+						TimeStamperUtil.timeRemaining(startDate, current++, filtered.size()));
+			}
+		}
+	}
+
+	@Override
+	public void completeLogs() {
+		Date startDate = new Date();
+		int current = 1;
+		
+		List<Edition> editions = editionRepository.getActiveEditionOfContest();
+		for (Edition edition : editions) {
+			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
+			List<Integer> lastLogsIdsList = lastEmails
+					.stream()
+					.map(LastEmail::getContestLogId)
+					.collect(Collectors.toList());
+			
+			Map<String, DxccEntity> map = this.fillDxccMap(edition);
+			List<ContestLog> logs = contestLogRepository.getContestLogWithoutDxccEntityByEdition(edition);
+			List<ContestLog> filteredLogs = logs
+					.stream()
+					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
+					.collect(Collectors.toList());
+			for(ContestLog contestLog: filteredLogs) {
+				try {
+					DxccEntity dxccEntity = this.getDxccOf(map, contestLog.getCallsign(), edition);
+					if(dxccEntity != null) {
+						contestLog.setDxccEntity(dxccEntity);
+						contestLog.setDxccNotFound(false);
+					} else {
+						contestLog.setDxccEntity(null);
+						contestLog.setDxccNotFound(true);
+					}
+					contestLogRepository.save(contestLog);
+				} catch (FmreContestException e) {
+					e.printStackTrace();
+				}
+				log.info("{} de {}; time remaining: {}", current, filteredLogs.size(),
+						TimeStamperUtil.timeRemaining(startDate, current++, filteredLogs.size()));
 			}
 		}
 	}
 	
 	private Map<String, DxccEntity> fillDxccMap(Edition edition) {
 		Map<String, DxccEntity> map = new HashMap<>();
-		List<DxccEntityCallsignDAO> listObjects = dxccEntityRepository.getAllByEdition(edition);
-		listObjects.stream().forEach(o -> map.put(o.getQso().getCallsignr(), o.getDxccEntity()));
+		List<DxccEntityCallsignDAO> listObjectsQsos = dxccEntityRepository.getAllByEditionOnQso(edition);
+		listObjectsQsos.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
+		List<DxccEntityCallsignDAO> listObjectsLogs = dxccEntityRepository.getAllByEditionOnLogs(edition);
+		listObjectsLogs.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
 		return map;
 	}
 
@@ -143,6 +191,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			Long dxccEntityNumber = resPueblaDx.getDxcc();
 			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
 			if (dxccEntity != null) {
+				log.info("{} from Puebla DX", callsign);
 				map.put(callsign, dxccEntity);
 				return dxccEntity;
 			}
@@ -160,3 +209,22 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 		return null;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

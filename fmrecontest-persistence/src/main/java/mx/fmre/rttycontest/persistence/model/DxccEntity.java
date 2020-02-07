@@ -43,7 +43,11 @@ public class DxccEntity implements Serializable {
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "dxccEntity", fetch = FetchType.LAZY)
-	private List<ContestQso> contestqsos;
+	private List<ContestQso> contestQsos;
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "dxccEntity", fetch = FetchType.LAZY)
+	private List<ContestLog> contestLogs;
 
 	@Override
 	public boolean equals(Object obj) {

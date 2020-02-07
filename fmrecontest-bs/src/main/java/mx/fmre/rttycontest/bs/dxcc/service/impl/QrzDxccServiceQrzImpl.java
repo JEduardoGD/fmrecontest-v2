@@ -57,7 +57,7 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 			return null;
 
 		if (qrzdatabase.getSession() != null && qrzdatabase.getSession().getError() != null) {
-			log.warn("Error de QRZ: " + qrzdatabase.getSession().getError());
+			log.warn("Error de QRZ: {}", qrzdatabase.getSession().getError());
 			return null;
 		}
 

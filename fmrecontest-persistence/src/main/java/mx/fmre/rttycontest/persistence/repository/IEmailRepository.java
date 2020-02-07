@@ -77,8 +77,20 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			"WHERE E.edition = :edition and " +
 			"      AF.isLogFile = true and " +
 			"      QSO.dxccEntity IS NULL and " +
-			"      (QSO.dxccNotFound is null or QSO.dxccNotFound = 0)")
-	public List<Email>getAllWithLogfileByEdition(@Param("edition") Edition edition);
+			"      (QSO.dxccNotFound is null or QSO.dxccNotFound = 0) ")
+	public List<Email>getAllWithLogfileByEditionWithoutDxcc(@Param("edition") Edition edition);
+	
+	@Query(value = "" +
+			"SELECT DISTINCT(E) " +
+			"FROM ContestQso QSO " +
+			"JOIN ContestLog LOG on QSO.contestLog.id = LOG.id " +
+			"JOIN Email E ON LOG.email.id = E.id " +
+			"JOIN AttachedFile AF on AF.email.id = E.id " +
+			"WHERE E.edition = :edition and " +
+			"      AF.isLogFile = true and " +
+			"      QSO.dxccEntity IS NULL and " +
+			"      QSO.dxccNotFound = 1 ")
+	public List<Email>getAllWithLogfileByEditionDxccNotFound(@Param("edition") Edition edition);
 }
 
 

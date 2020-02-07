@@ -14,7 +14,7 @@ import mx.fmre.rttycontest.persistence.model.Edition;
 @Repository
 public interface IDxccEntityRepository extends JpaRepository<DxccEntity, Long> {
 	@Query( value = "" +
-			"select new mx.fmre.rttycontest.persistence.dxcc.dao.DxccEntityCallsignDAO(E, qso) " +
+			"select new mx.fmre.rttycontest.persistence.dxcc.dao.DxccEntityCallsignDAO(E, qso.callsignr) " +
 			"from DxccEntity E " +
 			"join ContestQso qso on qso.dxccEntity.id = E.id " +
 			"join ContestLog log on log.id = qso.contestLog.id " +
@@ -22,7 +22,17 @@ public interface IDxccEntityRepository extends JpaRepository<DxccEntity, Long> {
 			"join Edition edition on edition.id = email.edition.id " +
 			"where edition = :edition " +
 			"group by E, qso, log, email, edition ")
-	public List<DxccEntityCallsignDAO> getAllByEdition(@Param("edition") Edition edition);
+	public List<DxccEntityCallsignDAO> getAllByEditionOnQso(@Param("edition") Edition edition);
+	
+	@Query( value = "" +
+			"select new mx.fmre.rttycontest.persistence.dxcc.dao.DxccEntityCallsignDAO(E, log.callsign) " +
+			"from DxccEntity E " +
+			"join ContestLog log on log.dxccEntity.id = E.id " +
+			"join Email email on email.id = log.email.id " +
+			"join Edition edition on edition.id = email.edition.id " +
+			"where edition = :edition " +
+			"group by E, log, email, edition ")
+	public List<DxccEntityCallsignDAO> getAllByEditionOnLogs(@Param("edition") Edition edition);
 	
 	@Query( value = "" +
 			"select E from DxccEntity E " +
