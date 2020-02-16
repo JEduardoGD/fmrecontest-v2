@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
+import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
 
 @SpringBootApplication
 
@@ -23,6 +24,7 @@ import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 public class EvaluateApp implements CommandLineRunner {
 	
 	@Autowired ICompleteDxccService completeDxccService;
+	@Autowired IEvaluateService evaluateService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(EvaluateApp.class);
@@ -33,10 +35,10 @@ public class EvaluateApp implements CommandLineRunner {
 		completeDxccService.completeDxccEntityQsos();
 		completeDxccService.completeDxccEntityLogs();
 		completeDxccService.completeBandsOnQsos();
-		completeDxccService.findForErrorsOnQsos();
-		completeDxccService.setPointsForQssos();
-		completeDxccService.setMultipliesQsos();
-		completeDxccService.evaluateActiveEditions();
+		evaluateService.findForErrorsOnQsos();
+		evaluateService.setPointsForQssos();
+		evaluateService.setMultipliesQsos();
+		evaluateService.evaluateActiveEditions();
 	}
 }
 

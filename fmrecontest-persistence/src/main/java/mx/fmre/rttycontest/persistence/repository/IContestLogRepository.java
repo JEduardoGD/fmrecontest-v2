@@ -12,7 +12,7 @@ import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 
 @Repository
-public interface IContestLogRepository extends JpaRepository<ContestLog, Integer> {
+public interface IContestLogRepository extends JpaRepository<ContestLog, Long> {
 	
 	public ContestLog findByEmail(Email email);
 	
