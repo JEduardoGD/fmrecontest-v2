@@ -37,4 +37,18 @@ public class EmailController extends BaseController {
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@GetMapping("/subject/{subject}/idedition/{idEdition}")
+	public ResponseEntity<StdResponse> getAllBySubjectAndEdition(
+			@PathVariable("subject") String subject,
+			@PathVariable("idEdition") Integer idEdition) {
+		try {
+			getResponseServiceVo().setData(emailService.getAllBySubjectAndEditionID(subject, idEdition));
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+		} catch (FmreContestException e) {
+			log.error("{}", e.getLocalizedMessage());
+			getResponseServiceVo().setMessageResponse(e.getLocalizedMessage());
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

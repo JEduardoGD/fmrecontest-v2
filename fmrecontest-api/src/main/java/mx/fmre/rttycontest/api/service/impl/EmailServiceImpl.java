@@ -57,4 +57,33 @@ public class EmailServiceImpl implements IEmailService {
 			return emailDTO;
 		}).collect(Collectors.toList());
 	}
+
+	@Override
+	public List<EmailDTO> getAllBySubjectAndEditionID(String subject, Integer editionid) throws FmreContestException {
+		Optional<Edition> editionOptional = editionRepository.findById(editionid);
+		
+		if(!editionOptional.isPresent())
+			throw new FmreContestException("Edition not found");
+
+		return emailRepository.findByEditionAndSubject(editionOptional.get(), subject)
+		.stream()
+		.map(e -> {
+			EmailStatus emailStatus = mapStatuses.get(e.getEmailStatus().getId());
+			emailStatus = emailStatus == null ? emailStatusService.getById(e.getEmailStatus().getId()) : emailStatus;
+			mapStatuses.put(emailStatus.getId(), emailStatus);
+			
+			EmailDTO emailDTO = new EmailDTO();
+			emailDTO.setSubject(e.getSubject());
+			emailDTO.setSentDate(df.format(e.getSentDate()));
+			emailDTO.setReceivedDate(df.format(e.getReceivedDate()));
+			emailDTO.setId(e.getId());
+			emailDTO.setRecipientsFromAddress(e.getRecipientsFromAddress());
+			emailDTO.setRecipientsFromName(e.getRecipientsFromName());
+			emailDTO.setEmailStatus(emailStatus.getStatus());
+			
+//			List<AttachedFile> attachedFiles = attachedFileRepository.getByEmail(e);
+//			emailDTO.setAtachedFiles(attachedFileUtil.map(attachedFiles));
+			return emailDTO;
+		}).collect(Collectors.toList());
+	}
 }

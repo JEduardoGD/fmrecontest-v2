@@ -91,6 +91,8 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			"      QSO.dxccEntity IS NULL and " +
 			"      QSO.dxccNotFound = 1 ")
 	public List<Email>getAllWithLogfileByEditionDxccNotFound(@Param("edition") Edition edition);
+	
+	public List<Email> findByEditionAndSubject(Edition edition, String subject);
 }
 
 
