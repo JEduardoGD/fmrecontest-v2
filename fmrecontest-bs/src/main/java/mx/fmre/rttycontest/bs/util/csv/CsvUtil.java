@@ -27,7 +27,10 @@ public class CsvUtil {
 			Map<Integer, String> emailStatusesArray) {
 		List<String[]> listStringsContent = emails.stream().map(email -> {
 			List<CatEmailError> emailErrors = catEmailErrorRepository.getErrorsOfEmail(email);
-			List<String> errors = emailErrors.stream().map(x -> mapEmmailError.get(x.getId())).collect(Collectors.toList());
+			List<String> errors = emailErrors
+					.stream()
+					.map(x -> mapEmmailError.get(x.getId()))
+					.collect(Collectors.toList());
 			String[] content = {
 					email.getId() + "",
 					email.getSubject(),

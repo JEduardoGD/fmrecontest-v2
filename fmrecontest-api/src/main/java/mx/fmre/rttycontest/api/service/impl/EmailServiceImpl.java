@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.api.service.IEmailService;
+import mx.fmre.rttycontest.api.util.AttachedFileUtil;
 import mx.fmre.rttycontest.dto.EmailDTO;
 import mx.fmre.rttycontest.exception.FmreContestException;
+import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
+import mx.fmre.rttycontest.persistence.repository.IAttachedFileRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 
@@ -25,6 +28,7 @@ public class EmailServiceImpl implements IEmailService {
 	@Autowired private IEmailRepository emailRepository;
 	@Autowired private IEditionRepository editionRepository;
 	@Autowired private EmailStatusService emailStatusService;
+	@Autowired private IAttachedFileRepository attachedFileRepository;
 	
 	private Map<Integer, EmailStatus> mapStatuses = new HashMap<>();
 	private DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -52,8 +56,8 @@ public class EmailServiceImpl implements IEmailService {
 			emailDTO.setRecipientsFromName(e.getRecipientsFromName());
 			emailDTO.setEmailStatus(emailStatus.getStatus());
 			
-//			List<AttachedFile> attachedFiles = attachedFileRepository.getByEmail(e);
-//			emailDTO.setAtachedFiles(attachedFileUtil.map(attachedFiles));
+			List<AttachedFile> attachedFiles = attachedFileRepository.findByEmail(e);
+			emailDTO.setAtachedFiles(AttachedFileUtil.map(attachedFiles));
 			return emailDTO;
 		}).collect(Collectors.toList());
 	}
@@ -81,8 +85,8 @@ public class EmailServiceImpl implements IEmailService {
 			emailDTO.setRecipientsFromName(e.getRecipientsFromName());
 			emailDTO.setEmailStatus(emailStatus.getStatus());
 			
-//			List<AttachedFile> attachedFiles = attachedFileRepository.getByEmail(e);
-//			emailDTO.setAtachedFiles(attachedFileUtil.map(attachedFiles));
+			List<AttachedFile> attachedFiles = attachedFileRepository.findByEmail(e);
+			emailDTO.setAtachedFiles(AttachedFileUtil.map(attachedFiles));
 			return emailDTO;
 		}).collect(Collectors.toList());
 	}
