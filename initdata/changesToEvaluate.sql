@@ -129,7 +129,7 @@ insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`,
 insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('14', '60 meters', '5.3465', '5.3465', 'USB phone1 and CW/RTTY/data2');
 insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('15', '60 meters', '5.357', '5.357', 'USB phone1 and CW/RTTY/data2');
 insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('16', '60 meters', '5.3715', '5.3715', 'USB phone1 and CW/RTTY/data2');
-insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('17', '60 meters', '5.403.5', '5.4035', 'USB phone1 and CW/RTTY/data2');
+insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('17', '60 meters', '5.4035', '5.4035', 'USB phone1 and CW/RTTY/data2');
 insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('18', '40 meters', '7.04', '0.04', 'RTTY/Data DX');
 insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('19', '40 meters', '7.08', '7.125', 'RTTY/Data');
 insert into CAT_FREQUENCY_BAND (`N_ID_FREQUENCY_BAND`, `S_BAND`, `D_START_FREQ`, `D_END_FREQ`, `S_REMARK`) values ('20', '40 meters', '7.171', '7.171', 'SSTV');
