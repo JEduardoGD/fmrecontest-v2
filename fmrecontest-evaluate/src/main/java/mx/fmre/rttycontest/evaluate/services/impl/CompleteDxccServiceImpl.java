@@ -166,6 +166,19 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			return dxccEntity;
 		}
 		
+		dxccEntity = getDxccFromExternalServicesByCallsign(callsign);
+		if(dxccEntity != null) {
+			log.info("{} from external Services", callsign);
+			map.put(callsign, dxccEntity);
+			return dxccEntity;
+		}
+		
+		return null;
+	}
+	
+	private DxccEntity getDxccFromExternalServicesByCallsign(String callsign) throws FmreContestException {
+		DxccEntity dxccEntity;
+		
 		// 3rd attempt, from QRZ
 		IDxccService dxccServiceQrz = appContext.getBean("qrzDxccServiceQrzImpl", IDxccService.class);
 		CallsignDAO resQrz = dxccServiceQrz.getDxccFromCallsign(callsign);
@@ -174,19 +187,17 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
 			if (dxccEntity != null) {
 				log.info("{} from qrz", callsign);
-				map.put(callsign, dxccEntity);
 				return dxccEntity;
 			}
 			if (dxccEntity == null && resQrz != null) {
 				dxccEntity = QrzUtil.parse(resQrz);
 				dxccEntity.setOrigen(QRZ_ORIGEN);
 				dxccEntity = dxccEntityRepository.save(dxccEntity);
-				map.put(callsign, dxccEntity);
 				return dxccEntity;
 			}
 		}
 		
-		// 3rd attempt, from Puebla DX
+		// 4rd attempt, from Puebla DX
 		IDxccService dxccServicePueblaDx = appContext.getBean("dxccServicePueblaDx", IDxccService.class);
 		CallsignDAO resPueblaDx = dxccServicePueblaDx.getDxccFromCallsign(callsign);
 		if (resPueblaDx != null) {
@@ -194,7 +205,6 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
 			if (dxccEntity != null) {
 				log.info("{} from Puebla DX", callsign);
-				map.put(callsign, dxccEntity);
 				return dxccEntity;
 			}
 			if (dxccEntity == null && resPueblaDx != null) {
@@ -202,7 +212,6 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 				dxccEntity = QrzUtil.parse(resPueblaDx);
 				dxccEntity.setOrigen(PUEBLA_DX_ORIGEN);
 				dxccEntity = dxccEntityRepository.save(dxccEntity);
-				map.put(callsign, dxccEntity);
 				return dxccEntity;
 			}
 		}
