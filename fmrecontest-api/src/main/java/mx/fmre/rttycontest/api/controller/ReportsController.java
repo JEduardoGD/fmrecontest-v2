@@ -28,7 +28,7 @@ public class ReportsController extends BaseController {
 
 	@GetMapping("/conteo/{conteoId}")
 	public ResponseEntity<StdResponse> generateConteoReport(@PathVariable("conteoId") Integer conteoId) {
-		getResponseServiceVo().setData(csvReportsService.generateRepor(conteoId));
+		getResponseServiceVo().setData(csvReportsService.generateReport(conteoId));
 		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
 		
 		
