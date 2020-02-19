@@ -74,7 +74,7 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 			"JOIN ContestLog LOG on QSO.contestLog.id = LOG.id " +
 			"JOIN Email E ON LOG.email.id = E.id " +
 			"JOIN AttachedFile AF on AF.email.id = E.id " +
-			"WHERE E.edition = :edition and " +
+			"WHERE E.edition like :edition and " +
 			"      AF.isLogFile = true and " +
 			"      QSO.dxccEntity IS NULL and " +
 			"      (QSO.dxccNotFound is null or QSO.dxccNotFound = 0) ")
