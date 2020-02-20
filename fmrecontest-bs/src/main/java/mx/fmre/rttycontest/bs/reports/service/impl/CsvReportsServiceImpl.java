@@ -28,6 +28,7 @@ import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
+import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
 @Service
 public class CsvReportsServiceImpl implements ICsvReportsService {
@@ -40,6 +41,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	@Autowired private IEmailRepository emailRepository;
 	@Autowired private IEmailEstatusRepository emailEstatusRepository;
 	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;
+	@Autowired private IRelQsoConteoRepository relQsoConteoRepository;
 	
 	private Map<Integer, String> emailStatusesArray;
 	private Map<Integer, String> mapEmmailError;
@@ -85,7 +87,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 		List<RelConteoContestLog> relConteoContestLogs = relConteoContestLogRepository.findByConteo(conteo);
 		
-		String[] header = { "CALLSIGN", "# QSOS" };
+		String[] header = { "LOG ID", "CALLSIGN", "# QSOS", "POINTS", "MULTIPLIERS", "TOTAL", "" };
 		
 		List<String[]> listStringsContent = new ArrayList<>();
 
@@ -96,7 +98,38 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 			List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
 			int contestQsoSize = contestQsos.size();
 
-			String[] content = { contestLog.getCallsign(), contestQsoSize + "" };
+			String[] content = {
+					contestLog.getId() + "",
+					contestLog.getCallsign(),
+					contestQsoSize + "",
+					relConteoContestLog.getSumOfPoints() + "",
+					relConteoContestLog.getMultipliers() + "",
+					relConteoContestLog.getTotalPoints() + "",
+					relConteoContestLog.isComplete() ? "" : "ERROR"};
+
+			listStringsContent.add(content);
+		}
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+
+	@Override
+	public byte[] generateLogReport(long logId) {
+		ContestLog contestLog = contestLogRepository.findById(logId).orElse(null);
+		List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
+		conteoRepository.g
+		
+		String[] header = { "QSO ID", "CALL E", "CALL R" };
+		
+		List<String[]> listStringsContent = new ArrayList<>();
+
+		for (ContestQso qso : contestQsos) {
+
+			String[] content = {
+					qso.getId() + "",
+					contestLog.getCallsign(),
+					qso.getCallsignr()
+			};
 
 			listStringsContent.add(content);
 		}

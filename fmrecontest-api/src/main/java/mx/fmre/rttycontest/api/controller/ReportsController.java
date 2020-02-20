@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import mx.fmre.rttycontest.api.common.BaseController;
-import mx.fmre.rttycontest.api.common.StdResponse;
 import mx.fmre.rttycontest.bs.reports.service.ICsvReportsService;
 
 @RestController
@@ -27,11 +25,21 @@ public class ReportsController extends BaseController {
 	@Autowired private ICsvReportsService csvReportsService;
 
 	@GetMapping("/conteo/{conteoId}")
-	public ResponseEntity<StdResponse> generateConteoReport(@PathVariable("conteoId") Integer conteoId) {
-		getResponseServiceVo().setData(csvReportsService.generateConteoReport(conteoId));
-		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
-		
-		
+	public ResponseEntity<Resource> generateConteoReport(@PathVariable("conteoId") Integer conteoId) {
+//		getResponseServiceVo().setData();
+//		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+		HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        byte[] bytesrray = csvReportsService.generateConteoReport(conteoId);
+        ByteArrayResource resource = new ByteArrayResource(bytesrray);
+	    return ResponseEntity.ok()
+	            .headers(headers)
+	            .contentLength(bytesrray.length)
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .contentType(new MediaType("text", "csv"))
+	            .body(resource);
 	}
 	
 	@GetMapping("/getallemail/{editionId}")
@@ -45,7 +53,23 @@ public class ReportsController extends BaseController {
 	    return ResponseEntity.ok()
 	            .headers(headers)
 	            .contentLength(bytesrray.length)
-//	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .contentType(new MediaType("text", "csv"))
+	            .body(resource);
+	}
+	
+	@GetMapping("/getbylogid/{logId}")
+	public ResponseEntity<Resource> getAllByEditionId(@PathVariable("logId") Long logId) {
+		HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        byte[] bytesrray = csvReportsService.generateLogReport(logId);
+        ByteArrayResource resource = new ByteArrayResource(bytesrray);
+	    return ResponseEntity.ok()
+	            .headers(headers)
+	            .contentLength(bytesrray.length)
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .contentType(new MediaType("text", "csv"))
 	            .body(resource);
 	}
