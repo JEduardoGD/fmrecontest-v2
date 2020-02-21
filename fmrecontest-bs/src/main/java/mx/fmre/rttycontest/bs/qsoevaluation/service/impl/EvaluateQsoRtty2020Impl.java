@@ -142,6 +142,9 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 			return null;
 		DxccEntity dxccEntityCalled = dxccEntityRepository.findById(dxccEntityCalledId).orElse(null);
 		
+		if(dxccEntityCalled == null)
+			return null;
+		
 		if(mexicoDxccEntity.equals(dxccEntityHome)) {
 			// mexicano llama a
 			if(mexicoDxccEntity.equals(dxccEntityCalled)) {

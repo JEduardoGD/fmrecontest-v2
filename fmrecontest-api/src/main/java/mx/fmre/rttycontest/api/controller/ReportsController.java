@@ -24,7 +24,7 @@ public class ReportsController extends BaseController {
 	private static final long serialVersionUID = -613764212672345431L;
 	@Autowired private ICsvReportsService csvReportsService;
 
-	@GetMapping("/conteo/{conteoId}")
+	@GetMapping("/conteoid/{conteoId}")
 	public ResponseEntity<Resource> generateConteoReport(@PathVariable("conteoId") Integer conteoId) {
 //		getResponseServiceVo().setData();
 //		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
@@ -58,13 +58,15 @@ public class ReportsController extends BaseController {
 	            .body(resource);
 	}
 	
-	@GetMapping("/getbylogid/{logId}")
-	public ResponseEntity<Resource> getAllByEditionId(@PathVariable("logId") Long logId) {
+	@GetMapping("/getbylogid/{logId}/conteoid/{conteoId}")
+	public ResponseEntity<Resource> getAllByEditionId(
+			@PathVariable("conteoId") Integer conteoId,
+			@PathVariable("logId") Long logId) {
 		HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
-        byte[] bytesrray = csvReportsService.generateLogReport(logId);
+        byte[] bytesrray = csvReportsService.generateLogReport(conteoId, logId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
 	            .headers(headers)

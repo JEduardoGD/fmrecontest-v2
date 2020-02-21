@@ -1,5 +1,7 @@
 package mx.fmre.rttycontest.bs.reports.service.impl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +18,17 @@ import mx.fmre.rttycontest.persistence.model.CatEmailError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
+import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
+import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
@@ -42,9 +47,13 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	@Autowired private IEmailEstatusRepository emailEstatusRepository;
 	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;
 	@Autowired private IRelQsoConteoRepository relQsoConteoRepository;
+	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	
 	private Map<Integer, String> emailStatusesArray;
 	private Map<Integer, String> mapEmmailError;
+	private List<DxccEntity> listDxccEntities;
+	
+	private DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	
 	@PostConstruct
 	private void initData() {
@@ -57,6 +66,8 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 				.findAll()
 				.stream()
 				.collect(Collectors.toMap(CatEmailError::getId, CatEmailError::getDescripcion));
+		
+		this.listDxccEntities = dxccEntityRepository.findAll();
 	}
 	
 	@Override
@@ -114,21 +125,56 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	}
 
 	@Override
-	public byte[] generateLogReport(long logId) {
+	public byte[] generateLogReport(int conteoId, long logId) {
 		ContestLog contestLog = contestLogRepository.findById(logId).orElse(null);
 		List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
-		conteoRepository.g
 		
-		String[] header = { "QSO ID", "CALL E", "CALL R" };
+		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
+		
+		String[] header = {
+				"QSO ID",
+				"CALL E",
+				"CALL R",
+				"DATETIME",
+				"EXCHANGE E",
+				"EXCHANGE R",
+				"RST E",
+				"RST R",
+				"DXCC NOT FOUND",
+				"DXCC ENTITY",
+				"POINTS",
+				"IS MULTIPLY",
+				"COMPLETE"};
 		
 		List<String[]> listStringsContent = new ArrayList<>();
 
 		for (ContestQso qso : contestQsos) {
+			
+			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
+			
+			Long dxccEntityId = qso.getDxccEntity() != null ? qso.getDxccEntity().getId() : null;
+			DxccEntity dxccEntity = null;
+			if(dxccEntityId != null) {
+				dxccEntity = this.listDxccEntities
+						.stream()
+						.filter(x -> x.getId().equals(dxccEntityId)).findFirst()
+						.orElse(null);
+			}
 
 			String[] content = {
 					qso.getId() + "",
 					contestLog.getCallsign(),
-					qso.getCallsignr()
+					qso.getCallsignr(),
+					df.format(qso.getDatetime()),
+					qso.getExchangee(),
+					qso.getExchanger(),
+					qso.getRste(),
+					qso.getRstr(),
+					qso.getDxccNotFound() ? "NOT FOUND" : "",
+					dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getId(), dxccEntity.getEntity())) : "",
+					relQsoConteo.getPoints() + "",
+					relQsoConteo.isMultiply() ? "1" : "",
+					relQsoConteo.isComplete() ? "" : "IMCOMPLETE",
 			};
 
 			listStringsContent.add(content);
