@@ -24,7 +24,7 @@ public class FrequencyServiceImpl implements IFrequencyService {
 		List<CatFrequencyBand> multipleFB = catFrequencyBandRepository.getByFrequency(frequency);
 		List<CatFrequencyBand> distinctBands = multipleFB
 				.stream()
-				.filter(CollectiosUtil.distinctByKey(CatFrequencyBand::getBand))
+				.filter(CollectiosUtil.distinctByKey(CatFrequencyBand::getId))
 				.collect(Collectors.toList());
 		if(distinctBands.size() == 1) {
 			return distinctBands.get(0);

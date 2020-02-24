@@ -2,16 +2,15 @@ package mx.fmre.rttycontest.persistence.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -29,19 +28,17 @@ public class CatFrequencyBand implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "N_ID_FREQUENCY_BAND")
 	private Integer id;
-	
-	@Column(name = "S_BAND")
-	private String band;
+
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "N_ID_BAND")
+	private CatBand band;
 	
 	@Column(name = "D_START_FREQ")
 	private BigDecimal startFrequency;
 	
 	@Column(name = "D_END_FREQ")
 	private BigDecimal endFrequency;
-
-	// bi-directional many-to-one association to Contestqso
-	@OneToMany(mappedBy = "frequencyBand", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-	private List<ContestQso> contestqsos;
 
 	@Override
 	public boolean equals(Object obj) {

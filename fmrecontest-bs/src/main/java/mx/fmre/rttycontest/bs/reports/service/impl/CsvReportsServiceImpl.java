@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.reports.service.ICsvReportsService;
 import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
+import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
-import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
@@ -27,8 +27,8 @@ import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteoQsoError;
+import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
-import mx.fmre.rttycontest.persistence.repository.ICatFrequencyBandRepository;
 import mx.fmre.rttycontest.persistence.repository.ICatQsoErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
@@ -56,13 +56,13 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
 	@Autowired private ICatQsoErrorRepository catQsoErrorRepository;
-	@Autowired private ICatFrequencyBandRepository catFrequencyBandRepository;
+	@Autowired private ICatBandRepository catBandRepository;
 	
 	private Map<Integer, String> emailStatusesArray;
 	private Map<Integer, String> mapEmmailError;
 	private List<DxccEntity> listDxccEntities;
 	private List<CatQsoError> listCatQsoError;
-	private List<CatFrequencyBand> listFrequencyBand;
+	private List<CatBand> listBands;
 	
 	private DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	
@@ -82,7 +82,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		
 		this.listCatQsoError = catQsoErrorRepository.findAll();
 		
-		this.listFrequencyBand = catFrequencyBandRepository.findAll();
+		this.listBands = catBandRepository.findAll();
 	}
 	
 	@Override
@@ -189,12 +189,12 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 			
 			List<String> keyErrors = qsosErrors.stream().map(r -> r.getKey()).collect(Collectors.toList());
 			
-			CatFrequencyBand frequencyBand = null;
-			if(qso.getFrequencyBand() != null) {
-				Integer frequencyBandId = qso.getFrequencyBand().getId();
-				frequencyBand = listFrequencyBand
+			CatBand qsoBand = null;
+			if(qso.getBand() != null) {
+				Integer qsoBandId = qso.getBand().getId();
+				qsoBand = listBands
 						.stream()
-						.filter(x -> x.getId() == frequencyBandId)
+						.filter(x -> x.getId() == qsoBandId)
 						.findFirst()
 						.orElse(null);
 			}
@@ -213,8 +213,8 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 					dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getId(), dxccEntity.getEntity())) : "",
 					relQsoConteo.getPoints() != null ? relQsoConteo.getPoints()  + "" : "",
 					relQsoConteo.isMultiply() ? "1" : "",
-					frequencyBand == null ? "NOT FOUND" : "",
-					frequencyBand != null ? frequencyBand.getBand() : "",
+					qsoBand == null ? "NOT FOUND" : "",
+					qsoBand != null ? qsoBand.getBand() : "",
 					String.join(";", keyErrors)
 			};
 

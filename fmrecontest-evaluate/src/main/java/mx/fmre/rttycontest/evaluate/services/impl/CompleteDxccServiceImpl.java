@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -21,6 +23,7 @@ import mx.fmre.rttycontest.bs.util.QrzUtil;
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.dxcc.dao.DxccEntityCallsignDAO;
+import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
@@ -28,6 +31,7 @@ import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.LastEmail;
+import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
@@ -47,12 +51,20 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Autowired private ApplicationContext              appContext;
 	@Autowired private ILastEmailRepository            lastEmailRepository;
 	@Autowired private IFrequencyService               frequencyService;
+	@Autowired private ICatBandRepository              catBandRepository;
+	
+	private List<CatBand> listBands;
 
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
 	
 	private static final String QRZ_ORIGEN = "QRZ.com";
 	private static final String PUEBLA_DX_ORIGEN = "Puebla DX";
+	
+	@PostConstruct
+	private void postConstruct() {
+		this.listBands = catBandRepository.findAll();
+	}
 	
 	@Override
 	public void completeDxccEntityQsos() {
@@ -242,13 +254,15 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			for (Email email : filtered) {
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				qsos = qsos.stream().filter(q -> q.getFrequencyBand() == null).collect(Collectors.toList());
+				qsos = qsos.stream().filter(q -> q.getBand() == null).collect(Collectors.toList());
 				List<ContestQso> newQsos = qsos.stream().map(qso -> {
 					BigDecimal bdFrequency = BigDecimal.valueOf(qso.getFrequency());
 					bdFrequency = bdFrequency.divide(BigDecimal.valueOf(1000));
 					CatFrequencyBand frequencyBand = frequencyService.getFrequencyBandOf(bdFrequency);
 					if (frequencyBand != null) {
-						qso.setFrequencyBand(frequencyBand);
+						Integer bandId = frequencyBand.getBand().getId();
+						CatBand band = listBands.stream().filter(b -> b.getId() == bandId).findFirst().orElse(null);
+						qso.setBand(band);
 					} else
 						log.warn("Frequency not found for freq {} on qso id {}", bdFrequency, qso.getId());
 					return qso;

@@ -73,8 +73,8 @@ public class ContestQso implements Serializable {
 	private DxccEntity dxccEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "N_ID_FREQUENCY_BAND")
-	private CatFrequencyBand frequencyBand;
+	@JoinColumn(name = "N_ID_BAND")
+	private CatBand band;
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "contestQso", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

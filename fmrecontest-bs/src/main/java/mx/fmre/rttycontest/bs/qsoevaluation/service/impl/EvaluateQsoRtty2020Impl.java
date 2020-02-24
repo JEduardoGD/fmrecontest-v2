@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
-import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
+import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
@@ -19,7 +19,7 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
-import mx.fmre.rttycontest.persistence.repository.ICatFrequencyBandRepository;
+import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
@@ -27,14 +27,14 @@ import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 	
 	@Autowired private IDxccEntityRepository       dxccEntityRepository;
-	@Autowired private ICatFrequencyBandRepository catFrequencyBandRepository;
 	@Autowired private IRelQsoConteoRepository     relQsoConteoRepository;
+	@Autowired private ICatBandRepository          catBandRepository;
 	
 	private DxccEntity mexicoDxccEntity;
 	private List<String> allowedMexicoEntities;
 	private String patternForNoMexicano = "^\\d+$";
-	private List<CatFrequencyBand> prohibitedWarcBands;
-	private List<CatFrequencyBand> frequencyBandsAllowed;
+	private List<String> prohibitedWarcBands;
+	private List<String> frequencyBandsAllowed;
 	
 	@PostConstruct private void fillMexicoDxccEntity() {
 		this.mexicoDxccEntity = dxccEntityRepository
@@ -46,8 +46,8 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 				"DGO", "GTO", "GRO", "HGO", "JAL", "MIC", "MOR", "NAY", "NL", "OAX", "PUE", "QRO", "QTR", "SLP", "SIN",
 				"SON", "TAB", "TMS", "TLX", "VER", "YUC", "ZAC");
 		
-		prohibitedWarcBands = catFrequencyBandRepository.findByBands(Arrays.asList("12 meters", "17 meters", "30 meters"));
-		frequencyBandsAllowed = catFrequencyBandRepository.findByBands(Arrays.asList("80 meters", "60 meters", "40 meters", "20 meters", "15 meters", "10 meters"));
+		prohibitedWarcBands = Arrays.asList("12 meters", "17 meters", "30 meters");
+		frequencyBandsAllowed = Arrays.asList("80 meters", "60 meters", "40 meters", "20 meters", "15 meters", "10 meters");
 	}
 	
 	@Override
@@ -96,12 +96,12 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 			listErrors.add(error_QSO_MADE_AFTER_CONTEST_START);
 		}
 		
-		CatFrequencyBand frequencyBand = qso.getFrequencyBand();
-		CatFrequencyBand qsoFrequencyBand = null;
-		if (frequencyBand != null) {
-			Integer qsoFrequencyBandId = frequencyBand.getId();
-			qsoFrequencyBand = catFrequencyBandRepository.findById(qsoFrequencyBandId).orElse(null);
-			if (!frequencyBandsAllowed.contains(qsoFrequencyBand)) {
+		CatBand band = qso.getBand();
+		CatBand qsoBand = null;
+		if (band != null) {
+			Integer bandId = band.getId();
+			qsoBand = catBandRepository.findById(bandId).orElse(null);
+			if (!frequencyBandsAllowed.contains(qsoBand.getBand())) {
 				listErrors.add(error_QSO_OUT_OF_BAND);
 			}
 		}
@@ -121,8 +121,8 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 			}
 		}
 		
-		if (qsoFrequencyBand != null) {
-			if (prohibitedWarcBands.contains(qsoFrequencyBand)) {
+		if (qsoBand != null) {
+			if (prohibitedWarcBands.contains(qsoBand.getBand())) {
 				listErrors.add(error_QSO_ON_WARC_BAND);
 			}
 		}
@@ -145,8 +145,8 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 		if(dxccEntityCalled == null)
 			return null;
 		
-		CatFrequencyBand frequencyBand = qso.getFrequencyBand();
-		if(frequencyBand == null)
+		CatBand qsoBand = qso.getBand();
+		if(qsoBand == null)
 			return null;
 		
 		if(mexicoDxccEntity.equals(dxccEntityHome)) {

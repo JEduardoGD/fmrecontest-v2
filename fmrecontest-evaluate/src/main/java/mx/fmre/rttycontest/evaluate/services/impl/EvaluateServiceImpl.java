@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
-import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
+import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
@@ -76,9 +76,9 @@ public class EvaluateServiceImpl implements IEvaluateService {
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				for(ContestQso qso: qsos) {
 					boolean qsoComplete = true;
-					CatFrequencyBand frequencyBand = qso.getFrequencyBand();
-					if(frequencyBand == null) {
-						log.error("El qso {} no tiene frecuencia-banda", qso.getId());
+					CatBand qsoBand = qso.getBand();
+					if(qsoBand == null) {
+						log.error("El qso {} no tiene banda", qso.getId());
 						qsoComplete = false;
 					}
 					if(qso.getDxccNotFound() == true) {
