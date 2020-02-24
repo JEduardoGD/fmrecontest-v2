@@ -32,6 +32,9 @@ public class FrequencyServiceImpl implements IFrequencyService {
 		if(distinctBands.size() > 1) {
 			log.warn("Multiple bands for {} frequency", frequency);
 		}
+		
+		
+		
 		return null;
 	}
 
