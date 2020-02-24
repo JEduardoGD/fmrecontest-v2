@@ -145,6 +145,10 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 		if(dxccEntityCalled == null)
 			return null;
 		
+		CatFrequencyBand frequencyBand = qso.getFrequencyBand();
+		if(frequencyBand == null)
+			return null;
+		
 		if(mexicoDxccEntity.equals(dxccEntityHome)) {
 			// mexicano llama a
 			if(mexicoDxccEntity.equals(dxccEntityCalled)) {
@@ -172,19 +176,34 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
 		for(ContestQso qso:qsos) {
 			String exchangeR = qso.getExchanger();
-			try {
-				Integer exchangeRInteger = Integer.valueOf(exchangeR);
-				exchangeR = exchangeRInteger.intValue() + "";
-			}catch(NumberFormatException nfe) {
-				
-			}
 			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
-			if(multpliesList.contains(exchangeR)) {
+
+			if(qso.getDxccEntity() == null) {
 				relQsoConteo.setMultiply(false);
-			}else {
-				relQsoConteo.setMultiply(true);
-				multpliesList.add(exchangeR);
+				continue;	
 			}
+			
+			DxccEntity qsoDxccEntity = dxccEntityRepository
+					.findById(qso.getDxccEntity().getId())
+					.orElse(null);
+			
+			if(qsoDxccEntity.equals(this.mexicoDxccEntity)) {
+				if(this.allowedMexicoEntities.contains(exchangeR) && !multpliesList.contains(exchangeR)) {
+					relQsoConteo.setMultiply(true);
+					multpliesList.add(exchangeR);
+				} else {
+					relQsoConteo.setMultiply(false);
+				}
+			} else {
+				exchangeR = qso.getDxccEntity().getId() + "";
+				if(!multpliesList.contains(exchangeR)) {
+					relQsoConteo.setMultiply(true);
+					multpliesList.add(exchangeR);
+				} else {
+					relQsoConteo.setMultiply(false);
+				}
+			}
+
 			listRelQsoConteo.add(relQsoConteo);
 		}
 		relQsoConteoRepository.saveAll(listRelQsoConteo);

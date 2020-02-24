@@ -202,6 +202,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 						.collect(Collectors.toList());
 				Integer sumOfPoints = listRelQsoConteo
 						.stream()
+						.filter(rqc -> rqc.getPoints() != null)
 						.collect(Collectors.summingInt(RelQsoConteo::getPoints));
 				
 				RelQsoConteo relQsoConteoNoComplete = listRelQsoConteo

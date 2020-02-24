@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import mx.fmre.rttycontest.bs.reports.service.ICsvReportsService;
 import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
+import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
+import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
@@ -24,7 +26,10 @@ import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
+import mx.fmre.rttycontest.persistence.model.RelQsoConteoQsoError;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
+import mx.fmre.rttycontest.persistence.repository.ICatFrequencyBandRepository;
+import mx.fmre.rttycontest.persistence.repository.ICatQsoErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
@@ -33,6 +38,7 @@ import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
+import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoQsoErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
 @Service
@@ -48,10 +54,15 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;
 	@Autowired private IRelQsoConteoRepository relQsoConteoRepository;
 	@Autowired private IDxccEntityRepository dxccEntityRepository;
+	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
+	@Autowired private ICatQsoErrorRepository catQsoErrorRepository;
+	@Autowired private ICatFrequencyBandRepository catFrequencyBandRepository;
 	
 	private Map<Integer, String> emailStatusesArray;
 	private Map<Integer, String> mapEmmailError;
 	private List<DxccEntity> listDxccEntities;
+	private List<CatQsoError> listCatQsoError;
+	private List<CatFrequencyBand> listFrequencyBand;
 	
 	private DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	
@@ -68,6 +79,10 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 				.collect(Collectors.toMap(CatEmailError::getId, CatEmailError::getDescripcion));
 		
 		this.listDxccEntities = dxccEntityRepository.findAll();
+		
+		this.listCatQsoError = catQsoErrorRepository.findAll();
+		
+		this.listFrequencyBand = catFrequencyBandRepository.findAll();
 	}
 	
 	@Override
@@ -105,6 +120,8 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		for (RelConteoContestLog relConteoContestLog : relConteoContestLogs) {
 			ContestLog contestLog = contestLogRepository.findById(relConteoContestLog.getContestLog().getId())
 					.orElse(null);
+			
+			
 
 			List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
 			int contestQsoSize = contestQsos.size();
@@ -133,6 +150,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		
 		String[] header = {
 				"QSO ID",
+				"FREQUENCY",
 				"CALL E",
 				"CALL R",
 				"DATETIME",
@@ -144,7 +162,9 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 				"DXCC ENTITY",
 				"POINTS",
 				"IS MULTIPLY",
-				"COMPLETE"};
+				"BAND NOT FOUND",
+				"BAND",
+				"ERRORS"};
 		
 		List<String[]> listStringsContent = new ArrayList<>();
 
@@ -160,9 +180,28 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 						.filter(x -> x.getId().equals(dxccEntityId)).findFirst()
 						.orElse(null);
 			}
-
+			
+			List<RelQsoConteoQsoError> relQsoConteoQsoErrors = relQsoConteoQsoErrorRepository.findByRelQsoConteo(relQsoConteo);
+			
+			List<Integer> idsQsoErrors = relQsoConteoQsoErrors.stream().map(x -> x.getCatQsoError().getId()).collect(Collectors.toList());
+			
+			List<CatQsoError> qsosErrors = listCatQsoError.stream().filter(x  -> idsQsoErrors.contains(x.getId())).collect(Collectors.toList());
+			
+			List<String> keyErrors = qsosErrors.stream().map(r -> r.getKey()).collect(Collectors.toList());
+			
+			CatFrequencyBand frequencyBand = null;
+			if(qso.getFrequencyBand() != null) {
+				Integer frequencyBandId = qso.getFrequencyBand().getId();
+				frequencyBand = listFrequencyBand
+						.stream()
+						.filter(x -> x.getId() == frequencyBandId)
+						.findFirst()
+						.orElse(null);
+			}
+			
 			String[] content = {
 					qso.getId() + "",
+					qso.getFrequency() + "",
 					contestLog.getCallsign(),
 					qso.getCallsignr(),
 					df.format(qso.getDatetime()),
@@ -172,9 +211,11 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 					qso.getRstr(),
 					qso.getDxccNotFound() ? "NOT FOUND" : "",
 					dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getId(), dxccEntity.getEntity())) : "",
-					relQsoConteo.getPoints() + "",
+					relQsoConteo.getPoints() != null ? relQsoConteo.getPoints()  + "" : "",
 					relQsoConteo.isMultiply() ? "1" : "",
-					relQsoConteo.isComplete() ? "" : "IMCOMPLETE",
+					frequencyBand == null ? "NOT FOUND" : "",
+					frequencyBand != null ? frequencyBand.getBand() : "",
+					String.join(";", keyErrors)
 			};
 
 			listStringsContent.add(content);
@@ -182,68 +223,4 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		
 		return CsvUtil.createCsvByteArray(header, listStringsContent);
 	}
-
-//	public List<byte[]> generateRepors(Edition edition) {
-//		List<byte[]> listBytes = new ArrayList<>();
-//		ByteArrayOutputStream out = new ByteArrayOutputStream();
-//		CSVWriter writer = null;
-//		try (OutputStreamWriter streamWriter = new OutputStreamWriter(out)) {
-//			// create FileWriter object with file as parameter
-//
-//			// create CSVWriter object filewriter object as parameter
-//			writer = new CSVWriter(streamWriter, ';', CSVWriter.NO_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER,
-//					CSVWriter.DEFAULT_LINE_END);
-//
-//			// adding header to csv
-//			String[] header = { "Name", "Class", "Marks" };
-//			writer.writeNext(header);
-//
-//			// add data to csv
-//			String[] data1 = { "Aman", "10", "620" };
-//			writer.writeNext(data1);
-//			String[] data2 = { "Suraj", "10", "630" };
-//			writer.writeNext(data2);
-//
-//			// closing writer connection
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} finally {
-//			if (writer != null)
-//				try {
-//					writer.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//		}
-//		return listBytes;
-//	}
-
-//	public void zip() {
-//		try {
-//			List<String> srcFiles = Arrays.asList("test1.txt", "test2.txt");
-//			FileOutputStream fos;
-//			fos = new FileOutputStream("multiCompressed.zip");
-//			ZipOutputStream zipOut = new ZipOutputStream(fos);
-//			for (String srcFile : srcFiles) {
-//				File fileToZip = new File(srcFile);
-//				FileInputStream fis = new FileInputStream(fileToZip);
-//				ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
-//				zipOut.putNextEntry(zipEntry);
-//
-//				byte[] bytes = new byte[1024];
-//				int length;
-//				while ((length = fis.read(bytes)) >= 0) {
-//					zipOut.write(bytes, 0, length);
-//				}
-//				fis.close();
-//			}
-//			zipOut.close();
-//			fos.close();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
-
 }
