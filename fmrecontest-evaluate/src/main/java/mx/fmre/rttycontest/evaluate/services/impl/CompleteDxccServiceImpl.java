@@ -38,6 +38,7 @@ import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
+import mx.fmre.rttycontest.persistence.repository.IVBandFrequencyRepository;
 
 @Slf4j
 @Service
@@ -52,6 +53,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Autowired private ILastEmailRepository            lastEmailRepository;
 	@Autowired private IFrequencyService               frequencyService;
 	@Autowired private ICatBandRepository              catBandRepository;
+	@Autowired private IVBandFrequencyRepository       vBandFrequencyRepository;
 	
 	private List<CatBand> listBands;
 
@@ -263,8 +265,10 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 						Integer bandId = frequencyBand.getBand().getId();
 						CatBand band = listBands.stream().filter(b -> b.getId() == bandId).findFirst().orElse(null);
 						qso.setBand(band);
-					} else
-						log.warn("Frequency not found for freq {} on qso id {}", bdFrequency, qso.getId());
+					} else {
+//						log.warn("Frequency not found for freq {} on qso id {}", bdFrequency, qso.getId());
+						vBandFrequencyRepository.findByFrequency(bdFrequency);
+					}
 					return qso;
 				}).collect(Collectors.toList());
 				contestQsoRepository.saveAll(newQsos);
