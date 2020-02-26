@@ -14,6 +14,7 @@ import com.opencsv.CSVWriter;
 
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
 import mx.fmre.rttycontest.persistence.model.Email;
+import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
 
 public class CsvUtil {
@@ -22,10 +23,15 @@ public class CsvUtil {
 	
 	public static List<String[]> listEmailsToStrings(
 			List<Email> emails,
+			List<LastEmail> lastEmails,
 			ICatEmailErrorRepository catEmailErrorRepository,
 			Map<Integer, String> mapEmmailError,
 			Map<Integer, String> emailStatusesArray) {
 		List<String[]> listStringsContent = emails.stream().map(email -> {
+			boolean usedForCount = false;
+			if(lastEmails.stream().filter(l -> l.getEmailId().equals(email.getId())).findFirst().orElse(null) != null) {
+				usedForCount = true;
+			}
 			List<CatEmailError> emailErrors = catEmailErrorRepository.getErrorsOfEmail(email);
 			List<String> errors = emailErrors
 					.stream()
@@ -40,6 +46,7 @@ public class CsvUtil {
 					df.format(email.getVerifiedAt()),
 					df.format(email.getAnsweredAt()),
 					emailStatusesArray.get(email.getEmailStatus().getId()),
+					usedForCount ? "USED" : "",
 					String.join(";", errors)};
 			return content;
 		}).collect(Collectors.toList());

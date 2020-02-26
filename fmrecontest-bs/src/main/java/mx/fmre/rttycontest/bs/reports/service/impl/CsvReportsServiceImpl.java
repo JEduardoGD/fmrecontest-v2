@@ -24,6 +24,7 @@ import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
+import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteoQsoError;
@@ -37,6 +38,7 @@ import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
+import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoQsoErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
@@ -57,6 +59,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
 	@Autowired private ICatQsoErrorRepository catQsoErrorRepository;
 	@Autowired private ICatBandRepository catBandRepository;
+	@Autowired private ILastEmailRepository lastEmailRepository;
 	
 	private Map<Integer, String> emailStatusesArray;
 	private Map<Integer, String> mapEmmailError;
@@ -91,6 +94,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		Edition edition = editionRepository.findById(editionId).orElse(null);
 		List<Email> emails = emailRepository.findByEdition(edition);
 		
+		List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(editionId);
 		
 		String[] header = { 
 				"ID",
@@ -101,9 +105,10 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 				"VERIFIED AT UTC",
 				"ANSWERED AT UTC", 
 				"STATUS",
+				"USED ON COUNT",
 				"ERRORS"};
 		
-		List<String[]> listStringsContent = CsvUtil.listEmailsToStrings(emails, catEmailErrorRepository, mapEmmailError, emailStatusesArray);
+		List<String[]> listStringsContent = CsvUtil.listEmailsToStrings(emails, lastEmails, catEmailErrorRepository, mapEmmailError, emailStatusesArray);
 		
 		return CsvUtil.createCsvByteArray(header, listStringsContent);
 	}
@@ -113,7 +118,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 		List<RelConteoContestLog> relConteoContestLogs = relConteoContestLogRepository.findByConteo(conteo);
 		
-		String[] header = { "LOG ID", "CALLSIGN", "# QSOS", "POINTS", "MULTIPLIERS", "TOTAL", "" };
+		String[] header = { "EMAIL ID", "LOG ID", "CALLSIGN", "# QSOS", "POINTS", "MULTIPLIERS", "TOTAL", "USED FOR COUNT", "" };
 		
 		List<String[]> listStringsContent = new ArrayList<>();
 
@@ -121,12 +126,13 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 			ContestLog contestLog = contestLogRepository.findById(relConteoContestLog.getContestLog().getId())
 					.orElse(null);
 			
-			
+			Integer emailId = contestLog.getEmail().getId();
 
 			List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
 			int contestQsoSize = contestQsos.size();
 
 			String[] content = {
+					emailId + "",
 					contestLog.getId() + "",
 					contestLog.getCallsign(),
 					contestQsoSize + "",
