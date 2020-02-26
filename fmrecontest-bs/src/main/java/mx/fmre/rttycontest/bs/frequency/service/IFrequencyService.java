@@ -2,8 +2,8 @@ package mx.fmre.rttycontest.bs.frequency.service;
 
 import java.math.BigDecimal;
 
-import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
+import mx.fmre.rttycontest.persistence.model.CatBand;
 
 public interface IFrequencyService {
-	public CatFrequencyBand getFrequencyBandOf(BigDecimal frequency);
+	public CatBand getFrequencyBandOf(BigDecimal frequency);
 }

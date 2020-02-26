@@ -13,7 +13,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "TBL_USERS")
+@Table(name = "V_BAND_FREQUENCY")
 public class VBandFrequency {
 
 
