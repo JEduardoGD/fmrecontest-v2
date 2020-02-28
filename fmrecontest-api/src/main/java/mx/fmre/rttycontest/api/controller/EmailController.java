@@ -51,4 +51,6 @@ public class EmailController extends BaseController {
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
 }
