@@ -183,7 +183,8 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 			if(dxccEntityId != null) {
 				dxccEntity = this.listDxccEntities
 						.stream()
-						.filter(x -> x.getId().equals(dxccEntityId)).findFirst()
+						.filter(x -> x.getId().longValue() == dxccEntityId.longValue())
+						.findFirst()
 						.orElse(null);
 			}
 			
