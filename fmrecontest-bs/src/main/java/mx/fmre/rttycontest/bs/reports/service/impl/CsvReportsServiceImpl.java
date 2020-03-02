@@ -126,7 +126,6 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 				"POINTS", 
 				"MULTIPLIERS", 
 				"TOTAL", 
-				"USED FOR COUNT", 
 				"" };
 		
 		List<String[]> listStringsContent = new ArrayList<>();

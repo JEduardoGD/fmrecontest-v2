@@ -77,13 +77,21 @@ public class EvaluateServiceImpl implements IEvaluateService {
 				for(ContestQso qso: qsos) {
 					boolean qsoComplete = true;
 					CatBand qsoBand = qso.getBand();
-					if(qsoBand == null) {
-						log.error("El qso {} no tiene banda", qso.getId());
-						qsoComplete = false;
+					if (qsoBand == null) {
+						if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
+
+						} else {
+							log.error("El qso {} no tiene banda", qso.getId());
+							qsoComplete = false;
+						}
 					}
-					if(qso.getDxccNotFound() == true) {
-						log.error("El qso {} no tiene entidad dxcc", qso);
-						qsoComplete = false;
+					if (qso.getDxccNotFound() == true) {
+						if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
+
+						} else {
+							log.error("El qso {} no tiene entidad dxcc", qso);
+							qsoComplete = false;
+						}
 					}
 					RelQsoConteo relQsoConteo = new RelQsoConteo();
 					relQsoConteo.setComplete(qsoComplete);
