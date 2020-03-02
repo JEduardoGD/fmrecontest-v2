@@ -34,11 +34,11 @@ public class EvaluateApp implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		completeDxccService.completeDxccEntityQsos();
 		completeDxccService.completeDxccEntityLogs();
-//		completeDxccService.completeBandsOnQsos();
-//		evaluateService.findForErrorsOnQsos();
-//		evaluateService.setPointsForQssos();
-//		evaluateService.setMultipliesQsos();
-//		evaluateService.evaluateActiveEditions();
+		completeDxccService.completeBandsOnQsos();
+		evaluateService.findForErrorsOnQsos();
+		evaluateService.setPointsForQssos();
+		evaluateService.setMultipliesQsos();
+		evaluateService.evaluateActiveEditions();
 	}
 }
 
