@@ -2,6 +2,9 @@ package mx.fmre.rttycontest.bs.dxcc.service.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -14,7 +17,9 @@ import org.xml.sax.SAXException;
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.XmlObjectPueblaDX;
+import mx.fmre.rttycontest.bs.dxcc.dao.XmlObjectPueblaDX.Call;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
+import mx.fmre.rttycontest.bs.util.CollectiosUtil;
 import mx.fmre.rttycontest.bs.util.FileUtil;
 import mx.fmre.rttycontest.bs.util.HttpUtil;
 import mx.fmre.rttycontest.bs.util.PueblaDxUtil;
@@ -34,7 +39,15 @@ public class DxccServicePueblaDxImpl implements IDxccService {
 		}
 		
 		if (xmlObjectPueblaDX == null || xmlObjectPueblaDX.getCalls().size() > 1) {
-			throw new FmreContestException("more than 1 call eelement found on puebladx for " + callsign);
+			List<Call> calls = xmlObjectPueblaDX.getCalls();
+			List<Call> x = calls
+					.stream()
+					.filter(CollectiosUtil.distinctByKey(Call::getDxcc))
+					.collect(Collectors.toList());
+			if(x.size() > 1)
+				throw new FmreContestException("more than 1 call eelement found on puebladx for " + callsign);
+			else
+				xmlObjectPueblaDX.setCalls(Arrays.asList(x.get(0)));
 		}
 		
 		CallsignDAO callsignDAO = PueblaDxUtil.parse(xmlObjectPueblaDX);
