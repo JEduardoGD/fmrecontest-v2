@@ -208,6 +208,7 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 			qso.setCallsignr(callsignR);
 			qso.setRstr(rstR);
 			qso.setExchanger(exchangeR);
+			qso.setError(null);
 		} else {
 			log.warn(String.format("Not parset %s", l));
 		}

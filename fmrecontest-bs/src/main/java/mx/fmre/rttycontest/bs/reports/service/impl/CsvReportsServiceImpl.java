@@ -118,7 +118,16 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 		List<RelConteoContestLog> relConteoContestLogs = relConteoContestLogRepository.findByConteo(conteo);
 		
-		String[] header = { "EMAIL ID", "LOG ID", "CALLSIGN", "# QSOS", "POINTS", "MULTIPLIERS", "TOTAL", "USED FOR COUNT", "" };
+		String[] header = { 
+				"EMAIL ID", 
+				"LOG ID", 
+				"CALLSIGN", 
+				"# QSOS", 
+				"POINTS", 
+				"MULTIPLIERS", 
+				"TOTAL", 
+				"USED FOR COUNT", 
+				"" };
 		
 		List<String[]> listStringsContent = new ArrayList<>();
 

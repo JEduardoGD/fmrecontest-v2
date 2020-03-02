@@ -76,6 +76,9 @@ public class ContestQso implements Serializable {
 	@JoinColumn(name = "N_ID_BAND")
 	private CatBand band;
 
+	@Column(name = "N_MARKED_AS_ERROR")
+	private Boolean error;
+
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "contestQso", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<RelQsoConteo> relQsoConteos;
