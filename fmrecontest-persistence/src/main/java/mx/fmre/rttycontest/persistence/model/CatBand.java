@@ -38,5 +38,9 @@ public class CatBand implements Serializable {/**
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "band", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<ContestQso> contestqsos;
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "band", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	private List<StaticFrequency> StaticFrequencies;
 	
 }

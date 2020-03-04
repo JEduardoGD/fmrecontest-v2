@@ -137,7 +137,10 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 			return null;
 		DxccEntity dxccEntityHome = dxccEntityRepository.findById(dxccEntityHomeId).orElse(null);
 		
-		Long dxccEntityCalledId = qso.getDxccEntity().getId();
+		Long dxccEntityCalledId = null;
+		if (qso.getDxccEntity() != null)
+			dxccEntityCalledId = qso.getDxccEntity().getId();
+		
 		if(dxccEntityCalledId == null)
 			return null;
 		DxccEntity dxccEntityCalled = dxccEntityRepository.findById(dxccEntityCalledId).orElse(null);

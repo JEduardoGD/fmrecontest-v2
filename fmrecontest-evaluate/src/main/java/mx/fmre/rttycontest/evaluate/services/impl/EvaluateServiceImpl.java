@@ -99,7 +99,6 @@ public class EvaluateServiceImpl implements IEvaluateService {
 					relQsoConteo.setContestQso(qso);
 					relQsoConteo.setDatetime(DateTimeUtil.getUtcTimeDate());
 					relQsoConteo.setPoints(null);
-//					relQsoConteo.setMultiply(null);
 					relQsoConteoRepository.save(relQsoConteo);
 					
 					List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(edition, contestLog, qso, catQsoErrors);

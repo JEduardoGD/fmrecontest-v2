@@ -14,18 +14,21 @@ import mx.fmre.rttycontest.bs.frequency.service.IFrequencyService;
 import mx.fmre.rttycontest.bs.util.CollectiosUtil;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
+import mx.fmre.rttycontest.persistence.model.StaticFrequency;
 import mx.fmre.rttycontest.persistence.model.VBandFrequency;
 import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.ICatFrequencyBandRepository;
+import mx.fmre.rttycontest.persistence.repository.IStaticFrequencyRepository;
 import mx.fmre.rttycontest.persistence.repository.IVBandFrequencyRepository;
 
 @Service
 @Slf4j
 public class FrequencyServiceImpl implements IFrequencyService {
 	
-	@Autowired ICatFrequencyBandRepository       catFrequencyBandRepository;
-	@Autowired private IVBandFrequencyRepository vBandFrequencyRepository;
-	@Autowired private ICatBandRepository        catBandRepository;
+	@Autowired ICatFrequencyBandRepository        catFrequencyBandRepository;
+	@Autowired private IVBandFrequencyRepository  vBandFrequencyRepository;
+	@Autowired private ICatBandRepository         catBandRepository;
+	@Autowired private IStaticFrequencyRepository staticFrequencyRepository;
 	
 	private List<CatBand> listBands;
 	
@@ -56,6 +59,13 @@ public class FrequencyServiceImpl implements IFrequencyService {
 		if(bandFrequencies.size() == 1) {
 			VBandFrequency bandFrequency =  bandFrequencies.get(0);
 			Integer bandId = bandFrequency.getId();
+			CatBand band = listBands.stream().filter(b -> b.getId() == bandId).findFirst().orElse(null);
+			return band;
+		}
+		
+		StaticFrequency staticFrequency = staticFrequencyRepository.findByFrequency(frequency);
+		if(staticFrequency != null) {
+			Integer bandId = staticFrequency.getBand().getId();
 			CatBand band = listBands.stream().filter(b -> b.getId() == bandId).findFirst().orElse(null);
 			return band;
 		}

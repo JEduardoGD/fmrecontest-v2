@@ -62,26 +62,26 @@ public class ContestQso implements Serializable {
 	private String rstr;
 
 	@Column(name = "D_DXCC_NOT_FOUND")
-	private Boolean dxccNotFound;
+	@ToString.Exclude private Boolean dxccNotFound;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST_LOG")
-	private ContestLog contestLog;
+	@ToString.Exclude private ContestLog contestLog;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "D_ENTITY_CODE")
-	private DxccEntity dxccEntity;
+	@ToString.Exclude private DxccEntity dxccEntity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_BAND")
-	private CatBand band;
+	@ToString.Exclude private CatBand band;
 
 	@Column(name = "N_MARKED_AS_ERROR")
 	private Boolean error;
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "contestQso", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-	private List<RelQsoConteo> relQsoConteos;
+	@ToString.Exclude private List<RelQsoConteo> relQsoConteos;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -107,13 +107,4 @@ public class ContestQso implements Serializable {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
-	
-	
 }
-
-
-
-
-
-
-
