@@ -108,10 +108,13 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 		
 		String qsoExchangeEmmited = qso.getExchangee();
 		
-		Long contestLogDxccEntityId = contestLog.getDxccEntity().getId();
-		DxccEntity contestLogDxccEntity = dxccEntityRepository.findById(contestLogDxccEntityId).orElse(null);
+		DxccEntity contestLogDxccEntity = null;
+		if (contestLog.getDxccEntity() != null) {
+			Long contestLogDxccEntityId = contestLog.getDxccEntity().getId();
+			contestLogDxccEntity = dxccEntityRepository.findById(contestLogDxccEntityId).orElse(null);
+		}
 		
-		if(contestLogDxccEntity.equals(this.mexicoDxccEntity)) {
+		if(contestLogDxccEntity != null && contestLogDxccEntity.equals(this.mexicoDxccEntity)) {
 			if(!allowedMexicoEntities.contains(qso.getExchangee())) {
 				listErrors.add(error_NOT_VALID_EXCHANGE_EMMITED);
 			}
@@ -127,15 +130,21 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 			}
 		}
 		
+		
 		return listErrors;
 	}
 
 	@Override
 	public Integer getPoints(ContestLog contestLog, ContestQso qso) {
-		Long dxccEntityHomeId = contestLog.getDxccEntity().getId();
-		if(dxccEntityHomeId == null)
+		DxccEntity dxccEntityHome = null;
+		if (contestLog.getDxccEntity() != null) {
+			Long dxccEntityHomeId = contestLog.getDxccEntity().getId();
+			if (dxccEntityHomeId == null)
+				return null;
+			dxccEntityHome = dxccEntityRepository.findById(dxccEntityHomeId).orElse(null);
+		}
+		if(dxccEntityHome == null)
 			return null;
-		DxccEntity dxccEntityHome = dxccEntityRepository.findById(dxccEntityHomeId).orElse(null);
 		
 		Long dxccEntityCalledId = null;
 		if (qso.getDxccEntity() != null)

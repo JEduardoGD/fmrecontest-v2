@@ -57,11 +57,9 @@ public class ContestLog implements Serializable {
 	@Column(name = "S_CATEGORY_MODE")
 	private String categoryMode;
 
-//	@Column(name = "S_ADDRESS_CATEGORY_OPERATOR")
 	@Column(name = "S_CATEGORY_OPERATOR")
 	private String categoryOperator;
 
-//	@Column(name = "S_ADDRESS_CATEGORY_POWER")
 	@Column(name = "S_CATEGORY_POWER")
 	private String categoryPower;
 
