@@ -29,4 +29,10 @@ public class EditionController extends BaseController {
 		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
 	}
 
+	@GetMapping
+	public ResponseEntity<StdResponse> getAll() {
+		getResponseServiceVo().setData(editionService.getAll());
+		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+	}
+
 }

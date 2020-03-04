@@ -13,16 +13,15 @@ import org.springframework.stereotype.Service;
 import mx.fmre.rttycontest.api.service.IEditionService;
 import mx.fmre.rttycontest.dto.EditionDTO;
 import mx.fmre.rttycontest.persistence.model.Contest;
+import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.repository.IContestRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 
 @Service
 public class EditionServiceImpl implements IEditionService {
 
-	@Autowired
-	private IEditionRepository editionRepository;
-	@Autowired
-	private IContestRepository contestRepository;
+	@Autowired private IEditionRepository editionRepository;
+	@Autowired private IContestRepository contestRepository;
 	
 	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
@@ -33,20 +32,33 @@ public class EditionServiceImpl implements IEditionService {
 		return editionRepository.getByContestId(contestId)
 				.stream()
 				.map(x -> {
-			EditionDTO editionDTO = new EditionDTO();
-			editionDTO.setId(x.getId());
-			editionDTO.setDescription(x.getDescription());
-			editionDTO.setYear(x.getYear());
-			editionDTO.setStartDate(df.format(x.getStart()));
-			editionDTO.setEndDate(df.format(x.getEnd()));
-			
-			Contest contest = m.get(x.getContest().getId());
-			contest = contest != null ? contest : contestRepository.findById(x.getContest().getId()).orElse(null);
-			m.put(contest.getId(), contest);
-			editionDTO.setContest(contest.getDescription());
-			
-			return editionDTO;
+					return this.map(x);
 		}).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<EditionDTO> getAll() {
+		return editionRepository.findAll()
+				.stream()
+				.map(x -> {
+					return this.map(x);
+		}).collect(Collectors.toList());
+	}
+	
+	private EditionDTO map(Edition edition) {
+		EditionDTO editionDTO = new EditionDTO();
+		editionDTO.setId(edition.getId());
+		editionDTO.setDescription(edition.getDescription());
+		editionDTO.setYear(edition.getYear());
+		editionDTO.setStartDate(df.format(edition.getStart()));
+		editionDTO.setEndDate(df.format(edition.getEnd()));
+		
+		Contest contest = m.get(edition.getContest().getId());
+		contest = contest != null ? contest : contestRepository.findById(edition.getContest().getId()).orElse(null);
+		m.put(contest.getId(), contest);
+		editionDTO.setContest(contest.getDescription());
+		
+		return editionDTO;
 	}
 
 }
