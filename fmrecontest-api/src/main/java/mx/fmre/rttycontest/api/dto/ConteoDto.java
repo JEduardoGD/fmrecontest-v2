@@ -6,7 +6,7 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class ConteoDto implements Serializable{
+public class ConteoDto implements Serializable {
 	/**
 	 * 
 	 */
@@ -15,4 +15,8 @@ public class ConteoDto implements Serializable{
 	private String description;
 	private Date datetime;
 	private Integer editionId;
+	private String edition;
+	private Integer contestId;
+	private String contest;
+	private boolean noComplete;
 }
