@@ -85,11 +85,11 @@ public class EvaluateServiceImpl implements IEvaluateService {
 							qsoComplete = false;
 						}
 					}
-					if (qso.getDxccNotFound() == true) {
+					if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
 						if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
 
 						} else {
-							log.error("El qso {} no tiene entidad dxcc", qso);
+							log.error("El qso {} no tiene entidad dxcc", qso.getId());
 							qsoComplete = false;
 						}
 					}
