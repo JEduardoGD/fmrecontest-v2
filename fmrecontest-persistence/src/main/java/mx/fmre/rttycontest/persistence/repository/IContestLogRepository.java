@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
@@ -31,5 +32,12 @@ public interface IContestLogRepository extends JpaRepository<ContestLog, Long> {
 			"JOIN Email E ON LOG.email.id = E.id " +
 			"WHERE E.edition = :edition ")
 	public List<ContestLog> findByEdition(@Param("edition") Edition edition);
+	
+	@Query(value = "" +
+			"select LOG " +
+			"from ContestLog LOG " +
+			"JOIN RelConteoContestLog R ON R.contestLog.id = LOG.id " +
+			"WHERE R.conteo = :conteo ")
+	public List<ContestLog> findByConteo(@Param("conteo") Conteo conteo);
 }
 
