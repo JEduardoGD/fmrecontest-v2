@@ -19,12 +19,31 @@ import mx.fmre.rttycontest.exception.FmreContestException;
 @Slf4j
 public class ContestlogController extends BaseController {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1129660214537242194L;
+	
 	@Autowired private ContestLogServiceImpl contestLogServiceImpl;
 
-//	@GetMapping("/byconteoid/{conteoId}")
+	@GetMapping("/byconteoid/{conteoId}")
 	public ResponseEntity<StdResponse> getAllByConteoId(@PathVariable("conteoId") Integer conteoId) {
 		try {
 			getResponseServiceVo().setData(contestLogServiceImpl.findByConteoId(conteoId));
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+		} catch (FmreContestException e) {
+			log.error("{}", e.getLocalizedMessage());
+			getResponseServiceVo().setMessageResponse(e.getLocalizedMessage());
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/byconteoid/{conteoId}/logid/{logid}")
+	public ResponseEntity<StdResponse> getAllByConteoId(
+			@PathVariable("conteoId") Integer conteoId,
+			@PathVariable("logid") Integer logId) {
+		try {
+			getResponseServiceVo().setData(contestLogServiceImpl.getContestlogByConteoIdAndLogId(conteoId, logId));
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
 		} catch (FmreContestException e) {
 			log.error("{}", e.getLocalizedMessage());
