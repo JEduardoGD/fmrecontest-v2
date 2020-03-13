@@ -14,7 +14,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan({
 	"mx.fmre.rttycontest.api.service",
 	"mx.fmre.rttycontest.api.conf",
-	"mx.fmre.rttycontest.api.controller"})
+	"mx.fmre.rttycontest.api.controller",
+	"mx.fmre.rttycontest.bs.reports.service"})
 public class ApiApplication {
 
 	public static void main(String[] args) {

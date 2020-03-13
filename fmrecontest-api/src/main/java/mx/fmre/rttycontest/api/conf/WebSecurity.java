@@ -40,6 +40,15 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	private static final String[] AUTH_WHITELIST = {
+            // -- swagger ui
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**",
+            "/auth/**"
+    };
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -59,6 +68,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.cors().and()
 		.csrf().disable()
 		.authorizeRequests().antMatchers(HttpMethod.POST, Constants.LOGIN_URL).permitAll()
+		.antMatchers(AUTH_WHITELIST).permitAll()
 		.anyRequest().authenticated().and()
 		.addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtSecretkey, jwtTokenExpirationtime, jwtIssuerInfo, userRepository, modelMapper))
 		.addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtSecretkey));

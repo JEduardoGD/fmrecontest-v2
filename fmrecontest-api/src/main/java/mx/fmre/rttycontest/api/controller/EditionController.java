@@ -23,15 +23,15 @@ public class EditionController extends BaseController {
 	
 	@Autowired private IEditionService editionService;
 
-	@GetMapping
-	public ResponseEntity<StdResponse> getAll() {
-		getResponseServiceVo().setData(null);
-		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
-	}
-
 	@GetMapping("/bycontestid/{contestid}")
 	public ResponseEntity<StdResponse> getAllByContestId(@PathVariable("contestid") Integer contestId) {
 		getResponseServiceVo().setData(editionService.getAllByContestId(contestId));
+		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+	}
+
+	@GetMapping
+	public ResponseEntity<StdResponse> getAll() {
+		getResponseServiceVo().setData(editionService.getAll());
 		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
 	}
 

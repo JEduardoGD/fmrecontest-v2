@@ -2,7 +2,9 @@ package mx.fmre.rttycontest.persistence.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,13 +13,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
 @Table(name = "TBL_CONTEST_QSO")
+@ToString
 public class ContestQso implements Serializable {
 	/**
 	 * 
@@ -56,7 +61,50 @@ public class ContestQso implements Serializable {
 	@Column(name = "S_RST_RECEIVED")
 	private String rstr;
 
+	@Column(name = "D_DXCC_NOT_FOUND")
+	@ToString.Exclude private Boolean dxccNotFound;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST_LOG")
-	private ContestLog contestLog;
+	@ToString.Exclude private ContestLog contestLog;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "D_ENTITY_CODE")
+	@ToString.Exclude private DxccEntity dxccEntity;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "N_ID_BAND")
+	@ToString.Exclude private CatBand band;
+
+	@Column(name = "N_MARKED_AS_ERROR")
+	private Boolean error;
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "contestQso", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	@ToString.Exclude private List<RelQsoConteo> relQsoConteos;
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ContestQso other = (ContestQso) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
 }
