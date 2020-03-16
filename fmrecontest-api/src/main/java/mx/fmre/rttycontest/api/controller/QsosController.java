@@ -11,25 +11,25 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.common.BaseController;
 import mx.fmre.rttycontest.api.common.StdResponse;
-import mx.fmre.rttycontest.api.service.impl.ContestLogServiceImpl;
+import mx.fmre.rttycontest.api.service.IQsoServie;
 import mx.fmre.rttycontest.exception.FmreContestException;
 
 @RestController
-@RequestMapping("/contestlogs")
+@RequestMapping("/qsos")
 @Slf4j
-public class ContestlogController extends BaseController {
-	
-	/**
+public class QsosController extends BaseController {/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1129660214537242194L;
+	private static final long serialVersionUID = 8747480931394486252L;
 	
-	@Autowired private ContestLogServiceImpl contestLogServiceImpl;
+	@Autowired private IQsoServie qsoServie;
 
-	@GetMapping("/byconteoid/{conteoId}")
-	public ResponseEntity<StdResponse> getAllByConteoId(@PathVariable("conteoId") Integer conteoId) {
+	@GetMapping("/byconteoid/{conteoId}/logid/{logid}")
+	public ResponseEntity<StdResponse> getAllByConteoId(
+			@PathVariable("conteoId") Integer conteoId,
+			@PathVariable("logid") Integer logId) {
 		try {
-			getResponseServiceVo().setData(contestLogServiceImpl.findByConteoId(conteoId));
+			getResponseServiceVo().setData(qsoServie.getQsosByConteoIdAndLogId(conteoId, logId));
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
 		} catch (FmreContestException e) {
 			log.error("{}", e.getLocalizedMessage());
@@ -37,4 +37,5 @@ public class ContestlogController extends BaseController {
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
 }
