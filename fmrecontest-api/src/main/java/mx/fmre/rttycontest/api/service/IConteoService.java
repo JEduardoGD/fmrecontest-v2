@@ -6,4 +6,5 @@ import mx.fmre.rttycontest.api.dto.ConteoDto;
 
 public interface IConteoService {
 	public List<ConteoDto> getAll();
+	public ConteoDto findById(Integer conteoId);
 }

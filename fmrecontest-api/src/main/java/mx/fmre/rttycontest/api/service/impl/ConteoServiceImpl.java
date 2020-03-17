@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.api.dto.ConteoDto;
 import mx.fmre.rttycontest.api.service.IConteoService;
+import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.Contest;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
@@ -37,38 +38,47 @@ public class ConteoServiceImpl implements IConteoService {
 
 	@Override
 	public List<ConteoDto> getAll() {
-		return conteoRepository.findAll().stream().map(c -> {
-			List<RelConteoContestLog> relConteoContestLogList = relConteoContestLogRepository.findByConteo(c);
-			int countNoComplete = relConteoContestLogList
-					.stream()
-					.filter(x -> x.isComplete() == false)
-					.collect(Collectors.toList())
-					.size();
-			
-			Edition edition = editionList
-					.stream()
-					.filter(e -> e.getId().equals(c.getEdition().getId()))
-					.findFirst()
-					.orElse(null);
-			
-			Contest contest = contestList
-					.stream()
-					.filter(co -> co.getId().equals(edition.getContest().getId()))
-					.findFirst()
-					.orElse(null);
-			
-			ConteoDto conteoDto = new ConteoDto();
-			conteoDto.setId(c.getId());
-			conteoDto.setDescription(c.getDescription());
-			conteoDto.setDatetime(c.getDatetime());
-			conteoDto.setEditionId(c.getEdition().getId());
-			conteoDto.setNoComplete(countNoComplete > 0);
-			conteoDto.setEditionId(edition.getId());
-			conteoDto.setEdition(edition.getDescription());
-			conteoDto.setContestId(contest.getId());
-			conteoDto.setContest(contest.getDescription());
-			return conteoDto;
-		}).collect(Collectors.toList());
+		return conteoRepository.findAll().stream().map(c -> map(c)).collect(Collectors.toList());
 	}
 
+	@Override
+	public ConteoDto findById(Integer conteoId) {
+		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
+		if (conteo != null)
+			return map(conteo);
+		return null;
+	}
+	
+	private ConteoDto map(Conteo c) {
+		List<RelConteoContestLog> relConteoContestLogList = relConteoContestLogRepository.findByConteo(c);
+		int countNoComplete = relConteoContestLogList
+				.stream()
+				.filter(x -> x.isComplete() == false)
+				.collect(Collectors.toList())
+				.size();
+		
+		Edition edition = editionList
+				.stream()
+				.filter(e -> e.getId().equals(c.getEdition().getId()))
+				.findFirst()
+				.orElse(null);
+		
+		Contest contest = contestList
+				.stream()
+				.filter(co -> co.getId().equals(edition.getContest().getId()))
+				.findFirst()
+				.orElse(null);
+		
+		ConteoDto conteoDto = new ConteoDto();
+		conteoDto.setId(c.getId());
+		conteoDto.setDescription(c.getDescription());
+		conteoDto.setDatetime(c.getDatetime());
+		conteoDto.setEditionId(c.getEdition().getId());
+		conteoDto.setNoComplete(countNoComplete > 0);
+		conteoDto.setEditionId(edition.getId());
+		conteoDto.setEdition(edition.getDescription());
+		conteoDto.setContestId(contest.getId());
+		conteoDto.setContest(contest.getDescription());
+		return conteoDto;
+	}
 }

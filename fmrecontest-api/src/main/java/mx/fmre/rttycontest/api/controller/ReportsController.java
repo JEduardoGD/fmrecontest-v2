@@ -37,8 +37,9 @@ public class ReportsController extends BaseController {
 	    return ResponseEntity.ok()
 	            .headers(headers)
 	            .contentLength(bytesrray.length)
+//	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
-	            .contentType(new MediaType("text", "csv"))
+//	            .contentType(new MediaType("text", "csv"))
 	            .body(resource);
 	}
 	
