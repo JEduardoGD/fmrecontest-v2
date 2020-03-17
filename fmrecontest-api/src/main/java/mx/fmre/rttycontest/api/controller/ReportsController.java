@@ -26,8 +26,6 @@ public class ReportsController extends BaseController {
 
 	@GetMapping("/conteoid/{conteoId}")
 	public ResponseEntity<Resource> generateConteoReport(@PathVariable("conteoId") Integer conteoId) {
-//		getResponseServiceVo().setData();
-//		return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
 		HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
@@ -37,9 +35,7 @@ public class ReportsController extends BaseController {
 	    return ResponseEntity.ok()
 	            .headers(headers)
 	            .contentLength(bytesrray.length)
-//	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
-//	            .contentType(new MediaType("text", "csv"))
 	            .body(resource);
 	}
 	
@@ -73,7 +69,6 @@ public class ReportsController extends BaseController {
 	            .headers(headers)
 	            .contentLength(bytesrray.length)
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
-	            .contentType(new MediaType("text", "csv"))
 	            .body(resource);
 	}
 }
