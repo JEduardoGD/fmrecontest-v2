@@ -7,6 +7,9 @@ import mx.fmre.rttycontest.exception.FmreContestException;
 
 public interface IQsoServie {
 
-	List<QsoDto> getQsosByConteoIdAndLogId(int conteoId, long logId) throws FmreContestException;
+	public List<QsoDto> getQsosByConteoIdAndLogId(int conteoId, long logId) throws FmreContestException;
 
+	public QsoDto findById(Integer conteoId, Long qsoId) throws FmreContestException;
+
+	public QsoDto update(QsoDto qsoDto) throws FmreContestException;
 }

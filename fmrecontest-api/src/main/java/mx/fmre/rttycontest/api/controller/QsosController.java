@@ -5,12 +5,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.common.BaseController;
 import mx.fmre.rttycontest.api.common.StdResponse;
+import mx.fmre.rttycontest.api.dto.QsoDto;
 import mx.fmre.rttycontest.api.service.IQsoServie;
 import mx.fmre.rttycontest.exception.FmreContestException;
 
@@ -37,5 +40,30 @@ public class QsosController extends BaseController {/**
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
+	@GetMapping("/byid/{qsoId}/andconteoid/{conteoid}")
+	public ResponseEntity<StdResponse> findById(
+			@PathVariable("conteoid") Integer conteoId,
+			@PathVariable("qsoId") Long qsoId) {
+		try {
+			getResponseServiceVo().setData(qsoServie.findById(conteoId, qsoId));
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+		} catch (FmreContestException e) {
+			log.error("{}", e.getLocalizedMessage());
+			getResponseServiceVo().setMessageResponse(e.getLocalizedMessage());
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@PostMapping
+	public ResponseEntity<StdResponse> updateQso(@RequestBody QsoDto qsoDto) {
+		try {
+			getResponseServiceVo().setData(qsoServie.update(qsoDto));
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+		} catch (FmreContestException e) {
+			log.error("{}", e.getLocalizedMessage());
+			getResponseServiceVo().setMessageResponse(e.getLocalizedMessage());
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

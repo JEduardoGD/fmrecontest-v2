@@ -1,7 +1,5 @@
 package mx.fmre.rttycontest.api.service.impl;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,8 +8,10 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.dto.QsoDto;
 import mx.fmre.rttycontest.api.service.IQsoServie;
+import mx.fmre.rttycontest.api.util.QsoUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.Conteo;
@@ -27,6 +27,7 @@ import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
 @Service
+@Slf4j
 public class QsoServiceImpl implements IQsoServie {
 
 	@Autowired private IConteoRepository conteoRepository;
@@ -39,17 +40,12 @@ public class QsoServiceImpl implements IQsoServie {
 	private List<DxccEntity> listDxccEntities;
 	private List<CatBand> listBands;
 	
-	private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
-	
 	@PostConstruct
 	private void initData() {
 		this.listDxccEntities = dxccEntityRepository.findAll();
 		
 		this.listBands = catBandRepository.findAll();
 	}
-	
-
 	
 	@Override
 	public List<QsoDto> getQsosByConteoIdAndLogId(int conteoId, long logId) throws FmreContestException {
@@ -81,22 +77,68 @@ public class QsoServiceImpl implements IQsoServie {
 						.orElse(null);
 			}
 			
-			QsoDto qsoDto = new QsoDto();
-			qsoDto.setId(x.getId());
-			qsoDto.setFrequency(x.getFrequency());
-			qsoDto.setCallsignE(x.getCallsigne());
-			qsoDto.setCallsignR(x.getCallsignr());
-			qsoDto.setDateTime(df.format(x.getDatetime()));
-			qsoDto.setExchangeE(x.getExchangee());
-			qsoDto.setExchangeR(x.getExchanger());
-			qsoDto.setRstE(x.getRste());
-			qsoDto.setRstR(x.getRstr());
-			qsoDto.setDxccEntity(dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getId(), dxccEntity.getEntity())) : "NOT FOUND");
-			qsoDto.setPoints(relQsoConteo.getPoints());
-			qsoDto.setMultiply(relQsoConteo.isMultiply());
-			qsoDto.setQsoBand(qsoBand != null ? qsoBand.getBand() : "NOT FOUND");
-			
-			return qsoDto;
+			return QsoUtil.map(dxccEntity, relQsoConteo, qsoBand, x);
 		}).collect(Collectors.toList());
 	}
+
+	@Override
+	public QsoDto findById(Integer conteoId, Long qsoId) throws FmreContestException {
+		ContestQso contestQso = contestQsoRepository.findById(qsoId).orElse(null);
+		if(contestQso == null) {
+			log.error("Qso not found with id {}", qsoId);
+			throw new FmreContestException("Qso not found");
+		}
+		
+		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
+		
+		DxccEntity dxccEntity = null;
+		
+		Long dxccEntityId = contestQso.getDxccEntity() != null ? contestQso.getDxccEntity().getId() : null;
+		
+		dxccEntity = this.listDxccEntities
+				.stream()
+				.filter(y -> y.getId().longValue() == dxccEntityId.longValue())
+				.findFirst()
+				.orElse(null);
+		
+		RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(contestQso, conteo);
+		
+		CatBand qsoBand = null;
+		if(contestQso.getBand() != null) {
+			Integer qsoBandId = contestQso.getBand().getId();
+			qsoBand = listBands
+					.stream()
+					.filter(y -> y.getId() == qsoBandId)
+					.findFirst()
+					.orElse(null);
+		}
+			
+		return QsoUtil.map(dxccEntity, relQsoConteo, qsoBand, contestQso);
+	}
+
+	@Override
+	public QsoDto update(QsoDto qsoDto) throws FmreContestException {
+		ContestQso qso = contestQsoRepository.findById(qsoDto.getId()).orElse(null);
+		Long dxccEntityId = qsoDto.getDxccEntityId();
+		DxccEntity dxccEntity = null;
+		if (dxccEntityId != null) {
+			dxccEntity = dxccEntityRepository.findById(dxccEntityId).orElse(null);
+			qso.setDxccEntity(dxccEntity);
+		}
+		ContestQso newQso = contestQsoRepository.save(qso);
+		return this.findById(qsoDto.getConteoId(), newQso.getId());
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
