@@ -7,5 +7,5 @@ import mx.fmre.rttycontest.persistence.model.CatBand;
 
 @Repository
 public interface ICatBandRepository extends JpaRepository<CatBand, Integer> {
-
+	
 }

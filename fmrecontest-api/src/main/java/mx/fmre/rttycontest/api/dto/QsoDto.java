@@ -25,5 +25,6 @@ public class QsoDto implements Serializable {/**
 	private Integer points;
 	private boolean isMultiply;
 	private String qsoBand;
+	private Integer qsoBandId;
 	
 }

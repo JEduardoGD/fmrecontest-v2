@@ -43,7 +43,6 @@ public class QsoServiceImpl implements IQsoServie {
 	@PostConstruct
 	private void initData() {
 		this.listDxccEntities = dxccEntityRepository.findAll();
-		
 		this.listBands = catBandRepository.findAll();
 	}
 	
@@ -124,6 +123,15 @@ public class QsoServiceImpl implements IQsoServie {
 		if (dxccEntityId != null) {
 			dxccEntity = dxccEntityRepository.findById(dxccEntityId).orElse(null);
 			qso.setDxccEntity(dxccEntity);
+		}
+		Integer qsoBandId = qsoDto.getQsoBandId();
+		if (qsoBandId != null) {
+			CatBand qsoBand = this.listBands
+					.stream()
+					.filter(band -> band.getId().intValue() == qsoBandId.intValue())
+					.findFirst()
+					.orElse(null);
+			qso.setBand(qsoBand);
 		}
 		ContestQso newQso = contestQsoRepository.save(qso);
 		return this.findById(qsoDto.getConteoId(), newQso.getId());

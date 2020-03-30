@@ -30,6 +30,7 @@ public abstract class QsoUtil {
 		qsoDto.setPoints(relQsoConteo.getPoints());
 		qsoDto.setMultiply(relQsoConteo.isMultiply());
 		qsoDto.setQsoBand(qsoBand != null ? qsoBand.getBand() : "NOT FOUND");
+		qsoDto.setQsoBandId(qsoBand != null ? qsoBand.getId() : null);
 		return qsoDto;
 	}
 }
