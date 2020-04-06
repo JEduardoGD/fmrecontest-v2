@@ -26,5 +26,5 @@ public class QsoDto implements Serializable {/**
 	private boolean isMultiply;
 	private String qsoBand;
 	private Integer qsoBandId;
-	
+	private boolean selectedUpdateAll;
 }

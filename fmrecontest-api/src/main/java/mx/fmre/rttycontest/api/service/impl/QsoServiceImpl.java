@@ -117,6 +117,33 @@ public class QsoServiceImpl implements IQsoServie {
 
 	@Override
 	public QsoDto update(QsoDto qsoDto) throws FmreContestException {
+		if(qsoDto.isSelectedUpdateAll()) {
+			ContestQso qso = contestQsoRepository.findById(qsoDto.getId()).orElse(null);
+			ContestLog contestLog = contestLogRepository
+					.findById(qso.getContestLog().getId())
+					.orElse(null);
+			List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
+			Integer qsoBandId = qsoDto.getQsoBandId();
+			CatBand qsoBand = this.listBands
+					.stream()
+					.filter(band -> band.getId().intValue() == qsoBandId.intValue())
+					.findFirst()
+					.orElse(null);
+			int frequency = qso.getFrequency();
+			List<ContestQso> qsosWithSameFrequency = contestQsos
+					.stream()
+					.filter(q -> q.getFrequency() == frequency)
+					.collect(Collectors.toList());
+			List<ContestQso> mappedQsos = qsosWithSameFrequency
+					.stream()
+					.map(q -> {
+						q.setBand(qsoBand);
+						return q;
+					})
+					.collect(Collectors.toList());
+			contestQsoRepository.saveAll(mappedQsos);
+			return this.findById(qsoDto.getConteoId(), qso.getId());
+		}
 		ContestQso qso = contestQsoRepository.findById(qsoDto.getId()).orElse(null);
 		Long dxccEntityId = qsoDto.getDxccEntityId();
 		DxccEntity dxccEntity = null;
