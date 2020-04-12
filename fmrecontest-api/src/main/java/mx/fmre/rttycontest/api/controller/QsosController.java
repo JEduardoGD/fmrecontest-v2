@@ -66,4 +66,21 @@ public class QsosController extends BaseController {/**
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+//	Long contestLogId, Integer conteoId, Integer editionId
+
+	@GetMapping("/contestlogid/{contestLogId}/conteoid/{conteoId}/editionid/{editionId}")
+	public ResponseEntity<StdResponse> reprocessLog(
+			@PathVariable("conteoid") Long contestLogId,
+			@PathVariable("qsoId") Integer conteoId,
+			@PathVariable("qsoId") Integer editionId) {
+		try {
+			getResponseServiceVo().setData(qsoServie.reevaluateLog(contestLogId, conteoId, editionId));
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+		} catch (FmreContestException e) {
+			log.error("{}", e.getLocalizedMessage());
+			getResponseServiceVo().setMessageResponse(e.getLocalizedMessage());
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

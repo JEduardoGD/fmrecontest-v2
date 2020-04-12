@@ -50,15 +50,12 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	public void findForErrorsOnQsos() {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 			
 			Conteo conteo = new Conteo();
 			conteo.setDatetime(DateTimeUtil.getUtcTimeDate());
 			conteo.setDescription(null);
 			conteo.setEdition(edition);
 			Conteo savedConteo = conteoRepository.save(conteo);
-			
-			List<CatQsoError> catQsoErrors = catQsoErrorRepository.findByEdition(edition);
 			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
 
 			List<Integer> lastLogsIdsList = lastEmails
@@ -72,48 +69,62 @@ public class EvaluateServiceImpl implements IEvaluateService {
 					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
 					.collect(Collectors.toList());
 
-			for(ContestLog contestLog: filteredLogs) {
-				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				for(ContestQso qso: qsos) {
-					boolean qsoComplete = true;
-					CatBand qsoBand = qso.getBand();
-					if (qsoBand == null) {
-						if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
+			for(ContestLog contestLog: filteredLogs)
+				this.findForErrors(contestLog, savedConteo, edition);
+		}
+	}
 
-						} else {
-							log.error("El qso {} no tiene banda", qso.getId());
-							qsoComplete = false;
-						}
-					}
-					if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
-						if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
+	@Override
+	public void findForErrorsOnQsos(Long contestLogId, Integer conteoId, Integer editionId) {
+		ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
+		Conteo savedConteo = conteoRepository.findById(conteoId).orElse(null);
+		Edition edition = editionRepository.findById(editionId).orElse(null);
+		this.findForErrors(contestLog, savedConteo, edition);
+	}
+	
+	private void findForErrors(ContestLog contestLog, Conteo savedConteo, Edition edition) {
+		List<CatQsoError> catQsoErrors = catQsoErrorRepository.findByEdition(edition);
+		IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
+		
+		List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+		for(ContestQso qso: qsos) {
+			boolean qsoComplete = true;
+			CatBand qsoBand = qso.getBand();
+			if (qsoBand == null) {
+				if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
 
-						} else {
-							log.error("El qso {} no tiene entidad dxcc", qso.getId());
-							qsoComplete = false;
-						}
-					}
-					RelQsoConteo relQsoConteo = new RelQsoConteo();
-					relQsoConteo.setComplete(qsoComplete);
-					relQsoConteo.setConteo(savedConteo);
-					relQsoConteo.setContestQso(qso);
-					relQsoConteo.setDatetime(DateTimeUtil.getUtcTimeDate());
-					relQsoConteo.setPoints(null);
-					relQsoConteoRepository.save(relQsoConteo);
-					
-					List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(edition, contestLog, qso, catQsoErrors);
-					if(resEvaluation.isEmpty())
-						continue;
-					List<RelQsoConteoQsoError> relQsoConteoQsoErrorList = resEvaluation.stream().map(x -> {
-						RelQsoConteoQsoError relQsoConteoQsoError = new RelQsoConteoQsoError();
-						relQsoConteoQsoError.setCatQsoError(x);
-						relQsoConteoQsoError.setDatetime(DateTimeUtil.getUtcTimeDate());
-						relQsoConteoQsoError.setRelQsoConteo(relQsoConteo);
-						return relQsoConteoQsoError;
-					}).collect(Collectors.toList());
-					relQsoConteoQsoErrorRepository.saveAll(relQsoConteoQsoErrorList);
+				} else {
+					log.error("El qso {} no tiene banda", qso.getId());
+					qsoComplete = false;
 				}
 			}
+			if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
+				if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
+
+				} else {
+					log.error("El qso {} no tiene entidad dxcc", qso.getId());
+					qsoComplete = false;
+				}
+			}
+			RelQsoConteo relQsoConteo = new RelQsoConteo();
+			relQsoConteo.setComplete(qsoComplete);
+			relQsoConteo.setConteo(savedConteo);
+			relQsoConteo.setContestQso(qso);
+			relQsoConteo.setDatetime(DateTimeUtil.getUtcTimeDate());
+			relQsoConteo.setPoints(null);
+			relQsoConteoRepository.save(relQsoConteo);
+			
+			List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(edition, contestLog, qso, catQsoErrors);
+			if(resEvaluation.isEmpty())
+				continue;
+			List<RelQsoConteoQsoError> relQsoConteoQsoErrorList = resEvaluation.stream().map(x -> {
+				RelQsoConteoQsoError relQsoConteoQsoError = new RelQsoConteoQsoError();
+				relQsoConteoQsoError.setCatQsoError(x);
+				relQsoConteoQsoError.setDatetime(DateTimeUtil.getUtcTimeDate());
+				relQsoConteoQsoError.setRelQsoConteo(relQsoConteo);
+				return relQsoConteoQsoError;
+			}).collect(Collectors.toList());
+			relQsoConteoQsoErrorRepository.saveAll(relQsoConteoQsoErrorList);
 		}
 	}
 

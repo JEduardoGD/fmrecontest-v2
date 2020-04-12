@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.api.dto.FrequencyDTO;
-import mx.fmre.rttycontest.api.service.IFrequencyService;
+import mx.fmre.rttycontest.api.service.IFrequencyApiService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
@@ -17,7 +17,7 @@ import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.ICatFrequencyBandRepository;
 
 @Service
-public class FrequencyServiceImpl implements IFrequencyService {
+public class FrequencyApiServiceImpl implements IFrequencyApiService {
 	
 	@Autowired private ICatFrequencyBandRepository catFrequencyBandRepository;
 	@Autowired private ICatBandRepository catBandRepository;

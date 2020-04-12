@@ -12,4 +12,6 @@ public interface IQsoServie {
 	public QsoDto findById(Integer conteoId, Long qsoId) throws FmreContestException;
 
 	public QsoDto update(QsoDto qsoDto) throws FmreContestException;
+
+	public boolean reevaluateLog(Long contestLogId, Integer conteoId, Integer editionId) throws FmreContestException;
 }

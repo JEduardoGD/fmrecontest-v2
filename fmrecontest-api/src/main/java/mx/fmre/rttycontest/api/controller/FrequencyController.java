@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.common.BaseController;
 import mx.fmre.rttycontest.api.common.StdResponse;
-import mx.fmre.rttycontest.api.service.IFrequencyService;
+import mx.fmre.rttycontest.api.service.IFrequencyApiService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 
 @RestController
@@ -21,7 +21,7 @@ public class FrequencyController extends BaseController {/**
 	 */
 	private static final long serialVersionUID = -718077169311161313L;
 	
-	@Autowired private IFrequencyService frequencyService;
+	@Autowired private IFrequencyApiService frequencyService;
 
 	@GetMapping
 	public ResponseEntity<StdResponse> getAll() {

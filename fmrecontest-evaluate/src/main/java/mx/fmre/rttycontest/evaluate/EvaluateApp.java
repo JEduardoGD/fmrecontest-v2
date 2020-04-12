@@ -20,7 +20,8 @@ import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
 	"mx.fmre.rttycontest.evaluate.services",
 	"mx.fmre.rttycontest.bs.dxcc.service",
 	"mx.fmre.rttycontest.bs.frequency.service", 
-	"mx.fmre.rttycontest.bs.qsoevaluation.service"})
+	"mx.fmre.rttycontest.bs.qsoevaluation.service",
+	"mx.fmre.rttycontest.bs.frequency.service"})
 public class EvaluateApp implements CommandLineRunner {
 	
 	@Autowired ICompleteDxccService completeDxccService;

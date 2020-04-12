@@ -24,6 +24,12 @@
 			<artifactId>fmrecontest-persistence</artifactId>
 			<version>${global.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>mx.fmre.rttycontest</groupId>
+			<artifactId>fmrecontest-evaluate</artifactId>
+			<version>${global.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>mx.fmre.rttycontest</groupId>

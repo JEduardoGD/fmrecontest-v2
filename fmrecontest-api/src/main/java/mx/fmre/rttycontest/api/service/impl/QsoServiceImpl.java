@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.dto.QsoDto;
 import mx.fmre.rttycontest.api.service.IQsoServie;
 import mx.fmre.rttycontest.api.util.QsoUtil;
+import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.Conteo;
@@ -36,6 +37,7 @@ public class QsoServiceImpl implements IQsoServie {
 	@Autowired private IRelQsoConteoRepository relQsoConteoRepository;
 	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	@Autowired private ICatBandRepository catBandRepository;
+	@Autowired private IEvaluateService evaluateService;
 	
 	private List<DxccEntity> listDxccEntities;
 	private List<CatBand> listBands;
@@ -162,6 +164,12 @@ public class QsoServiceImpl implements IQsoServie {
 		}
 		ContestQso newQso = contestQsoRepository.save(qso);
 		return this.findById(qsoDto.getConteoId(), newQso.getId());
+	}
+
+	@Override
+	public boolean reevaluateLog(Long contestLogId, Integer conteoId, Integer editionId) throws FmreContestException {
+		evaluateService.findForErrorsOnQsos(contestLogId, conteoId, editionId);
+		return true;
 	}
 }
 
