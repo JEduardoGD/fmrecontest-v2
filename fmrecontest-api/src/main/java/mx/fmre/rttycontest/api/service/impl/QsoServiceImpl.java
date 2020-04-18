@@ -94,11 +94,12 @@ public class QsoServiceImpl implements IQsoServie {
 		
 		Long dxccEntityId = contestQso.getDxccEntity() != null ? contestQso.getDxccEntity().getId() : null;
 		
-		dxccEntity = this.listDxccEntities
-				.stream()
-				.filter(y -> y.getId().longValue() == dxccEntityId.longValue())
-				.findFirst()
-				.orElse(null);
+		if(dxccEntityId != null)
+			dxccEntity = this.listDxccEntities
+					.stream()
+					.filter(y -> y.getId().longValue() == dxccEntityId.longValue())
+					.findFirst()
+					.orElse(null);
 		
 		RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(contestQso, conteo);
 		
@@ -144,7 +145,9 @@ public class QsoServiceImpl implements IQsoServie {
 			contestQsoRepository.saveAll(mappedQsos);
 			return this.findById(qsoDto.getConteoId(), qso.getId());
 		}
+		
 		ContestQso qso = contestQsoRepository.findById(qsoDto.getId()).orElse(null);
+		
 		Long dxccEntityId = qsoDto.getDxccEntityId();
 		DxccEntity dxccEntity = null;
 		if (dxccEntityId != null) {
@@ -160,6 +163,10 @@ public class QsoServiceImpl implements IQsoServie {
 					.orElse(null);
 			qso.setBand(qsoBand);
 		}
+		if(qsoDto.isDxccOrBandError()) {
+			qso.setError(true);
+		}
+		
 		ContestQso newQso = contestQsoRepository.save(qso);
 		return this.findById(qsoDto.getConteoId(), newQso.getId());
 	}

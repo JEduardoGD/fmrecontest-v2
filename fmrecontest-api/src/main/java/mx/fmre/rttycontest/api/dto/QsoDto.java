@@ -27,4 +27,6 @@ public class QsoDto implements Serializable {/**
 	private String qsoBand;
 	private Integer qsoBandId;
 	private boolean selectedUpdateAll;
+	private boolean dxccOrBandError;
+	private String rowClass;
 }

@@ -51,6 +51,11 @@ public class RelQsoConteo implements Serializable {
 	
 	@Column(name = "N_IS_MULTIPLY")
 	private boolean multiply;
+	
+	@Column(name = "N_IS_DXCC_OR_BAND_ERROR")
+	private Boolean dxccOrBandError;
+	
+	
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "relQsoConteo", fetch = FetchType.LAZY)

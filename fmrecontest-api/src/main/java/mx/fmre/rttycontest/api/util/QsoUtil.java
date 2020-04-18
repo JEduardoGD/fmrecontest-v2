@@ -14,6 +14,11 @@ public abstract class QsoUtil {
 	private final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static QsoDto map(DxccEntity dxccEntity, RelQsoConteo relQsoConteo, CatBand qsoBand, ContestQso x) {
+		String rowClass = null;
+		rowClass = (qsoBand == null ||  dxccEntity == null) ? "table-danger" : null;
+		if(x.getError() != null && x.getError().booleanValue() == true)
+			rowClass = "table-warning";
+		
 		QsoDto qsoDto = new QsoDto();
 		qsoDto.setConteoId(relQsoConteo.getConteo().getId());
 		qsoDto.setId(x.getId());
@@ -31,6 +36,8 @@ public abstract class QsoUtil {
 		qsoDto.setMultiply(relQsoConteo.isMultiply());
 		qsoDto.setQsoBand(qsoBand != null ? qsoBand.getBand() : "NOT FOUND");
 		qsoDto.setQsoBandId(qsoBand != null ? qsoBand.getId() : null);
+		qsoDto.setDxccOrBandError(x.getError() == null || x.getError().booleanValue() == false ? false : true);
+		qsoDto.setRowClass(rowClass);
 		return qsoDto;
 	}
 }
