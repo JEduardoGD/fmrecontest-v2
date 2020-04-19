@@ -141,6 +141,10 @@ public class EvaluateServiceImpl implements IEvaluateService {
 			for(ContestLog contestLog: filteredLogs) {
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				qsos = contestQsoRepository.findByContestLog(contestLog);
+				qsos = qsos
+						.stream()
+						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+						.collect(Collectors.toList());
 				List<RelQsoConteo> relQsoConteos = qsos.stream().map(qso -> {
 					Integer points = dxccServiceQrz.getPoints(contestLog, qso);
 					RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
@@ -175,6 +179,10 @@ public class EvaluateServiceImpl implements IEvaluateService {
 
 			for(ContestLog contestLog: filteredLogs) {
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+				qsos = qsos
+						.stream()
+						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+						.collect(Collectors.toList());
 				qsos = contestQsoRepository.findByContestLog(contestLog);
 				dxccServiceQrz.setMultiplies(conteo, qsos);
 			}
@@ -202,6 +210,10 @@ public class EvaluateServiceImpl implements IEvaluateService {
 
 			for(ContestLog contestLog: filteredLogs) {
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+				qsos = qsos
+						.stream()
+						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+						.collect(Collectors.toList());
 
 				List<RelQsoConteo> listRelQsoConteo = qsos
 						.stream()

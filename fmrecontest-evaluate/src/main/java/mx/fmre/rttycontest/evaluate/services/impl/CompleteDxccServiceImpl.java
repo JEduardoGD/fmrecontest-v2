@@ -78,7 +78,12 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			for (Email email : filtered) {
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
 				List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
-				List<ContestQso> newQsos = contestQsos.stream().map(qso -> {
+				List<ContestQso> f = contestQsos
+						.stream()
+						.filter(qso -> (qso.getError() == null || qso.getError().booleanValue() == false))
+						.filter(qso -> (qso.getDxccEntity() == null))
+						.collect(Collectors.toList());
+				List<ContestQso> newQsos = f.stream().map(qso -> {
 					DxccEntity dxccEntity = null;
 					try {
 						dxccEntity = getDxccOf(map, qso.getCallsignr(), edition);
@@ -242,7 +247,11 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			for (Email email : filtered) {
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				qsos = qsos.stream().filter(q -> q.getBand() == null).collect(Collectors.toList());
+				qsos = qsos
+						.stream()
+						.filter(q -> q.getBand() == null)
+						.filter(q -> q.getError() == null || q.getError().booleanValue() == false)
+						.collect(Collectors.toList());
 				List<ContestQso> newQsos = qsos.stream().map(qso -> {
 					BigDecimal bdFrequency = BigDecimal.valueOf(qso.getFrequency());
 					bdFrequency = bdFrequency.divide(BigDecimal.valueOf(1000));
