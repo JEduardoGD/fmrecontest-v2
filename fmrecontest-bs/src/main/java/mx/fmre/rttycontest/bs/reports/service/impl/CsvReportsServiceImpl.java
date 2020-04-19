@@ -3,6 +3,7 @@ package mx.fmre.rttycontest.bs.reports.service.impl;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -236,6 +237,52 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 			listStringsContent.add(content);
 		}
 		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+	
+	@Override
+	public byte[] getCallsignWithoutDxccEntityReport(int editionId) {
+		Edition edition = editionRepository.findById(editionId).orElse(null);
+		List<Email> emails = emailRepository.findByEdition(edition);
+		
+		List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(editionId);
+		
+		List<Integer> lastEmailsIdList = lastEmails
+				.stream()
+				.map(e -> e.getEmailId())
+				.collect(Collectors.toList());
+		
+		List<Email> filteredEmails = emails
+				.stream()
+				.filter(e -> lastEmailsIdList.contains(e.getId()))
+				.collect(Collectors.toList());
+		
+		Map<String, Integer> map = new HashMap<>();
+		
+		for (Email email : filteredEmails) {
+			ContestLog contestLog = contestLogRepository.findByEmail(email);
+			List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+			qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+					.filter(q -> q.getDxccEntity() == null).collect(Collectors.toList());
+
+			for (ContestQso qso : qsos) {
+				int c = 1;
+				if (map.containsKey(qso.getCallsignr())) {
+					c = map.get(qso.getCallsignr());
+					c = c + 1;
+				}
+				map.put(qso.getCallsignr(), c);
+			}
+		}
+
+		String[] header = { "DXCC ENTIY", "COUNT"};
+		
+		List<String[]> listStringsContent = new ArrayList<>();
+		for (String key : map.keySet()) {
+			Integer count = map.get(key);
+			listStringsContent.add(new String[] { key, count + "" });
+		}
+
 		return CsvUtil.createCsvByteArray(header, listStringsContent);
 	}
 }
