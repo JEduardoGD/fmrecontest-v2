@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
-import mx.fmre.rttycontest.bs.frequency.service.IFrequencyService;
+import mx.fmre.rttycontest.bs.frequency.service.IFrequencyBsService;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.bs.util.QrzUtil;
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
@@ -46,7 +46,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Autowired private IDxccEntityRepository           dxccEntityRepository;
 	@Autowired private ApplicationContext              appContext;
 	@Autowired private ILastEmailRepository            lastEmailRepository;
-	@Autowired private IFrequencyService               frequencyService;
+	@Autowired private IFrequencyBsService               frequencyService;
 	
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;

@@ -15,7 +15,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 	"mx.fmre.rttycontest.api.service",
 	"mx.fmre.rttycontest.api.conf",
 	"mx.fmre.rttycontest.api.controller",
-	"mx.fmre.rttycontest.bs.reports.service"})
+	"mx.fmre.rttycontest.bs.reports.service",
+	"mx.fmre.rttycontest.evaluate.services",
+	"mx.fmre.rttycontest.bs.frequency.service",
+	"mx.fmre.rttycontest.bs.qsoevaluation.service"})
 public class ApiApplication {
 
 	public static void main(String[] args) {

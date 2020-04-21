@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.frequency.service.IFrequencyService;
+import mx.fmre.rttycontest.bs.frequency.service.IFrequencyBsService;
 import mx.fmre.rttycontest.bs.util.CollectiosUtil;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatFrequencyBand;
@@ -23,7 +23,7 @@ import mx.fmre.rttycontest.persistence.repository.IVBandFrequencyRepository;
 
 @Service
 @Slf4j
-public class FrequencyServiceImpl implements IFrequencyService {
+public class FrequencyBsServiceImpl implements IFrequencyBsService {
 	
 	@Autowired ICatFrequencyBandRepository        catFrequencyBandRepository;
 	@Autowired private IVBandFrequencyRepository  vBandFrequencyRepository;

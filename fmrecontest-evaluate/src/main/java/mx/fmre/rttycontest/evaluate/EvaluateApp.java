@@ -1,5 +1,7 @@
 package mx.fmre.rttycontest.evaluate;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,6 +12,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
+import mx.fmre.rttycontest.persistence.model.Conteo;
+import mx.fmre.rttycontest.persistence.model.Edition;
+import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 
 @SpringBootApplication
 
@@ -26,6 +31,8 @@ public class EvaluateApp implements CommandLineRunner {
 	@Autowired ICompleteDxccService completeDxccService;
 	@Autowired IEvaluateService evaluateService;
 
+	@Autowired private IEditionRepository editionRepository;
+
 	public static void main(String[] args) {
 		SpringApplication.run(EvaluateApp.class);
 	}
@@ -35,10 +42,16 @@ public class EvaluateApp implements CommandLineRunner {
 		completeDxccService.completeDxccEntityQsos();
 		completeDxccService.completeDxccEntityLogs();
 		completeDxccService.completeBandsOnQsos();
-		evaluateService.findForErrorsOnQsos();
-		evaluateService.setPointsForQssos();
-		evaluateService.setMultipliesQsos();
-		evaluateService.evaluateActiveEditions();
+		
+		List<Edition> editions = editionRepository.getActiveEditionOfContest();
+		for (Edition edition : editions) {
+			String description = "conteo for edition id " + edition.getId();
+			Conteo conteo = evaluateService.createConteo(edition, description);
+			evaluateService.findForErrorsOnQsos(conteo, edition);
+			evaluateService.setPointsForQssos(conteo);
+			evaluateService.setMultipliesQsos(conteo);
+			evaluateService.evaluateActiveEditions(conteo);
+		}
 	}
 }
 

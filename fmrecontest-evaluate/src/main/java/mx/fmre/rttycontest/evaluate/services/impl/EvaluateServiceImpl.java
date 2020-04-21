@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.evaluate.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.Edition;
+import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
@@ -26,6 +28,7 @@ import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
+import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoQsoErrorRepository;
@@ -45,84 +48,110 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	@Autowired private IRelQsoConteoRepository         relQsoConteoRepository;
 	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
 	@Autowired private IRelConteoContestLogRepository  relConteoContestLogRepository;
+	@Autowired private IEmailRepository                emailRepository;
+	
+	@Override
+	public Conteo createConteo(Edition edition, String description) {
+		Conteo conteo = new Conteo();
+		conteo.setDatetime(DateTimeUtil.getUtcTimeDate());
+		conteo.setDescription(description);
+		conteo.setEdition(edition);
+		return conteoRepository.save(conteo);
+	}
 
 	@Override
-	public void findForErrorsOnQsos() {
-		List<Edition> editions = editionRepository.getActiveEditionOfContest();
-		for (Edition edition : editions) {
-			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
-			
-			Conteo conteo = new Conteo();
-			conteo.setDatetime(DateTimeUtil.getUtcTimeDate());
-			conteo.setDescription(null);
-			conteo.setEdition(edition);
-			Conteo savedConteo = conteoRepository.save(conteo);
-			
-			List<CatQsoError> catQsoErrors = catQsoErrorRepository.findByEdition(edition);
-			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
+	public void findForErrorsOnQsos(Conteo conteo, Edition edition) {
+		IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
+		
+		List<CatQsoError> catQsoErrors = catQsoErrorRepository.findByEdition(edition);
+		List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
 
-			List<Integer> lastLogsIdsList = lastEmails
-					.stream()
-					.map(LastEmail::getContestLogId)
-					.collect(Collectors.toList());
-			
-			List<ContestLog> logs = contestLogRepository.findByEdition(edition);
-			List<ContestLog> filteredLogs = logs
-					.stream()
-					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
-					.collect(Collectors.toList());
+		List<Integer> lastLogsIdsList = lastEmails
+				.stream()
+				.map(LastEmail::getContestLogId)
+				.collect(Collectors.toList());
+		
+		List<ContestLog> logs = contestLogRepository.findByEdition(edition);
+		List<ContestLog> filteredLogs = logs
+				.stream()
+				.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
+				.collect(Collectors.toList());
 
-			for(ContestLog contestLog: filteredLogs) {
-				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				for(ContestQso qso: qsos) {
-					boolean qsoComplete = true;
-					CatBand qsoBand = qso.getBand();
-					if (qsoBand == null) {
-						if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
+		for(ContestLog contestLog: filteredLogs)
+			this.findForErrorsOnQsosOfLog(contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
+	}
+	
+	@Override
+	public void findForErrorsOnQsosOfLog(ContestLog contestLog, Conteo conteo) {
+		Email email = emailRepository.findById(contestLog.getEmail().getId()).orElse(null);
+		Edition edition = editionRepository.findById(email.getEdition().getId()).orElse(null);
+		IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
+		List<CatQsoError> catQsoErrors = catQsoErrorRepository.findByEdition(edition);
+		this.findForErrorsOnQsosOfLog(contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
+	}
+	
+	private void findForErrorsOnQsosOfLog(
+			ContestLog contestLog,
+			Conteo conteo,
+			IEvaluateQso dxccServiceQrz,
+			Edition edition,
+			List<CatQsoError> catQsoErrors) {
+		List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+		for(ContestQso qso: qsos) {
+			boolean qsoComplete = true;
+			CatBand qsoBand = qso.getBand();
+			if (qsoBand == null) {
+				if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
 
-						} else {
-							log.error("El qso {} no tiene banda", qso.getId());
-							qsoComplete = false;
-						}
-					}
-					if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
-						if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
-
-						} else {
-							log.error("El qso {} no tiene entidad dxcc", qso.getId());
-							qsoComplete = false;
-						}
-					}
-					RelQsoConteo relQsoConteo = new RelQsoConteo();
-					relQsoConteo.setComplete(qsoComplete);
-					relQsoConteo.setConteo(savedConteo);
-					relQsoConteo.setContestQso(qso);
-					relQsoConteo.setDatetime(DateTimeUtil.getUtcTimeDate());
-					relQsoConteo.setPoints(null);
-					relQsoConteoRepository.save(relQsoConteo);
-					
-					List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(edition, contestLog, qso, catQsoErrors);
-					if(resEvaluation.isEmpty())
-						continue;
-					List<RelQsoConteoQsoError> relQsoConteoQsoErrorList = resEvaluation.stream().map(x -> {
-						RelQsoConteoQsoError relQsoConteoQsoError = new RelQsoConteoQsoError();
-						relQsoConteoQsoError.setCatQsoError(x);
-						relQsoConteoQsoError.setDatetime(DateTimeUtil.getUtcTimeDate());
-						relQsoConteoQsoError.setRelQsoConteo(relQsoConteo);
-						return relQsoConteoQsoError;
-					}).collect(Collectors.toList());
-					relQsoConteoQsoErrorRepository.saveAll(relQsoConteoQsoErrorList);
+				} else {
+					log.error("El qso {} no tiene banda", qso.getId());
+					qsoComplete = false;
 				}
 			}
+			if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
+				if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
+
+				} else {
+					log.error("El qso {} no tiene entidad dxcc", qso.getId());
+					qsoComplete = false;
+				}
+			}
+			RelQsoConteo relQsoConteo;
+			relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
+			if(relQsoConteo == null)
+				relQsoConteo = new RelQsoConteo();
+			relQsoConteo.setComplete(qsoComplete);
+			relQsoConteo.setConteo(conteo);
+			relQsoConteo.setContestQso(qso);
+			relQsoConteo.setDatetime(DateTimeUtil.getUtcTimeDate());
+			relQsoConteo.setPoints(null);
+			
+			relQsoConteo = relQsoConteoRepository.save(relQsoConteo);
+			
+			List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(edition, contestLog, qso, catQsoErrors);
+			if(resEvaluation.isEmpty())
+				continue;
+			
+			List<RelQsoConteoQsoError> exsist = relQsoConteoQsoErrorRepository.findByRelQsoConteo(relQsoConteo);
+			if(!exsist.isEmpty())
+				relQsoConteoQsoErrorRepository.deleteAll(exsist);
+			
+			List<RelQsoConteoQsoError> relQsoConteoQsoErrorList = new ArrayList<>();
+			for (CatQsoError x : resEvaluation) {
+				RelQsoConteoQsoError relQsoConteoQsoError = new RelQsoConteoQsoError();
+				relQsoConteoQsoError.setCatQsoError(x);
+				relQsoConteoQsoError.setDatetime(DateTimeUtil.getUtcTimeDate());
+				relQsoConteoQsoError.setRelQsoConteo(relQsoConteo);
+				relQsoConteoQsoErrorList.add(relQsoConteoQsoError);
+			}
+			relQsoConteoQsoErrorRepository.saveAll(relQsoConteoQsoErrorList);
 		}
 	}
 
 	@Override
-	public void setPointsForQssos() {
+	public void setPointsForQssos(Conteo conteo) {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			Conteo conteo = conteoRepository.getLastForEdition(edition);
-			
 			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 			
 			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
@@ -137,8 +166,11 @@ public class EvaluateServiceImpl implements IEvaluateService {
 					.stream()
 					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
 					.collect(Collectors.toList());
+			
+			int i = 1;
 
 			for(ContestLog contestLog: filteredLogs) {
+				log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, filteredLogs.size());
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				qsos = contestQsoRepository.findByContestLog(contestLog);
 				qsos = qsos
@@ -157,11 +189,9 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	}
 
 	@Override
-	public void setMultipliesQsos() {
+	public void setMultipliesQsos(Conteo conteo) {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			Conteo conteo = conteoRepository.getLastForEdition(edition);
-			
 			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 			
 			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
@@ -176,8 +206,11 @@ public class EvaluateServiceImpl implements IEvaluateService {
 					.stream()
 					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
 					.collect(Collectors.toList());
+			
+			int i = 1;
 
 			for(ContestLog contestLog: filteredLogs) {
+				log.info("Setting multipliers log id {} ({} / {})", contestLog.getId(), i++, filteredLogs.size());
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				qsos = qsos
 						.stream()
@@ -190,11 +223,9 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	}
 
 	@Override
-	public void evaluateActiveEditions() {
+	public void evaluateActiveEditions(Conteo conteo) {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			Conteo conteo = conteoRepository.getLastForEdition(edition);
-			
 			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
 
 			List<Integer> lastLogsIdsList = lastEmails
@@ -207,8 +238,11 @@ public class EvaluateServiceImpl implements IEvaluateService {
 					.stream()
 					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
 					.collect(Collectors.toList());
+			
+			int i = 1;
 
 			for(ContestLog contestLog: filteredLogs) {
+				log.info("Evaluating log id {} ({} / {})", contestLog.getId(), i++, filteredLogs.size());
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				qsos = qsos
 						.stream()
@@ -226,6 +260,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 				
 				RelQsoConteo relQsoConteoNoComplete = listRelQsoConteo
 						.stream()
+						.filter(rqc -> (rqc.getDxccOrBandError() == null || rqc.getDxccOrBandError().booleanValue() == false))
 						.filter(rqc -> !rqc.isComplete()).findFirst().orElse(null);
 				
 				int multipliers = listRelQsoConteo
