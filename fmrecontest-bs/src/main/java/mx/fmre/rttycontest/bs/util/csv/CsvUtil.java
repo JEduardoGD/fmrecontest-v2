@@ -42,9 +42,9 @@ public class CsvUtil {
 					email.getSubject(),
 					email.getRecipientsFromName(),
 					email.getRecipientsFromAddress(),
-					df.format(email.getSentDate()),
-					df.format(email.getVerifiedAt()),
-					df.format(email.getAnsweredAt()),
+					email.getSentDate() != null ? df.format(email.getSentDate()) : null,
+					email.getVerifiedAt() != null ? df.format(email.getVerifiedAt()) : null,
+					email.getAnsweredAt() != null ? df.format(email.getAnsweredAt()) : null,
 					emailStatusesArray.get(email.getEmailStatus().getId()),
 					usedForCount ? "USED" : "",
 					String.join(";", errors)};

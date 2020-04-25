@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.reports.service.ICsvReportsService;
+import mx.fmre.rttycontest.bs.util.CollectiosUtil;
 import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
+import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
@@ -284,5 +286,32 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		}
 
 		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	
+	}
+	
+	@Override
+	public List<String> getUniques(int editionId) throws FmreContestException{
+		Edition edition = editionRepository.findById(editionId).orElse(null);
+		List<Email> emails = emailRepository.findByEdition(edition);
+		List<String> distinctSubjects = emails
+				.stream()
+				.filter(email -> email != null)
+				.filter(email -> email.getSubject() != null)
+				.filter(CollectiosUtil.distinctByKey(Email::getSubject))
+				.map(Email::getSubject)
+				.map(email -> email.toUpperCase())
+				.collect(Collectors.toList());
+		
+		List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(editionId);
+		List<String> lastEmailsSubjects = lastEmails
+				.stream()
+				.map(le -> le.getEmailSubject().toUpperCase())
+				.collect(Collectors.toList());
+		
+		return distinctSubjects
+				.stream()
+				.filter(subject -> !lastEmailsSubjects.contains(subject))
+				.collect(Collectors.toList());
+		
 	}
 }

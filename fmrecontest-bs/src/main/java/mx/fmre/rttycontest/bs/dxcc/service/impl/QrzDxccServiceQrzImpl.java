@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.bs.dxcc.service.impl;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,13 +38,15 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 		
 		DxccSession session;
 		
+		
+//		Calendar calendar = Calendar.getInstance();
+		
+		
 		List<DxccSession> sessions = dxccSessionRepository.getActiveSessions();
 		if(sessions != null && !sessions.isEmpty())
 			session = sessions.get(sessions.size() - 1);
 		else {
-			QrzSessionDAO qrzSessionDAO = QrzUtil.getNewQrzSession(qrzUsername, qrzPassword);
-			session = QrzUtil.parse(qrzSessionDAO);
-			session = dxccSessionRepository.save(session);
+			session = this.getNewSession(qrzUsername, qrzPassword);
 		}
 
 		if (session == null)
@@ -73,5 +76,17 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 		}
 
 		return QrzUtil.parse(callsignQuery);
+	}
+	
+	private DxccSession getNewSession(String qrzUsername, String qrzPassword) throws FmreContestException {
+		DxccSession session;
+		try {
+			QrzSessionDAO qrzSessionDAO = QrzUtil.getNewQrzSession(qrzUsername, qrzPassword);
+			session = QrzUtil.parse(qrzSessionDAO);
+			session = dxccSessionRepository.save(session);
+		} catch (FmreContestException e) {
+			throw e;
+		}
+		return session;
 	}
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,11 +12,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.common.BaseController;
+import mx.fmre.rttycontest.api.common.StdResponse;
 import mx.fmre.rttycontest.bs.reports.service.ICsvReportsService;
+import mx.fmre.rttycontest.exception.FmreContestException;
 
 @RestController
 @RequestMapping("/reports")
+@Slf4j
 public class ReportsController extends BaseController {
 
 	/**
@@ -86,5 +91,18 @@ public class ReportsController extends BaseController {
 	            .contentLength(bytesrray.length)
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .body(resource);
+	}
+	
+	@GetMapping("/trace/{editionId}")
+	public ResponseEntity<StdResponse> trace(
+			@PathVariable("editionId") Integer editionId) {
+		try {
+			getResponseServiceVo().setData(csvReportsService.getUniques(editionId));
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
+		} catch (FmreContestException e) {
+			log.error("{}", e.getLocalizedMessage());
+			getResponseServiceVo().setMessageResponse(e.getLocalizedMessage());
+			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
