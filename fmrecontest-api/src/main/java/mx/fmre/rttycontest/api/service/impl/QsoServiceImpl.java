@@ -151,8 +151,11 @@ public class QsoServiceImpl implements IQsoServie {
 		Long dxccEntityId = qsoDto.getDxccEntityId();
 		DxccEntity dxccEntity = null;
 		if (dxccEntityId != null) {
-			dxccEntity = dxccEntityRepository.findById(dxccEntityId).orElse(null);
+			dxccEntity = dxccEntityRepository
+					.findById(dxccEntityId)
+					.orElse(null);
 			qso.setDxccEntity(dxccEntity);
+			qso.setDxccNotFound(false);
 		}
 		Integer qsoBandId = qsoDto.getQsoBandId();
 		if (qsoBandId != null) {

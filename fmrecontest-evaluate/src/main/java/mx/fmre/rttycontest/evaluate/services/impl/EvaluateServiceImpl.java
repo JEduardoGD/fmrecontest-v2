@@ -101,20 +101,12 @@ public class EvaluateServiceImpl implements IEvaluateService {
 			boolean qsoComplete = true;
 			CatBand qsoBand = qso.getBand();
 			if (qsoBand == null) {
-				if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
-
-				} else {
-					log.error("El qso {} no tiene banda", qso.getId());
-					qsoComplete = false;
-				}
+				log.error("El qso {} no tiene banda", qso.getId());
+				qsoComplete = false;
 			}
 			if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
-				if (qso.getError() != null && qso.getError().equals(Boolean.TRUE)) {
-
-				} else {
-					log.error("El qso {} no tiene entidad dxcc", qso.getId());
-					qsoComplete = false;
-				}
+				log.error("El qso {} no tiene entidad dxcc", qso.getId());
+				qsoComplete = false;
 			}
 			RelQsoConteo relQsoConteo;
 			relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
@@ -243,8 +235,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 
 			for(ContestLog contestLog: filteredLogs) {
 				log.info("Evaluating log id {} ({} / {})", contestLog.getId(), i++, filteredLogs.size());
-				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				qsos = qsos
+				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog)
 						.stream()
 						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
 						.collect(Collectors.toList());
@@ -253,6 +244,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 						.stream()
 						.map(qso -> relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo))
 						.collect(Collectors.toList());
+				
 				Integer sumOfPoints = listRelQsoConteo
 						.stream()
 						.filter(rqc -> rqc.getPoints() != null)
@@ -260,8 +252,13 @@ public class EvaluateServiceImpl implements IEvaluateService {
 				
 				RelQsoConteo relQsoConteoNoComplete = listRelQsoConteo
 						.stream()
-						.filter(rqc -> (rqc.getDxccOrBandError() == null || rqc.getDxccOrBandError().booleanValue() == false))
-						.filter(rqc -> !rqc.isComplete()).findFirst().orElse(null);
+						.filter(rcq -> {
+							Long qsoId = rcq.getContestQso().getId();
+							ContestQso qso = contestQsoRepository.findById(qsoId).orElse(null);
+							return (qso.getError() == null || qso.getError().booleanValue() == false);
+						})
+						.filter(rqc -> !rqc.isComplete()).findFirst()
+						.orElse(null);
 				
 				int multipliers = listRelQsoConteo
 						.stream()

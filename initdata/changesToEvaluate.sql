@@ -72,11 +72,11 @@ DELETE FROM `CAT_EMAIL_STATUS` WHERE `CAT_EMAIL_STATUS`.`N_ID_EMAIL_STATUS` = 6;
 #DELETE FROM `TBL_ATTACHED_FILE` WHERE `TBL_ATTACHED_FILE`.`N_ID_EMAIL` < 0;
 #DELETE FROM `TBL_EMAIL` WHERE `TBL_EMAIL`.`N_ID_EMAIL` < 0;
 
-#DELETE FROM `REL_EMAIL_EMAIL_ERROR` WHERE `REL_EMAIL_EMAIL_ERROR`.`N_ID_EMAIL` >                                                                   50;
-#DELETE FROM `TBL_CONTEST_QSO` WHERE `TBL_CONTEST_QSO`.`N_ID_CONTEST_LOG` IN (SELECT `N_ID_CONTEST_LOG` FROM `TBL_CONTEST_LOG` WHERE `N_ID_EMAIL` > 50);
-#DELETE FROM `TBL_CONTEST_LOG` WHERE `N_ID_EMAIL` >                                                                                                 50;
-#DELETE FROM `TBL_ATTACHED_FILE` WHERE `TBL_ATTACHED_FILE`.`N_ID_EMAIL` >                                                                           50;
-#DELETE FROM `TBL_EMAIL` WHERE `TBL_EMAIL`.`N_ID_EMAIL` >                                                                                           50;
+DELETE FROM `REL_EMAIL_EMAIL_ERROR` WHERE `REL_EMAIL_EMAIL_ERROR`.`N_ID_EMAIL` >                                                                   40;
+DELETE FROM `TBL_CONTEST_QSO` WHERE `TBL_CONTEST_QSO`.`N_ID_CONTEST_LOG` IN (SELECT `N_ID_CONTEST_LOG` FROM `TBL_CONTEST_LOG` WHERE `N_ID_EMAIL` > 40);
+DELETE FROM `TBL_CONTEST_LOG` WHERE `N_ID_EMAIL` >                                                                                                 40;
+DELETE FROM `TBL_ATTACHED_FILE` WHERE `TBL_ATTACHED_FILE`.`N_ID_EMAIL` >                                                                           40;
+DELETE FROM `TBL_EMAIL` WHERE `TBL_EMAIL`.`N_ID_EMAIL` >                                                                                           40;
 
 -- START CAT_QSO_ERROR
 CREATE TABLE `CAT_QSO_ERROR` (
