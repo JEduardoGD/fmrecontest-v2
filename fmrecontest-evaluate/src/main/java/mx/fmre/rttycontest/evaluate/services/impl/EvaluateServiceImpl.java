@@ -1,6 +1,7 @@
 package mx.fmre.rttycontest.evaluate.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
 	@Autowired private IRelConteoContestLogRepository  relConteoContestLogRepository;
 	@Autowired private IEmailRepository                emailRepository;
+//	@Autowired private EmailEmailErrorRepository       emailEmailErrorRepository;
 	
 	@Override
 	public Conteo createConteo(Edition edition, String description) {
@@ -77,8 +79,13 @@ public class EvaluateServiceImpl implements IEvaluateService {
 				.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
 				.collect(Collectors.toList());
 
-		for(ContestLog contestLog: filteredLogs)
+		Date startDate = new Date();
+		int current = 1;
+		for(ContestLog contestLog: filteredLogs) {
+			log.info("{} de {}; time remaining: {}", current, filteredLogs.size(),
+					DateTimeUtil.timeRemaining(startDate, current++, filteredLogs.size()));
 			this.findForErrorsOnQsosOfLog(contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
+		}
 	}
 	
 	@Override
@@ -219,7 +226,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
 			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
-
+			
 			List<Integer> lastLogsIdsList = lastEmails
 					.stream()
 					.map(LastEmail::getContestLogId)
@@ -267,13 +274,16 @@ public class EvaluateServiceImpl implements IEvaluateService {
 						.size();
 				long totalPoints = sumOfPoints * multipliers;
 				
+//				Integer emailId = contestLog.getEmail().getId();
+//				List<EmailEmailError> listRelEmailEmailerror = emailEmailErrorRepository.findByEmailId(emailId);
+				
 				RelConteoContestLog relConteoContestLog = new RelConteoContestLog();
 				relConteoContestLog.setConteo(conteo);
 				relConteoContestLog.setContestLog(contestLog);
 				relConteoContestLog.setSumOfPoints(sumOfPoints);
 				relConteoContestLog.setMultipliers(multipliers);
 				relConteoContestLog.setTotalPoints(totalPoints);
-				relConteoContestLog.setComplete(relQsoConteoNoComplete == null);
+				relConteoContestLog.setComplete(relQsoConteoNoComplete == null/* && listRelEmailEmailerror.size() <= 0*/);
 				relConteoContestLogRepository.save(relConteoContestLog);
 			}
 		}

@@ -1,0 +1,134 @@
+package mx.fmre.rttycontest.bs.reports.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import mx.fmre.rttycontest.bs.reports.service.IResultsReports;
+import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
+import mx.fmre.rttycontest.persistence.model.Conteo;
+import mx.fmre.rttycontest.persistence.model.ContestLog;
+import mx.fmre.rttycontest.persistence.model.EmailEmailError;
+import mx.fmre.rttycontest.persistence.model.LastEmail;
+import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
+import mx.fmre.rttycontest.persistence.repository.EmailEmailErrorRepository;
+import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
+import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
+import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
+import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
+
+@Service
+public class ResultsReportsImpl implements IResultsReports {
+	
+	@Autowired private IConteoRepository conteoRepository;
+	@Autowired private IContestLogRepository contestLogRepository;
+	@Autowired private IRelConteoContestLogRepository relConteoContestLogRepository;
+	@Autowired private ILastEmailRepository lastEmailRepository;
+	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
+
+	@Override
+	public byte[] highPowerWorld(int conteoId) {
+		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
+		
+		Integer editionId = conteo.getEdition().getId();
+		
+		List<Integer> lasEmailContestLogList = lastEmailRepository
+				.findByEditionId(editionId)
+				.stream()
+				.map(LastEmail::getContestLogId)
+				.collect(Collectors.toList());
+		
+		
+		List<RelConteoContestLog> listRelConteoContestLog = relConteoContestLogRepository
+				.findByConteo(conteo)
+				.stream()
+				.filter(rcl -> {
+					for (Integer l : lasEmailContestLogList) {
+						if (l.longValue() == rcl.getContestLog().getId().longValue())
+							return true;
+					}
+					return false;
+				})
+				.filter(RelConteoContestLog::isComplete)
+				.collect(Collectors.toList());
+		
+		//filter complete
+		listRelConteoContestLog = listRelConteoContestLog
+				.stream()
+				.filter(RelConteoContestLog::isComplete)
+				.collect(Collectors.toList());
+		
+		listRelConteoContestLog = listRelConteoContestLog
+				.stream()
+				.filter(rccl -> {
+					Long contestLogId = rccl.getContestLog().getId();
+					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
+					Integer emailId = contestLog.getEmail().getId();
+					List<EmailEmailError> listRelEmailEmailerror = emailEmailErrorRepository.findByEmailId(emailId);
+					return listRelEmailEmailerror.size() <= 0;})
+				.collect(Collectors.toList());
+		
+		//filter high power
+		List<RelConteoContestLog> highPowerListRelConteoContestLog = listRelConteoContestLog
+				.stream()
+				.filter(rcc -> {
+					Long contestLogId = rcc.getContestLog().getId();
+					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
+					return "HIGH".equals(contestLog.getCategoryPower());
+					})
+				.collect(Collectors.toList());
+		
+		highPowerListRelConteoContestLog = highPowerListRelConteoContestLog
+				.stream()
+				.sorted((o1,o2)->  {
+					if(o1.getTotalPoints() < o2.getTotalPoints())
+						return 1;
+					if(o1.getTotalPoints() > o2.getTotalPoints())
+						return -1;
+					return 0;
+				})
+				.collect(Collectors.toList());
+		
+		String[] header = { 
+				"id",
+				"callsign",
+				"dxcc_country",
+				"state",
+				"power",
+				"total_points",
+				"place"};
+		
+		List<String[]> listStringsContent = new ArrayList<>();
+		
+		int place = 0;
+		long lastPoints = -1;
+		
+		for (RelConteoContestLog q : highPowerListRelConteoContestLog) {
+			
+			place = lastPoints == q.getTotalPoints() ? place : place + 1;
+			
+//			Integer conteoId = q.getConteo().getId();
+//			Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
+			Long contestLogId = q.getContestLog().getId();
+			ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
+			String[] content = {
+					contestLog.getId() + "",
+					contestLog.getCallsign(),
+					contestLog.getDxccEntity().getId() + "",
+					contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
+					contestLog.getCategoryPower(),
+					q.getTotalPoints() + "",
+					place + ""};
+
+			listStringsContent.add(content);
+			
+			lastPoints = q.getTotalPoints();
+		}
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+
+}
