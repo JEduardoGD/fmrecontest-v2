@@ -18,15 +18,28 @@ import mx.fmre.rttycontest.bs.reports.service.IResultsReports;
 public class ResultsController {
 	@Autowired private IResultsReports resultsReports;
 	
-
-
 	@GetMapping("/highpowerworld/{conteoId}")
-	public ResponseEntity<Resource> generateConteoReport(@PathVariable("conteoId") Integer conteoId) {
+	public ResponseEntity<Resource> highPowerWorldReport(@PathVariable("conteoId") Integer conteoId) {
 		HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         byte[] bytesrray = resultsReports.highPowerWorld(conteoId);
+        ByteArrayResource resource = new ByteArrayResource(bytesrray);
+	    return ResponseEntity.ok()
+	            .headers(headers)
+	            .contentLength(bytesrray.length)
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .body(resource);
+	}
+	
+	@GetMapping("/lowPowerWorld/{conteoId}")
+	public ResponseEntity<Resource> lowPowerWorldReport(@PathVariable("conteoId") Integer conteoId) {
+		HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        byte[] bytesrray = resultsReports.lowPowerWorld(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
 	            .headers(headers)
