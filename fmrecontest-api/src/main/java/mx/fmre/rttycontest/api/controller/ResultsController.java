@@ -47,4 +47,19 @@ public class ResultsController {
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .body(resource);
 	}
+	
+	@GetMapping("/highPowerMexico/{conteoId}")
+	public ResponseEntity<Resource> highPowerMexicoReport(@PathVariable("conteoId") Integer conteoId) {
+		HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        byte[] bytesrray = resultsReports.highPowerMexico(conteoId);
+        ByteArrayResource resource = new ByteArrayResource(bytesrray);
+	    return ResponseEntity.ok()
+	            .headers(headers)
+	            .contentLength(bytesrray.length)
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .body(resource);
+	}
 }
