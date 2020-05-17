@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.reports.service.IResultsReports;
+import mx.fmre.rttycontest.bs.util.CollectiosUtil;
 import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
@@ -154,7 +155,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			ContestLog contestLog = contestLogRepository
 					.findById(contestLogId)
 					.orElse(null);
-			System.out.println(contestLog.getId());
 			String[] content = {
 					contestLog.getId() + "",
 					contestLog.getCallsign(),
@@ -222,7 +222,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			ContestLog contestLog = contestLogRepository
 					.findById(contestLogId)
 					.orElse(null);
-			System.out.println(contestLog.getId());
 			String[] content = {
 					contestLog.getId() + "",
 					contestLog.getCallsign(),
@@ -290,7 +289,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			ContestLog contestLog = contestLogRepository
 					.findById(contestLogId)
 					.orElse(null);
-			System.out.println(contestLog.getId());
 			String[] content = {
 					contestLog.getId() + "",
 					contestLog.getCallsign(),
@@ -308,6 +306,107 @@ public class ResultsReportsImpl implements IResultsReports {
 		return CsvUtil.createCsvByteArray(header, listStringsContent);
 	}
 	
+	@Override
+	public byte[] lowPowerByCountry(int conteoId) {
+		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
+		
+		List<ContestLog> contestLogList = listRelConteoContestLog
+				.stream()
+				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
+				.collect(Collectors.toList());
+		
+		List<DxccEntity> distinctDxccEntity = contestLogList
+				.stream()
+				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity))
+				.map(ContestLog::getDxccEntity)
+				.collect(Collectors.toList());
+		
+		//filter low power
+		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
+				.stream()
+				.filter(rcc -> {
+					long contestLogId = rcc.getContestLog().getId().longValue();
+					ContestLog contestLog = contestLogList
+							.stream()
+							.filter(cl -> cl.getId().longValue() == contestLogId)
+							.findFirst()
+							.orElse(null);
+					return ("LOW".equals(contestLog.getCategoryPower()));
+				})
+				.collect(Collectors.toList());
+		
+		List<String[]> listStringsContent = new ArrayList<>();
+		
+		for (DxccEntity dxccEntity : distinctDxccEntity) {
+			List<RelConteoContestLog> rccByDxccEntity = lowPowerListRelConteoContestLog
+					.stream()
+					.filter(rcc -> {
+						long contestLogId = rcc.getContestLog().getId().longValue();
+						ContestLog contestLog = contestLogList
+								.stream()
+								.filter(cl -> cl.getId().longValue() == contestLogId)
+								.findFirst()
+								.orElse(null);
+						return contestLog.getDxccEntity().getId().longValue() == dxccEntity.getId().longValue();
+					})
+					.collect(Collectors.toList());
+					
+			if(rccByDxccEntity.isEmpty())
+				continue;
+
+			
+			rccByDxccEntity = rccByDxccEntity
+					.stream()
+					.sorted((o1,o2)->  {
+						if(o1.getTotalPoints() < o2.getTotalPoints())
+							return 1;
+						if(o1.getTotalPoints() > o2.getTotalPoints())
+							return -1;
+						return 0;
+					})
+					.collect(Collectors.toList());
+			
+
+			int place = 0;
+			long lastPoints = -1;
+			for (RelConteoContestLog q : rccByDxccEntity) {
+				place = lastPoints == q.getTotalPoints() ? place : place + 1;
+				
+//				Integer conteoId = q.getConteo().getId();
+//				Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
+				Long contestLogId = q.getContestLog().getId();
+				ContestLog contestLog = contestLogRepository
+						.findById(contestLogId)
+						.orElse(null);
+				String[] content = {
+						contestLog.getId() + "",
+						contestLog.getCallsign(),
+						contestLog.getDxccEntity().getId() + "",
+						contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
+						contestLog.getCategoryPower(),
+						q.getTotalPoints() + "",
+						place + ""};
+
+				listStringsContent.add(content);
+				
+				lastPoints = q.getTotalPoints();
+			}
+			
+		}
+		
+		String[] header = { 
+				"id",
+				"callsign",
+				"dxcc_country",
+				"state",
+				"power",
+				"total_points",
+				"place"};
+		
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+
 	private List<RelConteoContestLog> filterContestLogList(Integer conteoId) {
 		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 		
