@@ -77,7 +77,7 @@ public class ResultsController {
         headers.add("Expires", "0");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.add("Content-Disposition", "attachment; filename=" + "lowpowermexico_conteoid_" + conteoId + ".csv");
-        byte[] bytesrray = resultsReports.highPowerMexico(conteoId);
+        byte[] bytesrray = resultsReports.lowPowerMexico(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
 	            .headers(headers)
