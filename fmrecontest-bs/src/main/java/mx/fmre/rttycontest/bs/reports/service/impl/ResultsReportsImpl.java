@@ -35,6 +35,9 @@ public class ResultsReportsImpl implements IResultsReports {
 	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
 	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	
+	private final String HIGH_POWER = "HIGH";
+	private final String LOW_POWER = "LOW";
+	
 	private DxccEntity mexicoDxccEntity;
 	
 	@PostConstruct
@@ -46,13 +49,21 @@ public class ResultsReportsImpl implements IResultsReports {
 	public byte[] highPowerWorld(int conteoId) {
 		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
 		
+//		List<String> d = listRelConteoContestLog
+//		.stream()
+//		.map(x -> {
+//			return contestLogRepository.findById(x.getContestLog().getId()).orElse(null);
+//		})
+//		.map(ContestLog::getCategoryPower)
+//		.collect(Collectors.toList());
+		
 		//filter high power
 		List<RelConteoContestLog> highPowerListRelConteoContestLog = listRelConteoContestLog
 				.stream()
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return "HIGH".equals(contestLog.getCategoryPower());
+					return (null == contestLog.getCategoryPower() || HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 					})
 				.collect(Collectors.toList());
 		
@@ -116,7 +127,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return "LOW".equals(contestLog.getCategoryPower());
+					return LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower());
 					})
 				.collect(Collectors.toList());
 		
@@ -182,7 +193,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return ("HIGH".equals(contestLog.getCategoryPower()) &&
+					return ((null == contestLog.getCategoryPower() || HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower())) &&
 							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
 					})
 				.collect(Collectors.toList());
@@ -249,7 +260,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return ("LOW".equals(contestLog.getCategoryPower()) &&
+					return (LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()) &&
 							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
 					})
 				.collect(Collectors.toList());
@@ -331,7 +342,7 @@ public class ResultsReportsImpl implements IResultsReports {
 							.filter(cl -> cl.getId().longValue() == contestLogId)
 							.findFirst()
 							.orElse(null);
-					return ("LOW".equals(contestLog.getCategoryPower()));
+					return (LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 				})
 				.collect(Collectors.toList());
 		
@@ -423,7 +434,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.collect(Collectors.toList());
 		
 		//filter low power
-		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
+		List<RelConteoContestLog> highPowerListRelConteoContestLog = listRelConteoContestLog
 				.stream()
 				.filter(rcc -> {
 					long contestLogId = rcc.getContestLog().getId().longValue();
@@ -432,14 +443,14 @@ public class ResultsReportsImpl implements IResultsReports {
 							.filter(cl -> cl.getId().longValue() == contestLogId)
 							.findFirst()
 							.orElse(null);
-					return ("HIGH".equals(contestLog.getCategoryPower()));
+					return (null == contestLog.getCategoryPower() || HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 				})
 				.collect(Collectors.toList());
 		
 		List<String[]> listStringsContent = new ArrayList<>();
 		
 		for (DxccEntity dxccEntity : distinctDxccEntity) {
-			List<RelConteoContestLog> rccByDxccEntity = lowPowerListRelConteoContestLog
+			List<RelConteoContestLog> rccByDxccEntity = highPowerListRelConteoContestLog
 					.stream()
 					.filter(rcc -> {
 						long contestLogId = rcc.getContestLog().getId().longValue();
@@ -519,6 +530,8 @@ public class ResultsReportsImpl implements IResultsReports {
 				.stream()
 				.map(LastEmail::getContestLogId)
 				.collect(Collectors.toList());
+		
+		
 		
 		
 		List<RelConteoContestLog> listRelConteoContestLog = relConteoContestLogRepository
