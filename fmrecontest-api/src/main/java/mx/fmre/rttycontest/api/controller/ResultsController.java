@@ -24,6 +24,8 @@ public class ResultsController {
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Content-Disposition", "attachment; filename=" + "highpowerworld_conteoid_" + conteoId + ".csv");
         byte[] bytesrray = resultsReports.highPowerWorld(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
@@ -39,6 +41,8 @@ public class ResultsController {
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Content-Disposition", "attachment; filename=" + "lowpowerworld_conteoid_" + conteoId + ".csv");
         byte[] bytesrray = resultsReports.lowPowerWorld(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
@@ -54,6 +58,8 @@ public class ResultsController {
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Content-Disposition", "attachment; filename=" + "highpowermexico_conteoid_" + conteoId + ".csv");
         byte[] bytesrray = resultsReports.highPowerMexico(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
@@ -69,6 +75,8 @@ public class ResultsController {
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Content-Disposition", "attachment; filename=" + "lowpowermexico_conteoid_" + conteoId + ".csv");
         byte[] bytesrray = resultsReports.highPowerMexico(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
@@ -84,6 +92,8 @@ public class ResultsController {
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Content-Disposition", "attachment; filename=" + "lowpowerbycountry_conteoid_" + conteoId + ".csv");
         byte[] bytesrray = resultsReports.lowPowerByCountry(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
@@ -99,6 +109,8 @@ public class ResultsController {
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Content-Disposition", "attachment; filename=" + "highpowerbycountry_conteoid_" + conteoId + ".csv");
         byte[] bytesrray = resultsReports.highPowerByCountry(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
