@@ -39,6 +39,7 @@ public class CsvUtil {
 					.collect(Collectors.toList());
 			String[] content = {
 					email.getId() + "",
+					email.getEmailCount() + "",
 					email.getSubject(),
 					email.getRecipientsFromName(),
 					email.getRecipientsFromAddress(),

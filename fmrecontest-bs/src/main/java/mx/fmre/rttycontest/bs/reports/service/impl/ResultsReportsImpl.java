@@ -63,7 +63,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return (null == contestLog.getCategoryPower() || HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
+					return (HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 					})
 				.collect(Collectors.toList());
 		
@@ -127,7 +127,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower());
+					return (null == contestLog.getCategoryPower() || LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 					})
 				.collect(Collectors.toList());
 		
@@ -193,7 +193,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return ((null == contestLog.getCategoryPower() || HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower())) &&
+					return (HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()) &&
 							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
 					})
 				.collect(Collectors.toList());
@@ -260,7 +260,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return (LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()) &&
+					return ((null == contestLog.getCategoryPower() || LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower())) &&
 							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
 					})
 				.collect(Collectors.toList());
@@ -342,7 +342,7 @@ public class ResultsReportsImpl implements IResultsReports {
 							.filter(cl -> cl.getId().longValue() == contestLogId)
 							.findFirst()
 							.orElse(null);
-					return (LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
+					return (null == contestLog.getCategoryPower() || LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 				})
 				.collect(Collectors.toList());
 		
@@ -443,7 +443,7 @@ public class ResultsReportsImpl implements IResultsReports {
 							.filter(cl -> cl.getId().longValue() == contestLogId)
 							.findFirst()
 							.orElse(null);
-					return (null == contestLog.getCategoryPower() || HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
+					return (HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 				})
 				.collect(Collectors.toList());
 		

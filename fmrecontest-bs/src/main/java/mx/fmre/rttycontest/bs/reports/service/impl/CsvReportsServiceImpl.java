@@ -101,6 +101,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 		
 		String[] header = { 
 				"ID",
+				"EMAIL COUNT",
 				"SUBJECT",
 				"FROM NAME",
 				"FROM ADDRESS",
