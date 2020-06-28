@@ -7,4 +7,5 @@ public interface IResultsReports {
 	public byte[] lowPowerMexico(int conteoId);
 	public byte[] lowPowerByCountry(int conteoId);
 	public byte[] highPowerByCountry(int conteoId);
+	public byte[] allResultsReport(int conteoId);
 }

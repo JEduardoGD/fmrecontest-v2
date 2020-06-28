@@ -119,4 +119,21 @@ public class ResultsController {
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .body(resource);
 	}
+	
+	@GetMapping("/allResultsRepor/{conteoId}")
+	public ResponseEntity<Resource> allResultsRepor(@PathVariable("conteoId") Integer conteoId) {
+		HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.add("Content-Disposition", "attachment; filename=" + "highpowerbycountry_conteoid_" + conteoId + ".csv");
+        byte[] bytesrray = resultsReports.highPowerByCountry(conteoId);
+        ByteArrayResource resource = new ByteArrayResource(bytesrray);
+	    return ResponseEntity.ok()
+	            .headers(headers)
+	            .contentLength(bytesrray.length)
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .body(resource);
+	}
 }

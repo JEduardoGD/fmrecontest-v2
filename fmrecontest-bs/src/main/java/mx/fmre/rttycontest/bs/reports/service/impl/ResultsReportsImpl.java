@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.reports.service.IResultsReports;
 import mx.fmre.rttycontest.bs.util.CollectiosUtil;
+import mx.fmre.rttycontest.bs.util.ResultReportsUtil;
+import mx.fmre.rttycontest.bs.util.StaticValues;
 import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
@@ -35,9 +37,6 @@ public class ResultsReportsImpl implements IResultsReports {
 	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
 	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	
-	private final String HIGH_POWER = "HIGH";
-	private final String LOW_POWER = "LOW";
-	
 	private DxccEntity mexicoDxccEntity;
 	
 	@PostConstruct
@@ -49,34 +48,9 @@ public class ResultsReportsImpl implements IResultsReports {
 	public byte[] highPowerWorld(int conteoId) {
 		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
 		
-//		List<String> d = listRelConteoContestLog
-//		.stream()
-//		.map(x -> {
-//			return contestLogRepository.findById(x.getContestLog().getId()).orElse(null);
-//		})
-//		.map(ContestLog::getCategoryPower)
-//		.collect(Collectors.toList());
-		
 		//filter high power
-		List<RelConteoContestLog> highPowerListRelConteoContestLog = listRelConteoContestLog
-				.stream()
-				.filter(rcc -> {
-					Long contestLogId = rcc.getContestLog().getId();
-					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return (HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
-					})
-				.collect(Collectors.toList());
-		
-		highPowerListRelConteoContestLog = highPowerListRelConteoContestLog
-				.stream()
-				.sorted((o1,o2)->  {
-					if(o1.getTotalPoints() < o2.getTotalPoints())
-						return 1;
-					if(o1.getTotalPoints() > o2.getTotalPoints())
-						return -1;
-					return 0;
-				})
-				.collect(Collectors.toList());
+		List<RelConteoContestLog> highPowerListRelConteoContestLog = 
+				ResultReportsUtil.filterHighPowerWorld(listRelConteoContestLog, contestLogRepository);
 		
 		String[] header = { 
 				"id",
@@ -122,25 +96,8 @@ public class ResultsReportsImpl implements IResultsReports {
 		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
 		
 		//filter low power
-		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
-				.stream()
-				.filter(rcc -> {
-					Long contestLogId = rcc.getContestLog().getId();
-					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return (null == contestLog.getCategoryPower() || LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
-					})
-				.collect(Collectors.toList());
-		
-		lowPowerListRelConteoContestLog = lowPowerListRelConteoContestLog
-				.stream()
-				.sorted((o1,o2)->  {
-					if(o1.getTotalPoints() < o2.getTotalPoints())
-						return 1;
-					if(o1.getTotalPoints() > o2.getTotalPoints())
-						return -1;
-					return 0;
-				})
-				.collect(Collectors.toList());
+		List<RelConteoContestLog> lowPowerListRelConteoContestLog =
+				ResultReportsUtil.filterLowPowerWorld(listRelConteoContestLog, contestLogRepository);
 		
 		String[] header = { 
 				"id",
@@ -160,8 +117,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			
 			place = lastPoints == q.getTotalPoints() ? place : place + 1;
 			
-//			Integer conteoId = q.getConteo().getId();
-//			Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository
 					.findById(contestLogId)
@@ -187,27 +142,9 @@ public class ResultsReportsImpl implements IResultsReports {
 	public byte[] highPowerMexico(int conteoId) {
 		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
 		
-		//filter low power
-		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
-				.stream()
-				.filter(rcc -> {
-					Long contestLogId = rcc.getContestLog().getId();
-					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return (HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()) &&
-							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
-					})
-				.collect(Collectors.toList());
-		
-		lowPowerListRelConteoContestLog = lowPowerListRelConteoContestLog
-				.stream()
-				.sorted((o1,o2)->  {
-					if(o1.getTotalPoints() < o2.getTotalPoints())
-						return 1;
-					if(o1.getTotalPoints() > o2.getTotalPoints())
-						return -1;
-					return 0;
-				})
-				.collect(Collectors.toList());
+		//filter low power, mexico
+		List<RelConteoContestLog> lowPowerListRelConteoContestLog = 
+				ResultReportsUtil.filterHighPowerMexico(listRelConteoContestLog, contestLogRepository, mexicoDxccEntity);
 		
 		String[] header = { 
 				"id",
@@ -254,27 +191,9 @@ public class ResultsReportsImpl implements IResultsReports {
 	public byte[] lowPowerMexico(int conteoId) {
 		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
 		
-		//filter low power
-		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
-				.stream()
-				.filter(rcc -> {
-					Long contestLogId = rcc.getContestLog().getId();
-					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
-					return ((null == contestLog.getCategoryPower() || LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower())) &&
-							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
-					})
-				.collect(Collectors.toList());
-		
-		lowPowerListRelConteoContestLog = lowPowerListRelConteoContestLog
-				.stream()
-				.sorted((o1,o2)->  {
-					if(o1.getTotalPoints() < o2.getTotalPoints())
-						return 1;
-					if(o1.getTotalPoints() > o2.getTotalPoints())
-						return -1;
-					return 0;
-				})
-				.collect(Collectors.toList());
+		//filter low power, mexico
+		List<RelConteoContestLog> lowPowerListRelConteoContestLog = 
+				ResultReportsUtil.filterLowPowerMexico(listRelConteoContestLog, contestLogRepository, mexicoDxccEntity);
 		
 		String[] header = { 
 				"id",
@@ -294,8 +213,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			
 			place = lastPoints == q.getTotalPoints() ? place : place + 1;
 			
-//			Integer conteoId = q.getConteo().getId();
-//			Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository
 					.findById(contestLogId)
@@ -331,8 +248,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity))
 				.map(ContestLog::getDxccEntity)
 				.collect(Collectors.toList());
-		
-		//filter low power
+
 		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
 				.stream()
 				.filter(rcc -> {
@@ -342,7 +258,7 @@ public class ResultsReportsImpl implements IResultsReports {
 							.filter(cl -> cl.getId().longValue() == contestLogId)
 							.findFirst()
 							.orElse(null);
-					return (null == contestLog.getCategoryPower() || LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
+					return (null == contestLog.getCategoryPower() || StaticValues.LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
 				})
 				.collect(Collectors.toList());
 		
@@ -422,89 +338,8 @@ public class ResultsReportsImpl implements IResultsReports {
 	public byte[] highPowerByCountry(int conteoId) {
 		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
 		
-		List<ContestLog> contestLogList = listRelConteoContestLog
-				.stream()
-				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
-				.collect(Collectors.toList());
-		
-		List<DxccEntity> distinctDxccEntity = contestLogList
-				.stream()
-				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity))
-				.map(ContestLog::getDxccEntity)
-				.collect(Collectors.toList());
-		
-		//filter low power
-		List<RelConteoContestLog> highPowerListRelConteoContestLog = listRelConteoContestLog
-				.stream()
-				.filter(rcc -> {
-					long contestLogId = rcc.getContestLog().getId().longValue();
-					ContestLog contestLog = contestLogList
-							.stream()
-							.filter(cl -> cl.getId().longValue() == contestLogId)
-							.findFirst()
-							.orElse(null);
-					return (HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
-				})
-				.collect(Collectors.toList());
-		
-		List<String[]> listStringsContent = new ArrayList<>();
-		
-		for (DxccEntity dxccEntity : distinctDxccEntity) {
-			List<RelConteoContestLog> rccByDxccEntity = highPowerListRelConteoContestLog
-					.stream()
-					.filter(rcc -> {
-						long contestLogId = rcc.getContestLog().getId().longValue();
-						ContestLog contestLog = contestLogList
-								.stream()
-								.filter(cl -> cl.getId().longValue() == contestLogId)
-								.findFirst()
-								.orElse(null);
-						return contestLog.getDxccEntity().getId().longValue() == dxccEntity.getId().longValue();
-					})
-					.collect(Collectors.toList());
-					
-			if(rccByDxccEntity.isEmpty())
-				continue;
-
-			
-			rccByDxccEntity = rccByDxccEntity
-					.stream()
-					.sorted((o1,o2)->  {
-						if(o1.getTotalPoints() < o2.getTotalPoints())
-							return 1;
-						if(o1.getTotalPoints() > o2.getTotalPoints())
-							return -1;
-						return 0;
-					})
-					.collect(Collectors.toList());
-			
-
-			int place = 0;
-			long lastPoints = -1;
-			for (RelConteoContestLog q : rccByDxccEntity) {
-				place = lastPoints == q.getTotalPoints() ? place : place + 1;
-				
-//				Integer conteoId = q.getConteo().getId();
-//				Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
-				Long contestLogId = q.getContestLog().getId();
-				ContestLog contestLog = contestLogRepository
-						.findById(contestLogId)
-						.orElse(null);
-				String[] content = {
-						contestLog.getId() + "",
-						contestLog.getCallsign(),
-						contestLog.getDxccEntity().getId() + "",
-						contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
-						contestLog.getCategoryPower(),
-						q.getTotalPoints() + "",
-						place + ""};
-
-				listStringsContent.add(content);
-				
-				lastPoints = q.getTotalPoints();
-			}
-			
-		}
+		List<String[]> listStringsContent = 
+				ResultReportsUtil.filterHighPowerByCountry(listRelConteoContestLog, contestLogRepository, mexicoDxccEntity);
 		
 		String[] header = { 
 				"id",
@@ -530,9 +365,6 @@ public class ResultsReportsImpl implements IResultsReports {
 				.stream()
 				.map(LastEmail::getContestLogId)
 				.collect(Collectors.toList());
-		
-		
-		
 		
 		List<RelConteoContestLog> listRelConteoContestLog = relConteoContestLogRepository
 				.findByConteo(conteo)
@@ -564,6 +396,12 @@ public class ResultsReportsImpl implements IResultsReports {
 				.collect(Collectors.toList());
 		
 		return listRelConteoContestLog;
+	}
+
+	@Override
+	public byte[] allResultsReport(int conteoId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
