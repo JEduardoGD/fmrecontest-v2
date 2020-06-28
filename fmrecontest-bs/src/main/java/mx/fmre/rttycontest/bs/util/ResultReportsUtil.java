@@ -112,6 +112,31 @@ public final class ResultReportsUtil {
 				.collect(Collectors.toList());
 	}
 	
+	public static List<RelConteoContestLog> filterLowPowerByCountry(
+			List<RelConteoContestLog> listRelConteoContestLog,
+			IContestLogRepository contestLogRepository,
+			DxccEntity mexicoDxccEntity) {
+
+		
+		List<ContestLog> contestLogList = listRelConteoContestLog
+				.stream()
+				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
+				.collect(Collectors.toList());
+
+		return listRelConteoContestLog
+				.stream()
+				.filter(rcc -> {
+					long contestLogId = rcc.getContestLog().getId().longValue();
+					ContestLog contestLog = contestLogList
+							.stream()
+							.filter(cl -> cl.getId().longValue() == contestLogId)
+							.findFirst()
+							.orElse(null);
+					return (null == contestLog.getCategoryPower() || StaticValues.LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
+				})
+				.collect(Collectors.toList());
+	}
+	
 	public static List<String[]> filterHighPowerByCountry(
 			List<RelConteoContestLog> listRelConteoContestLog,
 			IContestLogRepository contestLogRepository,

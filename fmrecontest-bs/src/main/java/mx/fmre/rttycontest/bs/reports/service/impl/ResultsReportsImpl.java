@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import mx.fmre.rttycontest.bs.reports.service.IResultsReports;
 import mx.fmre.rttycontest.bs.util.CollectiosUtil;
 import mx.fmre.rttycontest.bs.util.ResultReportsUtil;
-import mx.fmre.rttycontest.bs.util.StaticValues;
 import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
@@ -61,6 +60,13 @@ public class ResultsReportsImpl implements IResultsReports {
 				"total_points",
 				"place"};
 		
+		List<String[]> listStringsContent = this.createListHighPowerWorld(highPowerListRelConteoContestLog);
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+	
+	private List<String[]> createListHighPowerWorld(List<RelConteoContestLog> highPowerListRelConteoContestLog) {
+		
 		List<String[]> listStringsContent = new ArrayList<>();
 		
 		int place = 0;
@@ -70,8 +76,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			
 			place = lastPoints == q.getTotalPoints() ? place : place + 1;
 			
-//			Integer conteoId = q.getConteo().getId();
-//			Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 			String[] content = {
@@ -88,7 +92,8 @@ public class ResultsReportsImpl implements IResultsReports {
 			lastPoints = q.getTotalPoints();
 		}
 		
-		return CsvUtil.createCsvByteArray(header, listStringsContent);
+		return listStringsContent;
+		
 	}
 
 	@Override
@@ -98,7 +103,7 @@ public class ResultsReportsImpl implements IResultsReports {
 		//filter low power
 		List<RelConteoContestLog> lowPowerListRelConteoContestLog =
 				ResultReportsUtil.filterLowPowerWorld(listRelConteoContestLog, contestLogRepository);
-		
+
 		String[] header = { 
 				"id",
 				"callsign",
@@ -107,6 +112,13 @@ public class ResultsReportsImpl implements IResultsReports {
 				"power",
 				"total_points",
 				"place"};
+		
+		List<String[]> listStringsContent = this.createListLowPowerWorld(lowPowerListRelConteoContestLog);
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+	
+	private List<String[]> createListLowPowerWorld(List<RelConteoContestLog> lowPowerListRelConteoContestLog) {
 		
 		List<String[]> listStringsContent = new ArrayList<>();
 		
@@ -135,7 +147,7 @@ public class ResultsReportsImpl implements IResultsReports {
 			lastPoints = q.getTotalPoints();
 		}
 		
-		return CsvUtil.createCsvByteArray(header, listStringsContent);
+		return listStringsContent;
 	}
 
 	@Override
@@ -155,6 +167,13 @@ public class ResultsReportsImpl implements IResultsReports {
 				"total_points",
 				"place"};
 		
+		List<String[]> listStringsContent = this.createListHighPowerMexico(lowPowerListRelConteoContestLog);
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+	
+	private List<String[]> createListHighPowerMexico(List<RelConteoContestLog> lowPowerListRelConteoContestLog) {
+		
 		List<String[]> listStringsContent = new ArrayList<>();
 		
 		int place = 0;
@@ -164,8 +183,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			
 			place = lastPoints == q.getTotalPoints() ? place : place + 1;
 			
-//			Integer conteoId = q.getConteo().getId();
-//			Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository
 					.findById(contestLogId)
@@ -184,7 +201,7 @@ public class ResultsReportsImpl implements IResultsReports {
 			lastPoints = q.getTotalPoints();
 		}
 		
-		return CsvUtil.createCsvByteArray(header, listStringsContent);
+		return listStringsContent;
 	}
 
 	@Override
@@ -204,6 +221,12 @@ public class ResultsReportsImpl implements IResultsReports {
 				"total_points",
 				"place"};
 		
+		List<String[]> listStringsContent = this.createListLowPowerMexico(lowPowerListRelConteoContestLog);
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+	
+	private List<String[]> createListLowPowerMexico(List<RelConteoContestLog> lowPowerListRelConteoContestLog) {
 		List<String[]> listStringsContent = new ArrayList<>();
 		
 		int place = 0;
@@ -231,7 +254,7 @@ public class ResultsReportsImpl implements IResultsReports {
 			lastPoints = q.getTotalPoints();
 		}
 		
-		return CsvUtil.createCsvByteArray(header, listStringsContent);
+		return listStringsContent;
 	}
 	
 	@Override
@@ -248,20 +271,31 @@ public class ResultsReportsImpl implements IResultsReports {
 				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity))
 				.map(ContestLog::getDxccEntity)
 				.collect(Collectors.toList());
-
-		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
-				.stream()
-				.filter(rcc -> {
-					long contestLogId = rcc.getContestLog().getId().longValue();
-					ContestLog contestLog = contestLogList
-							.stream()
-							.filter(cl -> cl.getId().longValue() == contestLogId)
-							.findFirst()
-							.orElse(null);
-					return (null == contestLog.getCategoryPower() || StaticValues.LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower()));
-				})
-				.collect(Collectors.toList());
 		
+		List<RelConteoContestLog> lowPowerListRelConteoContestLog = 
+				ResultReportsUtil.filterLowPowerByCountry(listRelConteoContestLog, contestLogRepository, mexicoDxccEntity);
+		
+		List<String[]> listStringsContent = 
+				this.createListLowPowerByCountry(contestLogList, lowPowerListRelConteoContestLog, distinctDxccEntity);
+		
+		String[] header = { 
+				"id",
+				"callsign",
+				"dxcc_country",
+				"state",
+				"power",
+				"total_points",
+				"place"};
+		
+		
+		return CsvUtil.createCsvByteArray(header, listStringsContent);
+	}
+	
+	private List<String[]> createListLowPowerByCountry(
+			List<ContestLog> contestLogList,
+			List<RelConteoContestLog> lowPowerListRelConteoContestLog,
+			List<DxccEntity> distinctDxccEntity) {
+
 		List<String[]> listStringsContent = new ArrayList<>();
 		
 		for (DxccEntity dxccEntity : distinctDxccEntity) {
@@ -299,8 +333,6 @@ public class ResultsReportsImpl implements IResultsReports {
 			for (RelConteoContestLog q : rccByDxccEntity) {
 				place = lastPoints == q.getTotalPoints() ? place : place + 1;
 				
-//				Integer conteoId = q.getConteo().getId();
-//				Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 				Long contestLogId = q.getContestLog().getId();
 				ContestLog contestLog = contestLogRepository
 						.findById(contestLogId)
@@ -318,20 +350,9 @@ public class ResultsReportsImpl implements IResultsReports {
 				
 				lastPoints = q.getTotalPoints();
 			}
-			
 		}
 		
-		String[] header = { 
-				"id",
-				"callsign",
-				"dxcc_country",
-				"state",
-				"power",
-				"total_points",
-				"place"};
-		
-		
-		return CsvUtil.createCsvByteArray(header, listStringsContent);
+		return listStringsContent;
 	}
 
 	@Override
@@ -400,7 +421,21 @@ public class ResultsReportsImpl implements IResultsReports {
 
 	@Override
 	public byte[] allResultsReport(int conteoId) {
-		// TODO Auto-generated method stub
+		
+		
+		@SuppressWarnings("unused")
+		String[] header = { 
+				"id",
+				"callsign",
+				"dxcc_country",
+				"state",
+				"power",
+				"total_points",
+				"place",
+				"ano",
+				"REF"};
+		
+		
 		return null;
 	}
 
