@@ -12,11 +12,14 @@ import java.util.stream.Collectors;
 
 import com.opencsv.CSVWriter;
 
+import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.parsers.rtty2020.QsoParserRtty2020ServiceImpl;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
 
+@Slf4j
 public class CsvUtil {
 	
 	public static List<String[]> listEmailsToStrings(
@@ -68,7 +71,7 @@ public class CsvUtil {
 				try {
 					writer.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error(e.getLocalizedMessage());
 				}
 		}
 		return out.toByteArray();

@@ -29,7 +29,7 @@ public class QrzUtil {
 	public static QrzSessionDAO getNewQrzSession(String username, String password) throws FmreContestException {
 		QRZDatabaseDAO qrzdatabase = null;
 
-		String url = String.format(QRZ_URL + "/?username=%s;password=%s", username, password);
+		String url = QRZ_URL + "/?username=" + username + ";password=" + password;
 
 		qrzdatabase = callToQrz(url);
 		

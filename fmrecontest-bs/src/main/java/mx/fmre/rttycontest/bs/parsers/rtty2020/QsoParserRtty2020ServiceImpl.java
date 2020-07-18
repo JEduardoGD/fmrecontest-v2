@@ -122,7 +122,7 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 				rstRS = s[9];
 				exchangeRS = s[10];
 			} catch (IndexOutOfBoundsException e) {
-				e.printStackTrace();
+				log.error(e.getLocalizedMessage());
 			}
 		}
 
@@ -141,7 +141,7 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 				rstRS = s[8];
 				exchangeRS = s[9];
 			} catch (IndexOutOfBoundsException e) {
-				e.printStackTrace();
+				log.error(e.getLocalizedMessage());
 			}
 		}
 
@@ -159,7 +159,7 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 				rstRS = s[9];
 				exchangeRS = s[10];
 			} catch (IndexOutOfBoundsException e) {
-				e.printStackTrace();
+				log.error(e.getLocalizedMessage());
 			}
 		}
 
@@ -177,7 +177,7 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 				rstRS = s[9];
 				exchangeRS = s[10];
 			} catch (IndexOutOfBoundsException e) {
-				e.printStackTrace();
+				log.error(e.getLocalizedMessage());
 			}
 		}
 		
