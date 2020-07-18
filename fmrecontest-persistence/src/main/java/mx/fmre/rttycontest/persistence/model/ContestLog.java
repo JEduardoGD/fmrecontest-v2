@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -56,11 +57,9 @@ public class ContestLog implements Serializable {
 	@Column(name = "S_CATEGORY_MODE")
 	private String categoryMode;
 
-//	@Column(name = "S_ADDRESS_CATEGORY_OPERATOR")
 	@Column(name = "S_CATEGORY_OPERATOR")
 	private String categoryOperator;
 
-//	@Column(name = "S_ADDRESS_CATEGORY_POWER")
 	@Column(name = "S_CATEGORY_POWER")
 	private String categoryPower;
 
@@ -95,10 +94,21 @@ public class ContestLog implements Serializable {
 	@JoinColumn(name = "N_ID_EMAIL")
 	private Email email;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "D_ENTITY_CODE")
+	private DxccEntity dxccEntity;
+
 	// bi-directional many-to-one association to Contestqso
-	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST)
+	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<ContestQso> contestqsos;
+
+	@Column(name = "D_DXCC_NOT_FOUND")
+	private Boolean dxccNotFound;
 
 	@OneToMany(mappedBy = "contest", fetch = FetchType.LAZY)
     private List<Edition> editions = new ArrayList<>();
+
+	// bi-directional many-to-one association to Contestqso
+	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	private List<RelConteoContestLog> relConteoContestLogs;
 }

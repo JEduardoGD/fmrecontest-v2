@@ -6,14 +6,14 @@ import java.util.stream.Collectors;
 import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 
-public class AttachedFileUtil {
-	public List<AttachedFileDTO> map(List<AttachedFile> attachedFiles) {
+public abstract class AttachedFileUtil {
+	public static List<AttachedFileDTO> map(List<AttachedFile> attachedFiles) {
 		return attachedFiles.stream().map(af -> {
-			return this.map(af);
+			return AttachedFileUtil.map(af);
 		}).collect(Collectors.toList());
 	}
 
-	public AttachedFileDTO map(AttachedFile attachedFile) {
+	public static AttachedFileDTO map(AttachedFile attachedFile) {
 		AttachedFileDTO a = new AttachedFileDTO();
 		a.setId(attachedFile.getId());
 		a.setFilename(attachedFile.getFilename());

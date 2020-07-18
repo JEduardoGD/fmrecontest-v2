@@ -4,3 +4,5 @@ target/
 .attach_pid*
 opt/*
 docker-compose.yml
+.project
+app.log*

@@ -75,8 +75,7 @@ public class ParserEmailServiceRtty2020Impl implements IParserEmail {
 		Edition edition = editionRepository.findById(email.getEdition().getId()).orElse(null);
 		IQsoParserService qsoParser = appContext.getBean(edition.getQsoParserImpl(), IQsoParserService.class);
 		
-		AttachedFileUtil attachedFileUtil = new AttachedFileUtil();
-		AttachedFileDTO attachedFileDTOMapped = attachedFileUtil.map(attachedLogFile);
+		AttachedFileDTO attachedFileDTOMapped = AttachedFileUtil.map(attachedLogFile);
 		AttachedFileDTO attachedFileDTOWithByteArray = fileManagerService.getFile(email, attachedFileDTOMapped);
 		InputStream is = FileUtil.byteArrayToInputStream(attachedFileDTOWithByteArray.getByteArray());
 		try {
