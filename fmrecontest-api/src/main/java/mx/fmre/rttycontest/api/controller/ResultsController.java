@@ -127,8 +127,8 @@ public class ResultsController {
         headers.add("Pragma", "no-cache");
         headers.add("Expires", "0");
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.add("Content-Disposition", "attachment; filename=" + "highpowerbycountry_conteoid_" + conteoId + ".csv");
-        byte[] bytesrray = resultsReports.highPowerByCountry(conteoId);
+        headers.add("Content-Disposition", "attachment; filename=" + "complete_conteoid_" + conteoId + ".csv");
+        byte[] bytesrray = resultsReports.allResultsReport(conteoId);
         ByteArrayResource resource = new ByteArrayResource(bytesrray);
 	    return ResponseEntity.ok()
 	            .headers(headers)

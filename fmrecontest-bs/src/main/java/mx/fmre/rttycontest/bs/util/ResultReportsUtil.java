@@ -63,7 +63,7 @@ public final class ResultReportsUtil {
 			List<RelConteoContestLog> listRelConteoContestLog,
 			IContestLogRepository contestLogRepository,
 			DxccEntity mexicoDxccEntity) {
-		List<RelConteoContestLog> lowPowerListRelConteoContestLog = listRelConteoContestLog
+		List<RelConteoContestLog> highPowerListRelConteoContestLog = listRelConteoContestLog
 				.stream()
 				.filter(rcc -> {
 					Long contestLogId = rcc.getContestLog().getId();
@@ -73,7 +73,7 @@ public final class ResultReportsUtil {
 					})
 				.collect(Collectors.toList());
 		
-		return lowPowerListRelConteoContestLog
+		return highPowerListRelConteoContestLog
 				.stream()
 				.sorted((o1,o2)->  {
 					if(o1.getTotalPoints() < o2.getTotalPoints())
@@ -137,7 +137,7 @@ public final class ResultReportsUtil {
 				.collect(Collectors.toList());
 	}
 	
-	public static List<String[]> filterHighPowerByCountry(
+	public static List<RelConteoContestLog> filterHighPowerByCountry(
 			List<RelConteoContestLog> listRelConteoContestLog,
 			IContestLogRepository contestLogRepository,
 			DxccEntity mexicoDxccEntity) {
@@ -167,7 +167,7 @@ public final class ResultReportsUtil {
 				})
 				.collect(Collectors.toList());
 		
-		List<String[]> listStringsContent = new ArrayList<>();
+		List<RelConteoContestLog> ordered = new ArrayList<>();
 		
 		for (DxccEntity dxccEntity : distinctDxccEntity) {
 			List<RelConteoContestLog> rccByDxccEntity = highPowerListRelConteoContestLog
@@ -198,7 +198,10 @@ public final class ResultReportsUtil {
 					})
 					.collect(Collectors.toList());
 			
+			ordered.addAll(rccByDxccEntity);
+			
 
+			/*
 			int place = 0;
 			long lastPoints = -1;
 			for (RelConteoContestLog q : rccByDxccEntity) {
@@ -221,8 +224,9 @@ public final class ResultReportsUtil {
 				
 				lastPoints = q.getTotalPoints();
 			}
+				*/
 		}
 		
-		return listStringsContent;
+		return ordered;
 	}
 }
