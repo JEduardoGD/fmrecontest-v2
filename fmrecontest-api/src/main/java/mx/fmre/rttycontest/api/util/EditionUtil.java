@@ -7,9 +7,9 @@ import mx.fmre.rttycontest.dto.EditionDTO;
 import mx.fmre.rttycontest.persistence.model.Edition;
 
 public abstract class EditionUtil {
-	private final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public static EditionDTO parse(Edition edition, String contestDescription) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		EditionDTO editionDTO = new EditionDTO();
 		editionDTO.setId(edition.getId());
 		editionDTO.setDescription(edition.getDescription());

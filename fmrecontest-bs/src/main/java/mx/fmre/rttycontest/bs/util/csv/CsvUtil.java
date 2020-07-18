@@ -19,8 +19,6 @@ import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
 
 public class CsvUtil {
 	
-	private final static DateFormat df = new SimpleDateFormat("yy-MM-dd HH:mm:ss", Locale.ENGLISH);
-	
 	public static List<String[]> listEmailsToStrings(
 			List<Email> emails,
 			List<LastEmail> lastEmails,
@@ -28,6 +26,7 @@ public class CsvUtil {
 			Map<Integer, String> mapEmmailError,
 			Map<Integer, String> emailStatusesArray) {
 		List<String[]> listStringsContent = emails.stream().map(email -> {
+			DateFormat df = new SimpleDateFormat("yy-MM-dd HH:mm:ss", Locale.ENGLISH);
 			boolean usedForCount = false;
 			if(lastEmails.stream().filter(l -> l.getEmailId().equals(email.getId())).findFirst().orElse(null) != null) {
 				usedForCount = true;

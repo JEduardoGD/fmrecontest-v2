@@ -1,6 +1,5 @@
 package mx.fmre.rttycontest.bs.util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -22,17 +21,15 @@ public class HttpUtil {
 			log.error(String.format("Error al consultar la URL (%s): %s", url, responseCode));
 			return null;
 		}
-		BufferedReader br = null;
 		InputStream is = null;
 		byte[] charArray = null;
 		try {
 			is = con.getInputStream();
 			charArray = FileUtil.inputStreamToByteArray(is);
 		} finally {
-			if (br != null)
-				br.close();
-			if (is != null)
+			if (is != null) {
 				is.close();
+			}
 		}
 
 		return charArray;

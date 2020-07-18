@@ -10,9 +10,9 @@ import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
 
 public abstract class MailMapperUtil {
-	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	public static EmailDTO map(Email e, EmailStatus emailStatus, List<AttachedFile> attachedFiles) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		EmailDTO emailDTO = new EmailDTO();
 		emailDTO.setSubject(e.getSubject());

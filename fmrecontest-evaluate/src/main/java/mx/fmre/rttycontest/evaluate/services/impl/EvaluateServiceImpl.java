@@ -272,7 +272,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 						.filter(rqc -> rqc.isMultiply())
 						.collect(Collectors.toList())
 						.size();
-				long totalPoints = sumOfPoints * multipliers;
+				long totalPoints = sumOfPoints * (long)multipliers;
 				
 //				Integer emailId = contestLog.getEmail().getId();
 //				List<EmailEmailError> listRelEmailEmailerror = emailEmailErrorRepository.findByEmailId(emailId);

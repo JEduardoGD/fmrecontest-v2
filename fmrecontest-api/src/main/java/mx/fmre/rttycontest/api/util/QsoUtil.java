@@ -11,9 +11,8 @@ import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
 
 public abstract class QsoUtil {
 	
-	private final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
 	public static QsoDto map(DxccEntity dxccEntity, RelQsoConteo relQsoConteo, CatBand qsoBand, ContestQso x) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String rowClass = null;
 		rowClass = (qsoBand == null ||  dxccEntity == null) ? "table-danger" : null;
 		if(x.getError() != null && x.getError().booleanValue() == true)

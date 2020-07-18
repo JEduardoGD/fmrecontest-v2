@@ -38,8 +38,7 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 	
 	@PostConstruct private void fillMexicoDxccEntity() {
 		this.mexicoDxccEntity = dxccEntityRepository
-				.findById(Long.valueOf(50)
-				.longValue())
+				.findById(50l)
 				.orElse(null);
 		
 		this.allowedMexicoEntities = Arrays.asList("AGS", "BC", "BCS", "CAM", "CHS", "CHH", "COA", "COL", "CDMX", "EMX",
@@ -161,25 +160,16 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 		if(qsoBand == null)
 			return null;
 		
-		if(mexicoDxccEntity.equals(dxccEntityHome)) {
-			// mexicano llama a
-			if(mexicoDxccEntity.equals(dxccEntityCalled)) {
-				//mexicano
-				return 4;
-			} else {
-				//extranjero
-				return 3;
-			}
-		} else {
-			// extranjero llama a
-			if(mexicoDxccEntity.equals(dxccEntityCalled)) {
-				//mexicano
-				return 3;
-			} else {
-				//extranjero
-				return 3;
-			}
+		boolean CALLER_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityHome);
+		boolean CALLED_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityCalled);
+		
+		int return_val = 3;
+
+		if (CALLER_IS_MEXICANO && CALLED_IS_MEXICANO) {
+			return_val = 4;
 		}
+
+		return return_val;
 	}
 
 	@Override

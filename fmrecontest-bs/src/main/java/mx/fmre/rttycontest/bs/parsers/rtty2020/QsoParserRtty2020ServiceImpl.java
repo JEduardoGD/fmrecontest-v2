@@ -26,8 +26,6 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 @Slf4j
 @Service("qsoParserRtty2020ServiceImpl")
 public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
-	
-	private static final SimpleDateFormat sdfQso = new SimpleDateFormat("yyyy-MM-dd HHmm");
 	private final String propertiesMap = "" + 
 			"address=ADDRESS\n" + 
 			"addressCity=ADDRESS-CITY\n" + 
@@ -87,6 +85,7 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 	}
 	
 	private ContestQso parseLine(String l) {
+		SimpleDateFormat sdfQso = new SimpleDateFormat("yyyy-MM-dd HHmm");
 		ContestQso qso = null;
 
 		boolean matched = false;

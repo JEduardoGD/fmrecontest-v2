@@ -160,6 +160,10 @@ public class ResponderServiceImpl implements IResponderService {
 		} catch (FmreContestException e) {
 			e.printStackTrace();
 		}
+		
+		if(encryptDecryptStringHelper == null) {
+			return null;
+		}
 
 		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 		mailSender.setHost(emailAccount.getOutHost());
