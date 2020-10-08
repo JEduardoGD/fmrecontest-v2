@@ -19,6 +19,7 @@
 		<module>fmrecontest-recibir</module>
 		<module>fmrecontest-api</module>
 		<module>fmrecontest-bs</module>
+		<module>fmrecontest-evaluate</module>
 	</modules>
 
 	<properties>
