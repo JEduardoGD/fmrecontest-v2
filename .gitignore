@@ -6,4 +6,5 @@ opt/*
 docker-compose.yml
 app.log*
 opt_back
-
+.project
+initdata/opt
