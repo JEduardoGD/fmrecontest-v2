@@ -3,6 +3,8 @@ package mx.fmre.rttycontest.recibir.services.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,14 +34,26 @@ public class ParserServiceImpl implements IParserService {
 
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
+	
+	private EmailStatus emailEstatusRecived;
+	private EmailStatus emailEstatusIdentified;
+	private EmailStatus emailEstatusNoIdentified;
+	private EmailStatus emailEstatusIgnored;
+	private EmailStatus emailEstatusParsed;
+	private EmailStatus emailEstatusNotParsed;
+
+	@PostConstruct
+	private void init() {
+		emailEstatusRecived = emailEstatusRepository.findByStatus("RECIVED");
+		emailEstatusIdentified = emailEstatusRepository.findByStatus("IDENTIFIED");
+		emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
+		emailEstatusIgnored = emailEstatusRepository.findByStatus("IGNORED");
+		emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
+		emailEstatusNotParsed = emailEstatusRepository.findByStatus("NO_PARSED");
+	}
 
 	@Override
 	public void identifyLogFiles() {
-		EmailStatus emailEstatusRecived = emailEstatusRepository.findByStatus("RECIVED");
-		EmailStatus emailEstatusIdentified = emailEstatusRepository.findByStatus("IDENTIFIED");
-		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
-		EmailStatus emailEstatusIgnored = emailEstatusRepository.findByStatus("IGNORED");
-
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(edition,
@@ -81,10 +95,6 @@ public class ParserServiceImpl implements IParserService {
 
 	@Override
 	public void parseRecivedEmails() {
-		EmailStatus emailEstatusIdentified = emailEstatusRepository.findByStatus("IDENTIFIED");
-		EmailStatus emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
-		EmailStatus emailEstatusNotParsed = emailEstatusRepository.findByStatus("NO_PARSED");
-
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(edition,

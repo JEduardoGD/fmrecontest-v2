@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.mail.internet.InternetAddress;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,17 +71,18 @@ public class ResponderServiceImpl implements IResponderService {
 	
 	@Autowired MailContentBuilder mailContentBuilder;
 	
-	@Override
-	public void responseParsedEmail() {
+	List<EmailStatus> listEstatuses;
+
+	@PostConstruct
+	private void init() {
 		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
 		EmailStatus emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
 		EmailStatus emailEstatusNoParsed = emailEstatusRepository.findByStatus("NO_PARSED");
-		
-		List<EmailStatus> listEstatuses = Arrays.asList(
-				emailEstatusNoIdentified, 
-				emailEstatusParsed, 
-				emailEstatusNoParsed);
-		
+		listEstatuses = Arrays.asList(emailEstatusNoIdentified, emailEstatusParsed, emailEstatusNoParsed);
+	}
+	
+	@Override
+	public void responseParsedEmail() {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
 			Integer idContest = edition.getContest().getId();
@@ -104,8 +106,11 @@ public class ResponderServiceImpl implements IResponderService {
 				emailDataDTO.setFromAddress(email.getRecipientsFromAddress());
 				emailDataDTO.setToName(email.getRecipientsTo());
 				emailDataDTO.setToName(contest.getDescription() + " " + edition.getDescription());
-				emailDataDTO.setToAddress(email.getRecipientsTo());
-				
+				if (edition.getTest()) {
+					emailDataDTO.setToAddress(edition.getEmailTest());
+				} else {
+					emailDataDTO.setToAddress(email.getRecipientsTo());
+				}
 				emailDataDTO.setTemplate(edition.getTemplate());
 				emailDataDTO.setDateOfSend(email.getSentDate());
 				emailDataDTO.setCallsign(email.getSubject());

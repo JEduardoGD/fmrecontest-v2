@@ -4,20 +4,8 @@ LABEL maintainer="eduardo_gd@hotmail.com"
 
 VOLUME /tmp
 
-EXPOSE 8080
-
-ARG EXT_JAR_FILE=${EXT_JAR_FILE}
-ARG JAR_FILE=${EXT_JAR_FILE}
-ADD ${JAR_FILE} application.jar
+ADD target/fmrecontest-api*.jar recibir.jar
 
 WORKDIR /
 
-#ENV AMAZON_CRED_SECRETKEY=
-#ENV AMAZON_CREDS_ACCESSKEY=
-#ENV EMAIL_PASSWORD_KEYENCODE=
-#ENV MYSQL_DB_PASSWORD=
-#ENV MYSQL_DB_URL=
-#ENV MYSQL_DB_USERNAME=
-
-ENTRYPOINT ["java","-jar","/application.jar"]
-
+ENTRYPOINT ["java","-jar", "/recibir.jar"]

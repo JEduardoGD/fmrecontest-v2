@@ -9,3 +9,4 @@ opt_back
 .project
 app.log*
 initdata/opt
+vars.env
