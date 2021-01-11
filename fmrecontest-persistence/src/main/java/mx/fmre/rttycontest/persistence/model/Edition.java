@@ -67,6 +67,12 @@ public class Edition implements Serializable {
 
 	@Column(name = "S_QSO_VALIDATION_IMPL")
 	private String qsoValidationImpl;
+
+	@Column(name = "N_TEST")
+	private Boolean test;
+
+	@Column(name = "S_EMAIL_TEST")
+	private String emailTest;
 	
 	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();

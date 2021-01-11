@@ -4,7 +4,7 @@ LABEL maintainer="eduardo_gd@hotmail.com"
 
 VOLUME /tmp
 
-ADD target/fmrecontest-recibir*.jar recibir.jar
+ADD target/fmrecontest-evaluate*.jar recibir.jar
 
 WORKDIR /
 

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,13 +36,19 @@ public class VerifierServiceImpl implements IVerifierService {
 	
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
+	
+	private List<EmailStatus> listEstatuses;
 
-	@Override
-	public void verifyRecivedEmails() {
+	@PostConstruct
+	private void init() {
 		EmailStatus emailEstatusNoIdentified = emailEstatusRepository.findByStatus("NO_IDENTIFIED");
 		EmailStatus emailEstatusParsed = emailEstatusRepository.findByStatus("PARSED");
 		EmailStatus emailEstatusNoParsed = emailEstatusRepository.findByStatus("NO_PARSED");
-		List<EmailStatus> listEstatuses = Arrays.asList(emailEstatusNoIdentified, emailEstatusParsed, emailEstatusNoParsed);
+		listEstatuses = Arrays.asList(emailEstatusNoIdentified, emailEstatusParsed, emailEstatusNoParsed);
+	}
+
+	@Override
+	public void verifyRecivedEmails() {
 		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {

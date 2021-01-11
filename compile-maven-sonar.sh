@@ -5,8 +5,9 @@ JAVA_HOME=/home/geduardo/sft/java/jdk1.8.0_221
 
 export PATH=$PATH:$MAVEN_HOME/bin:$JAVA_HOME/bin
 
-mvn -v 
+mvn -v
 
 mvn clean package -Dmaven.test.skip=true
 
 mvn sonar:sonar
+
