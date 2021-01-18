@@ -57,12 +57,6 @@ public class ResponderServiceImpl implements IResponderService {
 	@Value("${email.password.encodingkey}")
 	private String emailPasswordEncodingkey;
 	
-	@Value("${email.responder.testmode}")
-	private boolean emailResponderTestmode;
-	
-	@Value("${email.responder.testemail}")
-	private String emailResponderTestmail;
-	
 	@Value("${email.responder.co}")
 	private String emailResponderCopiaoculta;
 	
@@ -199,11 +193,8 @@ public class ResponderServiceImpl implements IResponderService {
 			
 			messageHelper.setFrom(emailAccount.getEmailAddress(), emailDataDTO.getToName());
 			messageHelper.setReplyTo(new InternetAddress(emailAccount.getReplyToEmail(), emailAccount.getReplyToName()));
-			
-			if (emailResponderTestmode)
-				messageHelper.setTo(new InternetAddress(emailResponderTestmail, emailDataDTO.getFromName()));
-			else
-				messageHelper.setTo(new InternetAddress(emailDataDTO.getFromAddress(), emailDataDTO.getFromName()));
+
+			messageHelper.setTo(new InternetAddress(emailDataDTO.getFromAddress(), emailDataDTO.getFromName()));
 			
 			
 			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta)) {
