@@ -57,9 +57,6 @@ public class ResponderServiceImpl implements IResponderService {
 	@Value("${email.password.encodingkey}")
 	private String emailPasswordEncodingkey;
 	
-	@Value("${email.responder.co}")
-	private String emailResponderCopiaoculta;
-	
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
 	
@@ -195,12 +192,7 @@ public class ResponderServiceImpl implements IResponderService {
 			messageHelper.setReplyTo(new InternetAddress(emailAccount.getReplyToEmail(), emailAccount.getReplyToName()));
 
 			messageHelper.setTo(new InternetAddress(emailDataDTO.getFromAddress(), emailDataDTO.getFromName()));
-			
-			
-			if (emailResponderCopiaoculta != null && !"".equals(emailResponderCopiaoculta)) {
-				String[] arrEmailBcc = emailResponderCopiaoculta.split("\\,");
-				messageHelper.setBcc(arrEmailBcc);
-			}
+
 			messageHelper.setSubject(emailDataDTO.getSubject());
 			String content = mailContentBuilder.build(emailDataDTO);
 			messageHelper.setText(content, true);
