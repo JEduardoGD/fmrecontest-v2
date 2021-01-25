@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -19,6 +21,7 @@ import javax.mail.Store;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dto.AttachedFileDTO;
+import mx.fmre.rttycontest.bs.util.FileUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.Contest;
@@ -44,6 +47,8 @@ public class ScannerThread {
 	private IFileManagerService fileManagerService;
 	private EmailStatus emailEstatusRecived;
 	private Integer messagesPerminute;
+
+	private final String UTF8_ENCODEDFILENAME_PATTERN = "\\=\\?(UTF-8|utf-8)\\?(B|b)\\?";
 
 	public void run() {
 		try {
@@ -112,6 +117,8 @@ public class ScannerThread {
 			Email email = MailHelper.messageToEmailMapper(edition, message, emailFieldsToLenght, emailEstatusRecived);
 			List<AttachedFile> attachedFiles = new ArrayList<>();
 			for (AttachedFileDTO attachedFileDTO : attachedFilesDTO) {
+				attachedFileDTO.setFilename(parseBase64encodedFilename(attachedFileDTO.getFilename()));
+				
 				AttachedFile attachedFile = MailHelper.attachedFileDTOToAttachedFile(attachedFileDTO);
 				attachedFile.setEmail(email);
 				
@@ -123,5 +130,17 @@ public class ScannerThread {
 			emailRepository.save(email);
 		}
 
+	}
+	
+	private String parseBase64encodedFilename(String filename) {
+		Pattern p = Pattern.compile("^" + UTF8_ENCODEDFILENAME_PATTERN + ".*" + "$");
+		Matcher m = p.matcher(filename);
+		if (m.matches()) {
+			String[] arr = filename.split(UTF8_ENCODEDFILENAME_PATTERN);
+			if (arr.length == 2) {
+				return FileUtil.mimeBase64ToString(arr[1]);
+			}
+		}
+		return filename;
 	}
 }

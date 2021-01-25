@@ -95,7 +95,6 @@ public class ResponderServiceImpl implements IResponderService {
 				emailDataDTO.setEmailSubject(email.getSubject());
 				emailDataDTO.setFromName(email.getRecipientsFromName());
 				emailDataDTO.setFromAddress(email.getRecipientsFromAddress());
-				emailDataDTO.setToName(email.getRecipientsTo());
 				emailDataDTO.setToName(contest.getDescription() + " " + edition.getDescription());
 				if (edition.getTest()) {
 					emailDataDTO.setToAddress(edition.getEmailTest());
@@ -191,7 +190,7 @@ public class ResponderServiceImpl implements IResponderService {
 			messageHelper.setFrom(emailAccount.getEmailAddress(), emailDataDTO.getToName());
 			messageHelper.setReplyTo(new InternetAddress(emailAccount.getReplyToEmail(), emailAccount.getReplyToName()));
 
-			messageHelper.setTo(new InternetAddress(emailDataDTO.getFromAddress(), emailDataDTO.getFromName()));
+			messageHelper.setTo(new InternetAddress(emailDataDTO.getToAddress(), emailDataDTO.getFromName()));
 
 			messageHelper.setSubject(emailDataDTO.getSubject());
 			String content = mailContentBuilder.build(emailDataDTO);

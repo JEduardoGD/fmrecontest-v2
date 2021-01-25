@@ -38,10 +38,15 @@ public abstract class FileUtil {
 	}
 
 	public static String base64ToString(String s) {
-		byte[] encoded = Base64.getDecoder().decode(s);
-		return new String(encoded);
+		byte[] decoded = Base64.getDecoder().decode(s);
+		return new String(decoded);
 	}
-
+	
+	public static String mimeBase64ToString(String s) {
+		byte[] decoded = Base64.getMimeDecoder().decode(s);
+		return new String(decoded);
+	}
+	
 	public static InputStream byteArrayToInputStream(byte[] byteArray) {
 		return new ByteArrayInputStream(byteArray);
 	}
