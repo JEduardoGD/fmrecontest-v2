@@ -63,6 +63,7 @@ public class QrzUtil {
 		JAXBContext jc = JAXBContext.newInstance(QRZDatabaseDAO.class);
 		Unmarshaller unmarshaller = jc.createUnmarshaller();
 
+		//NOSONAR
 		XMLReader reader = XMLReaderFactory.createXMLReader();
 		MyNamespaceFilter inFilter = new MyNamespaceFilter(null, true);
 		inFilter.setParent(reader);
