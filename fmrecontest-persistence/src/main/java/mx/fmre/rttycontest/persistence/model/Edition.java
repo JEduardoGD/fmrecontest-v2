@@ -73,6 +73,9 @@ public class Edition implements Serializable {
 
 	@Column(name = "S_EMAIL_TEST")
 	private String emailTest;
+
+	@Column(name = "S_BCC")
+	private String bcc;
 	
 	@OneToMany(mappedBy = "edition", fetch = FetchType.LAZY)
     private List<Email> emails = new ArrayList<>();
