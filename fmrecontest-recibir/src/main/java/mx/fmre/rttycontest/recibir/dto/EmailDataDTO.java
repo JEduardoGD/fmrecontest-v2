@@ -20,8 +20,9 @@ public class EmailDataDTO implements Serializable {
 	private String describeErrors;
 	private String fromName;
 	private String fromAddress;
-	private String toName;
-	private String toAddress;
+	private String to;        //original email to
+	private String toAddress; //new email toAddress
+	private String toName;    //new email toName
 	private String template;
 	private Date dateOfSend;
 	private String callsign;
