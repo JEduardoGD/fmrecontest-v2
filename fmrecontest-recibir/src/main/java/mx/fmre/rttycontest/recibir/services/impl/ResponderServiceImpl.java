@@ -100,6 +100,7 @@ public class ResponderServiceImpl implements IResponderService {
 					emailDataDTO.setToAddress(edition.getEmailTest());
 				} else {
 					emailDataDTO.setToAddress(email.getRecipientsTo());
+//					emailDataDTO.s
 				}
 				emailDataDTO.setTemplate(edition.getTemplate());
 				emailDataDTO.setDateOfSend(email.getSentDate());
@@ -113,7 +114,8 @@ public class ResponderServiceImpl implements IResponderService {
 				if(errors.isEmpty()) {
 					emailDataDTO.setSubject(emailAccount.getSuccessfullyMsg());
 				} else {
-					emailDataDTO.setSubject(emailAccount.getErrorMsg());	
+					emailDataDTO.setSubject(emailAccount.getErrorMsg());
+					emailDataDTO.setBcc(edition.getBcc());
 				}
 				
 				JavaMailSender jsm = this.getJsm(emailAccount);
@@ -191,6 +193,10 @@ public class ResponderServiceImpl implements IResponderService {
 			messageHelper.setReplyTo(new InternetAddress(emailAccount.getReplyToEmail(), emailAccount.getReplyToName()));
 
 			messageHelper.setTo(new InternetAddress(emailDataDTO.getToAddress(), emailDataDTO.getFromName()));
+			
+			if (emailDataDTO.getBcc() != null) {
+				messageHelper.setBcc(new InternetAddress(emailDataDTO.getBcc()));
+			}
 
 			messageHelper.setSubject(emailDataDTO.getSubject());
 			String content = mailContentBuilder.build(emailDataDTO);

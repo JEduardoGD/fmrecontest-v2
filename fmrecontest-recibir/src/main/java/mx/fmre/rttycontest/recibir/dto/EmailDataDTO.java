@@ -27,4 +27,5 @@ public class EmailDataDTO implements Serializable {
 	private String callsign;
 	private int noQsos;
 	private String debugData;
+	private String bcc;
 }
