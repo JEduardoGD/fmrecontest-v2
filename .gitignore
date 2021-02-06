@@ -10,3 +10,4 @@ opt_back
 app.log*
 initdata/opt
 vars.env
+.history/
