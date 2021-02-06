@@ -83,23 +83,31 @@ public class ResponderServiceImpl implements IResponderService {
 			if (emails.size() > messagesPerminute)
 				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
-				EmailDataDTO emailDataDTO = new EmailDataDTO();
 				
 				List<CatEmailError> errors = emailErrorRepository.getErrorsOfEmail(email);
 				List<ErrorDTO> errorsDto = errors.stream()
 						.map(x -> new ErrorDTO(x.getSuggestionEs(), x.getSuggestionEn()))
 						.collect(Collectors.toList());
+				
+				EmailDataDTO emailDataDTO = new EmailDataDTO();
 				emailDataDTO.setErrors(errorsDto);
 				emailDataDTO.setOthersLogs(this.createOthersLogs(email, edition));
-				
+
+				//desde donde llego el correo actual
 				emailDataDTO.setEmailSubject(email.getSubject());
 				emailDataDTO.setFromName(email.getRecipientsFromName());
 				emailDataDTO.setFromAddress(email.getRecipientsFromAddress());
-				emailDataDTO.setToName(contest.getDescription() + " " + edition.getDescription());
+				emailDataDTO.setTo(email.getRecipientsTo());
+
+				//nuevo correo
+				emailDataDTO.setSubject(contest.getDescription() + " " + edition.getDescription());
+				emailDataDTO.setToName(email.getRecipientsFromName());
+				
 				if (edition.getTest()) {
 					emailDataDTO.setToAddress(edition.getEmailTest());
+					emailDataDTO.setBcc(null);
 				} else {
-					emailDataDTO.setToAddress(email.getRecipientsTo());
+					emailDataDTO.setToAddress(email.getRecipientsFromAddress());
 					emailDataDTO.setBcc(edition.getBcc());
 				}
 				emailDataDTO.setTemplate(edition.getTemplate());
@@ -119,7 +127,7 @@ public class ResponderServiceImpl implements IResponderService {
 				
 				JavaMailSender jsm = this.getJsm(emailAccount);
 				try {
-					if(this.prepareAndSend(emailAccount, emailDataDTO, jsm)) {
+					if(this.prepareAndSend(emailAccount, contest.getDescription(), emailDataDTO, jsm)) {
 						email.setAnsweredAt(DateTimeUtil.getUtcTimeDate());
 						emailRepository.save(email);
 					}
@@ -184,14 +192,18 @@ public class ResponderServiceImpl implements IResponderService {
 		return jsm;
 	}
 
-	public boolean prepareAndSend(EmailAccount emailAccount, EmailDataDTO emailDataDTO, JavaMailSender mailSender) throws FmreContestException {
+	public boolean prepareAndSend(EmailAccount emailAccount, String newMailFromName, EmailDataDTO emailDataDTO, JavaMailSender mailSender) throws FmreContestException {
 		MimeMessagePreparator messagePreparator = mimeMessage -> {
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
 			
-			messageHelper.setFrom(emailAccount.getEmailAddress(), emailDataDTO.getToName());
+			messageHelper.setFrom(emailAccount.getEmailAddress(), newMailFromName);
 			messageHelper.setReplyTo(new InternetAddress(emailAccount.getReplyToEmail(), emailAccount.getReplyToName()));
 
-			messageHelper.setTo(new InternetAddress(emailDataDTO.getToAddress(), emailDataDTO.getFromName()));
+			if (emailDataDTO.getToName() != null && !"".equals(emailDataDTO.getToName())) {
+				messageHelper.setTo(new InternetAddress(emailDataDTO.getToAddress(), emailDataDTO.getToName()));
+			} else {
+				messageHelper.setTo(new InternetAddress(emailDataDTO.getToAddress()));
+			}
 			
 			if (emailDataDTO.getBcc() != null) {
 				messageHelper.setBcc(new InternetAddress(emailDataDTO.getBcc()));
