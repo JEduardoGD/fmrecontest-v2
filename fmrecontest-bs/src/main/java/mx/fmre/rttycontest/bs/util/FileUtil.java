@@ -42,7 +42,7 @@ public abstract class FileUtil {
 		return new String(decoded);
 	}
 	
-	public static String mimeBase64ToString(String s) {
+	public static String mimeBase64ToString(String s) throws java.lang.IllegalArgumentException {
 		byte[] decoded = Base64.getMimeDecoder().decode(s);
 		return new String(decoded);
 	}
