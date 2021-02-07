@@ -140,10 +140,10 @@ public class ScannerThread {
 			if (arr.length == 2) {
 				try {
 					return FileUtil.mimeBase64ToString(arr[1]);
-				} catch (java.lang.IllegalArgumentException e) {
-					log.info("No se pudo parsear con mime: " + filename);
+				} catch (Exception e) {
+					log.error(e.getLocalizedMessage());
+					return null;
 				}
-				return FileUtil.base64ToString(arr[1]);
 			}
 		}
 		return filename;
