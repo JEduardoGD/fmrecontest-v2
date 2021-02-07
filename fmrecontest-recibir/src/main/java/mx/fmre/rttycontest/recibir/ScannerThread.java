@@ -67,7 +67,7 @@ public class ScannerThread {
 			return;
 		EmailAccount emailAccount = contest.getEmailAccount();
 		encryptDecryptStringHelper = new EncryptDecryptStringHelper(emailPasswordEncodingkey);
-
+		
 		Session session = Session.getDefaultInstance(new Properties());
 		Store store = session.getStore("imaps");
 		store.connect(emailAccount.getInHost(), emailAccount.getInPort(), emailAccount.getEmailAddress(),

@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
@@ -28,11 +29,11 @@ import mx.fmre.rttycontest.recibir.services.IVerifierService;
 @Service
 public class VerifierServiceImpl implements IVerifierService {
 
-	@Autowired private IEmailEstatusRepository emailEstatusRepository;
-	@Autowired private IEditionRepository editionRepository;
-	@Autowired private IEmailRepository emailRepository;
-	@Autowired private IVerificacionEmail verificacionEmail;
+	@Autowired private IEmailEstatusRepository   emailEstatusRepository;
+	@Autowired private IEditionRepository        editionRepository;
+	@Autowired private IEmailRepository          emailRepository;
 	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
+	@Autowired private ApplicationContext        appContext;
 	
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
@@ -49,9 +50,9 @@ public class VerifierServiceImpl implements IVerifierService {
 
 	@Override
 	public void verifyRecivedEmails() {
-		
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
+			IVerificacionEmail verificacionEmail = appContext.getBean(edition.getVerificationEmailImpl(), IVerificacionEmail.class);
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndNotVerified(edition, listEstatuses);
 			if (emails.size() > messagesPerminute)
 				emails = emails.subList(0, messagesPerminute);

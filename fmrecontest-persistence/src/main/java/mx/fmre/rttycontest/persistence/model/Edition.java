@@ -62,6 +62,9 @@ public class Edition implements Serializable {
 	@Column(name = "S_TEMPLATE")
 	private String template;
 
+	@Column(name = "S_VERIFICATION_EMAIL_IMPL")
+	private String verificationEmailImpl;
+
 	@Column(name = "S_QSO_PARSER_IMPL")
 	private String qsoParserImpl;
 

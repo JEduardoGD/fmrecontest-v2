@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import com.opencsv.CSVWriter;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.parsers.rtty2020.QsoParserRtty2020ServiceImpl;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.LastEmail;
