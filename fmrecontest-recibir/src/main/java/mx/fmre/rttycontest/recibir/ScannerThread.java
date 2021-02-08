@@ -67,7 +67,7 @@ public class ScannerThread {
 			return;
 		EmailAccount emailAccount = contest.getEmailAccount();
 		encryptDecryptStringHelper = new EncryptDecryptStringHelper(emailPasswordEncodingkey);
-
+		
 		Session session = Session.getDefaultInstance(new Properties());
 		Store store = session.getStore("imaps");
 		store.connect(emailAccount.getInHost(), emailAccount.getInPort(), emailAccount.getEmailAddress(),
@@ -138,7 +138,12 @@ public class ScannerThread {
 		if (m.matches()) {
 			String[] arr = filename.split(UTF8_ENCODEDFILENAME_PATTERN);
 			if (arr.length == 2) {
-				return FileUtil.mimeBase64ToString(arr[1]);
+				try {
+					return FileUtil.mimeBase64ToString(arr[1]);
+				} catch (Exception e) {
+					log.error(e.getLocalizedMessage());
+					return null;
+				}
 			}
 		}
 		return filename;

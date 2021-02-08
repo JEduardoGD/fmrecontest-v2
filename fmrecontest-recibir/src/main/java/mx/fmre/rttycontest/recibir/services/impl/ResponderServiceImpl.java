@@ -196,6 +196,12 @@ public class ResponderServiceImpl implements IResponderService {
 		MimeMessagePreparator messagePreparator = mimeMessage -> {
 			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
 			
+			List<ErrorDTO> errors = emailDataDTO.getErrors().stream().map(e -> {
+				e.setSuggestionEs( changeHtmlCharaters(e.getSuggestionEs()));
+				return e;
+			}).collect(Collectors.toList());
+			emailDataDTO.setErrors(errors);
+			
 			messageHelper.setFrom(emailAccount.getEmailAddress(), newMailFromName);
 			messageHelper.setReplyTo(new InternetAddress(emailAccount.getReplyToEmail(), emailAccount.getReplyToName()));
 
@@ -220,5 +226,25 @@ public class ResponderServiceImpl implements IResponderService {
 			throw new FmreContestException(e.getLocalizedMessage());
 		}
 		return true;
+	}
+	
+	private String changeHtmlCharaters(String text) {
+		if (text == null) {
+			return null;
+		}
+		if (text == "") {
+			return "";
+		}
+		return text
+				.replaceAll("\\Á", "&Aacute;")
+				.replaceAll("\\É", "&Eacute;")
+				.replaceAll("\\Í", "&Iacute;")
+				.replaceAll("\\Ó", "&Oacute;")
+				.replaceAll("\\Ú", "&Uacute;")
+				.replaceAll("\\á", "&aacute;")
+				.replaceAll("\\é", "&eacute;")
+				.replaceAll("\\í", "&iacute;")
+				.replaceAll("\\ó", "&oacute;")
+				.replaceAll("\\ú", "&uacute;");
 	}
 }
