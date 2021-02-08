@@ -50,7 +50,6 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
 	@Autowired private IRelConteoContestLogRepository  relConteoContestLogRepository;
 	@Autowired private IEmailRepository                emailRepository;
-//	@Autowired private EmailEmailErrorRepository       emailEmailErrorRepository;
 	
 	@Override
 	public Conteo createConteo(Edition edition, String description) {

@@ -18,9 +18,8 @@ import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.recibir.business.IVerificacionEmail;
 
-@Service("verificacionEmailRtty2019")
-public class VerificacionEmailRtty2020 implements IVerificacionEmail {
-
+@Service("verificacionEmailRtty2020Impl")
+public class VerificacionEmailRtty2020Impl implements IVerificacionEmail {
 	@Autowired private IEditionRepository editionRepository;
 	@Autowired private IAttachedFileRepository attachedFileRepository;
 	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;

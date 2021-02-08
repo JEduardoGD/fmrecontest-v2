@@ -1,6 +1,5 @@
 package mx.fmre.rttycontest.bs.dxcc.service.impl;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
+import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
 import mx.fmre.rttycontest.bs.util.QrzUtil;
@@ -36,28 +35,30 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 		log.debug("Info from QRZData para {}", callsign);
 		QRZDatabaseDAO qrzdatabase = null;
 		
-		DxccSession session;
-		
-		
-//		Calendar calendar = Calendar.getInstance();
-		
-		
-		List<DxccSession> sessions = dxccSessionRepository.getActiveSessions();
-		if(sessions != null && !sessions.isEmpty())
-			session = sessions.get(sessions.size() - 1);
-		else {
-			session = this.getNewSession(qrzUsername, qrzPassword);
-		}
-
-		if (session == null)
-			return null;
+		DxccSession session = getActiveSession();
 
 		String url = String.format(QRZ_URL + "?s=%s;callsign=%s", session.getKey(), callsign);
 
 		qrzdatabase = QrzUtil.callToQrz(url);
 
-		if (qrzdatabase == null)
+		if (qrzdatabase == null) {
 			return null;
+		}
+		
+		if (
+				qrzdatabase.getSession() != null &&
+				qrzdatabase.getSession().getError() != null &&
+				(
+						"Invalid session key".equalsIgnoreCase(qrzdatabase.getSession().getError()) ||
+						"Session Timeout".equalsIgnoreCase(qrzdatabase.getSession().getError())
+						)) {
+			session = getNewSession(qrzUsername, qrzPassword);
+			url = String.format(QRZ_URL + "?s=%s;callsign=%s", session.getKey(), callsign);
+			qrzdatabase = QrzUtil.callToQrz(url);
+			if (qrzdatabase == null) {
+				return null;
+			}
+		}
 
 		if (qrzdatabase.getSession() != null && qrzdatabase.getSession().getError() != null) {
 			log.warn("Error de QRZ: {}", qrzdatabase.getSession().getError());
@@ -76,6 +77,18 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 		}
 
 		return QrzUtil.parse(callsignQuery);
+	}
+	
+	private DxccSession getActiveSession() throws FmreContestException {
+		DxccSession session;
+		List<DxccSession> sessions = dxccSessionRepository.getActiveSessions();
+		if(sessions != null && !sessions.isEmpty())
+			session = sessions.get(sessions.size() - 1);
+		else {
+			session = this.getNewSession(qrzUsername, qrzPassword);
+		}
+		
+		return session;
 	}
 	
 	private DxccSession getNewSession(String qrzUsername, String qrzPassword) throws FmreContestException {
