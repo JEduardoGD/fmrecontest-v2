@@ -42,9 +42,8 @@ public abstract class FileUtil {
 		return new String(decoded);
 	}
 	
-	public static String mimeBase64ToString(String s) throws java.lang.IllegalArgumentException {
-		byte[] decoded = Base64.getDecoder().decode(s.getBytes());
-		return new String(decoded);
+	public static String mimeBase64ToString(String s){
+		 return new String(org.apache.commons.codec.binary.Base64.decodeBase64(s.getBytes()));
 	}
 	
 	public static InputStream byteArrayToInputStream(byte[] byteArray) {
