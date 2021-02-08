@@ -138,7 +138,12 @@ public class ScannerThread {
 		if (m.matches()) {
 			String[] arr = filename.split(UTF8_ENCODEDFILENAME_PATTERN);
 			if (arr.length == 2) {
-				return FileUtil.mimeBase64ToString(arr[1]);
+				try {
+					return FileUtil.mimeBase64ToString(arr[1]);
+				} catch (java.lang.IllegalArgumentException e) {
+					log.info("No se pudo parsear con mime: " + filename);
+				}
+				return FileUtil.base64ToString(arr[1]);
 			}
 		}
 		return filename;
