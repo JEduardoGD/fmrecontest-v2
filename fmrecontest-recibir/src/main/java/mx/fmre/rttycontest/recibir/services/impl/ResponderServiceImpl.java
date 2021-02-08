@@ -232,19 +232,19 @@ public class ResponderServiceImpl implements IResponderService {
 		if (text == null) {
 			return null;
 		}
-		if (text == "") {
+		if ("".equals(text)) {
 			return "";
 		}
-		return text
-				.replaceAll("\\Á", "&Aacute;")
-				.replaceAll("\\É", "&Eacute;")
-				.replaceAll("\\Í", "&Iacute;")
-				.replaceAll("\\Ó", "&Oacute;")
-				.replaceAll("\\Ú", "&Uacute;")
-				.replaceAll("\\á", "&aacute;")
-				.replaceAll("\\é", "&eacute;")
-				.replaceAll("\\í", "&iacute;")
-				.replaceAll("\\ó", "&oacute;")
-				.replaceAll("\\ú", "&uacute;");
+			return text
+				.replaceAll("\\Á", "A")
+				.replaceAll("\\É", "E")
+				.replaceAll("\\Í", "I")
+				.replaceAll("\\Ó", "O")
+				.replaceAll("\\Ú", "U")
+				.replaceAll("\\á", "a")
+				.replaceAll("\\é", "e")
+				.replaceAll("\\í", "i")
+				.replaceAll("\\ó", "o")
+				.replaceAll("\\ú", "u");
 	}
 }

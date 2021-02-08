@@ -150,6 +150,9 @@ public class VerificacionEmailRtty2021Impl implements IVerificacionEmail {
 
 	private boolean verify_WRONG_CHANGE_CODE(Email email, Edition edition, List<AttachedFile> attachedFiles) {
 		ContestLog contestLog = contestLogRepository.findByEmail(email);
+		if(null == contestLog){
+			return false;
+		}
 		DxccEntity mexicoDxccEntity = dxccEntityRepository.findAll().stream()
 				.filter(entity -> entity.getEntity().equalsIgnoreCase("mexico")).findFirst().get();
 		DxccEntity dxccEntity = contestLog.getDxccEntity();
