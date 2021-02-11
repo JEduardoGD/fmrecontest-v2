@@ -39,113 +39,134 @@ import mx.fmre.rttycontest.recibir.services.IFileManagerService;
 @AllArgsConstructor
 public class ScannerThread {
 
-	private Edition edition;
-	private IContestRepository contestRepository;
-	private String emailPasswordEncodingkey;
-	private IEmailRepository emailRepository;
-	private int emailFieldsToLenght;
-	private IFileManagerService fileManagerService;
-	private EmailStatus emailEstatusRecived;
-	private Integer messagesPerminute;
+    private Edition edition;
+    private IContestRepository contestRepository;
+    private String emailPasswordEncodingkey;
+    private IEmailRepository emailRepository;
+    private int emailFieldsToLenght;
+    private IFileManagerService fileManagerService;
+    private EmailStatus emailEstatusRecived;
+    private Integer messagesPerminute;
 
-	private final String UTF8_ENCODEDFILENAME_PATTERN = "\\=\\?(UTF-8|utf-8)\\?(B|b)\\?";
+    private final String UTF8_ENCODEDFILENAME_PATTERN = "\\=\\?(UTF-8|utf-8)\\?(B|b)\\?";
+    private final String UTF8_SPECIAL_NAME_STR = "(\\=\\?(UTF-8|utf-8)\\?(Q|q)\\?)";
+    private final String UTF8_SPECIAL_NAME_END = "(\\?\\=)";
 
-	public void run() {
-		try {
-			this.scan();
-		} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | MessagingException
-				| IOException | FmreContestException e) {
-			log.error(e.getLocalizedMessage());
-		}
-	}
+    public void run() {
+        try {
+            this.scan();
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | MessagingException
+                | IOException | FmreContestException e) {
+            log.error(e.getLocalizedMessage());
+        }
+    }
 
-	private void scan() throws MessagingException, IOException, InvalidKeyException, NoSuchAlgorithmException,
-			NoSuchPaddingException, FmreContestException {
-		Contest contest = contestRepository.findById(edition.getContest().getId()).orElse(null);
-		EncryptDecryptStringHelper encryptDecryptStringHelper = null;
-		if (contest == null)
-			return;
-		EmailAccount emailAccount = contest.getEmailAccount();
-		encryptDecryptStringHelper = new EncryptDecryptStringHelper(emailPasswordEncodingkey);
-		
-		Session session = Session.getDefaultInstance(new Properties());
-		Store store = session.getStore("imaps");
-		store.connect(emailAccount.getInHost(), emailAccount.getInPort(), emailAccount.getEmailAddress(),
-				encryptDecryptStringHelper.decrypt(emailAccount.getPassword()));
-		Folder inbox = store.getFolder("INBOX");
-		inbox.open(Folder.READ_ONLY);
+    private void scan() throws MessagingException, IOException, InvalidKeyException, NoSuchAlgorithmException,
+            NoSuchPaddingException, FmreContestException {
+        Contest contest = contestRepository.findById(edition.getContest().getId()).orElse(null);
+        EncryptDecryptStringHelper encryptDecryptStringHelper = null;
+        if (contest == null)
+            return;
+        EmailAccount emailAccount = contest.getEmailAccount();
+        encryptDecryptStringHelper = new EncryptDecryptStringHelper(emailPasswordEncodingkey);
+        
+        Session session = Session.getDefaultInstance(new Properties());
+        Store store = session.getStore("imaps");
+        store.connect(emailAccount.getInHost(), emailAccount.getInPort(), emailAccount.getEmailAddress(),
+                encryptDecryptStringHelper.decrypt(emailAccount.getPassword()));
+        Folder inbox = store.getFolder("INBOX");
+        inbox.open(Folder.READ_ONLY);
 
-		List<Integer> saved;
-		if (edition.getEmailEnd() != null)
-			saved = emailRepository.getEmailCountsSaved(edition.getEmailStart(), edition.getEmailEnd(),
-					edition.getId());
-		else
-			saved = emailRepository.getEmailCountsSaved(edition.getEmailStart(), edition.getId());
-		int maxIdEmailSaved = saved
-			      .stream()
-			      .mapToInt(v -> v)
-			      .max()
-			      .orElse(0);
-		int messageCount = inbox.getMessageCount();
-		
-		int maxIdEmail = messageCount > maxIdEmailSaved ? messageCount : maxIdEmailSaved;
-		
-		List<Integer> shouldBeSaved = IntStream
-				.iterate(edition.getEmailStart(), x -> x + 1)
-				.limit(maxIdEmail - edition.getEmailStart() + 1)
-				.boxed()
-				.collect(Collectors.toList());
-		shouldBeSaved.removeAll(saved);
-		
-		if(shouldBeSaved.isEmpty())
-			return;
-		
-		int upperLimit = messagesPerminute < shouldBeSaved.size() ? messagesPerminute : shouldBeSaved.size();
-		List<Integer> listToDownload = shouldBeSaved.subList(0, upperLimit);
-		int[] intArray = new int[listToDownload.size()];
-		for (int i = 0; i < listToDownload.size(); i++) {
-			intArray[i] = listToDownload.get(i);
-		}
+        List<Integer> saved;
+        if (edition.getEmailEnd() != null)
+            saved = emailRepository.getEmailCountsSaved(edition.getEmailStart(), edition.getEmailEnd(),
+                    edition.getId());
+        else
+            saved = emailRepository.getEmailCountsSaved(edition.getEmailStart(), edition.getId());
+        int maxIdEmailSaved = saved
+                  .stream()
+                  .mapToInt(v -> v)
+                  .max()
+                  .orElse(0);
+        int messageCount = inbox.getMessageCount();
+        
+        int maxIdEmail = messageCount > maxIdEmailSaved ? messageCount : maxIdEmailSaved;
+        
+        List<Integer> shouldBeSaved = IntStream
+                .iterate(edition.getEmailStart(), x -> x + 1)
+                .limit(maxIdEmail - edition.getEmailStart() + 1)
+                .boxed()
+                .collect(Collectors.toList());
+        shouldBeSaved.removeAll(saved);
+        
+        if(shouldBeSaved.isEmpty())
+            return;
+        
+        int upperLimit = messagesPerminute < shouldBeSaved.size() ? messagesPerminute : shouldBeSaved.size();
+        List<Integer> listToDownload = shouldBeSaved.subList(0, upperLimit);
+        int[] intArray = new int[listToDownload.size()];
+        for (int i = 0; i < listToDownload.size(); i++) {
+            intArray[i] = listToDownload.get(i);
+        }
 
-		// Fetch unseen messages from inbox folder
-//		Message[] messages = inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
-//		int messageCount = inbox.getMessageCount();
-		Message[] messages = inbox.getMessages(intArray);
+        // Fetch unseen messages from inbox folder
+//        Message[] messages = inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
+//        int messageCount = inbox.getMessageCount();
+        Message[] messages = inbox.getMessages(intArray);
 
-		for (Message message : messages) {
-			List<AttachedFileDTO> attachedFilesDTO = MailHelper.getAttachedFiles(message);
-			Email email = MailHelper.messageToEmailMapper(edition, message, emailFieldsToLenght, emailEstatusRecived);
-			List<AttachedFile> attachedFiles = new ArrayList<>();
-			for (AttachedFileDTO attachedFileDTO : attachedFilesDTO) {
-				attachedFileDTO.setFilename(parseBase64encodedFilename(attachedFileDTO.getFilename()));
-				
-				AttachedFile attachedFile = MailHelper.attachedFileDTOToAttachedFile(attachedFileDTO);
-				attachedFile.setEmail(email);
-				
-				String bucketPath = fileManagerService.saveFile(email, attachedFileDTO);
-				attachedFile.setPath(bucketPath);
-				attachedFiles.add(attachedFile);
-			}
-			email.setAttachedFiles(attachedFiles);
-			emailRepository.save(email);
-		}
+        for (Message message : messages) {
+            List<AttachedFileDTO> attachedFilesDTO = MailHelper.getAttachedFiles(message);
+            Email email = MailHelper.messageToEmailMapper(edition, message, emailFieldsToLenght, emailEstatusRecived);
+            List<AttachedFile> attachedFiles = new ArrayList<>();
+            for (AttachedFileDTO attachedFileDTO : attachedFilesDTO) {
+                String filename;
+                filename = parseBase64encodedFilename(attachedFileDTO.getFilename());
+                filename = parseSpecialNameFilename(attachedFileDTO.getFilename());
+                attachedFileDTO.setFilename(filename);
+                AttachedFile attachedFile = MailHelper.attachedFileDTOToAttachedFile(attachedFileDTO);
+                attachedFile.setEmail(email);
 
-	}
-	
-	private String parseBase64encodedFilename(String filename) {
-		Pattern p = Pattern.compile("^" + UTF8_ENCODEDFILENAME_PATTERN + ".*" + "$");
-		Matcher m = p.matcher(filename);
-		if (m.matches()) {
-			String[] arr = filename.split(UTF8_ENCODEDFILENAME_PATTERN);
-			if (arr.length == 2) {
-				try {
-					return FileUtil.mimeBase64ToString(arr[1]);
-				} catch (Exception e) {
-					log.error(e.getLocalizedMessage());
-					return null;
-				}
-			}
-		}
-		return filename;
-	}
+                String bucketPath = fileManagerService.saveFile(email, attachedFileDTO);
+                attachedFile.setPath(bucketPath);
+                attachedFiles.add(attachedFile);
+            }
+            email.setAttachedFiles(attachedFiles);
+            emailRepository.save(email);
+        }
+
+    }
+    
+    private String parseBase64encodedFilename(String filename) {
+        Pattern p = Pattern.compile("^" + UTF8_ENCODEDFILENAME_PATTERN + ".*" + "$");
+        Matcher m = p.matcher(filename);
+        if (m.matches()) {
+            String[] arr = filename.split(UTF8_ENCODEDFILENAME_PATTERN);
+            if (arr.length == 2) {
+                try {
+                    return FileUtil.mimeBase64ToString(arr[1]);
+                } catch (Exception e) {
+                    log.error(e.getLocalizedMessage());
+                    return null;
+                }
+            }
+        }
+        return filename;
+    }
+    
+    private String parseSpecialNameFilename(String filename) {
+        Pattern p = Pattern.compile("^" + UTF8_SPECIAL_NAME_STR + ".*" + UTF8_SPECIAL_NAME_END + "$");
+        Matcher m = p.matcher(filename);
+        if (m.matches()) {
+            String[] arr = filename.split(UTF8_SPECIAL_NAME_STR + "|" + UTF8_SPECIAL_NAME_END);
+            if (arr.length == 2) {
+                try {
+                    return arr[1];
+                } catch (Exception e) {
+                    log.error(e.getLocalizedMessage());
+                    return null;
+                }
+            }
+        }
+        return filename;
+    }
 }
