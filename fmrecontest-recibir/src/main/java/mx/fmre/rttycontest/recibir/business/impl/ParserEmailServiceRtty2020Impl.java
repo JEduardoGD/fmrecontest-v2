@@ -39,7 +39,7 @@ public class ParserEmailServiceRtty2020Impl implements IParserEmail {
 	@Value("${file.manager.impl}")
 	private String fileManagerImpl;
 	
-	private final String logFileNamePattern = "^[\\w,\\s-]+\\.(([tT][xX][tT])|([lL][oO][gG])|([cC][bB][rR]))$";
+	private final String logFileNamePattern = "^.+\\.(([tT][xX][tT])|([lL][oO][gG])|([cC][bB][rR]))$";
 
 	@Override
 	public List<AttachedFile> identifyLogFile(Email email) {
