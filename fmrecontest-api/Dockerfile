@@ -5,6 +5,8 @@ LABEL maintainer="eduardo_gd@hotmail.com"
 VOLUME /tmp
 
 ADD target/fmrecontest-api*.jar recibir.jar
+ 
+EXPOSE 8080
 
 WORKDIR /
 
