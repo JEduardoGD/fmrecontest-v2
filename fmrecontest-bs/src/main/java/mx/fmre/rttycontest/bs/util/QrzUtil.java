@@ -62,9 +62,15 @@ public class QrzUtil {
 	private static QRZDatabaseDAO parseQrz(InputSource is) throws JAXBException, SAXException {
 		JAXBContext jc = JAXBContext.newInstance(QRZDatabaseDAO.class);
 		Unmarshaller unmarshaller = jc.createUnmarshaller();
-
-		//NOSONAR
+		
 		XMLReader reader = XMLReaderFactory.createXMLReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		// This may not be strictly required as DTDs shouldn't be allowed at all, per previous line.
+		reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+		reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		
+		
 		MyNamespaceFilter inFilter = new MyNamespaceFilter(null, true);
 		inFilter.setParent(reader);
 		SAXSource source = new SAXSource(inFilter, is);
