@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
+import mx.fmre.rttycontest.bs.dxcc.dao.DxccentityModelDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
-import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
 import mx.fmre.rttycontest.bs.util.QrzUtil;
@@ -28,7 +28,7 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 	
 	@Value("${qrz.password}")
 	private String qrzPassword;
-	private static final String QRZ_URL = "http://xmldata.qrz.com/xml/1.31";
+	private static final String QRZ_URL = "https://xmldata.qrz.com/xml/1.34/";
 
 	@Override
 	public CallsignDAO getDxccFromCallsign(String callsign) throws FmreContestException {
@@ -37,7 +37,7 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 		
 		DxccSession session = getActiveSession();
 
-		String url = String.format(QRZ_URL + "?s=%s;callsign=%s", session.getKey(), callsign);
+		String url = String.format(QRZ_URL + "?s=%s;dxcc=%s", session.getKey(), callsign);
 
 		qrzdatabase = QrzUtil.callToQrz(url);
 
@@ -60,23 +60,22 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 			}
 		}
 
-		if (qrzdatabase.getSession() != null && qrzdatabase.getSession().getError() != null) {
-			log.warn("Error de QRZ: {}", qrzdatabase.getSession().getError());
-			return null;
-		}
+        if (qrzdatabase.getSession() != null && qrzdatabase.getSession().getError() != null) {
+            log.warn("Error de QRZ: {}", qrzdatabase.getSession().getError());
+            return null;
+        }
 
-		if (qrzdatabase != null && qrzdatabase.getCallsign() == null) {
-			log.error("qrzdatabase es nulo");
-			return null;
-		}
+        if (qrzdatabase == null || qrzdatabase.getDxcc() == null || qrzdatabase.getDxcc().getDxcc() == null) {
+            log.error("qrzdatabase es nulo");
+            return null;
+        }
 
-		QrzCallsignDAO callsignQuery = qrzdatabase.getCallsign();
+		DxccentityModelDAO callsignQuery = qrzdatabase.getDxcc();
+		
+		CallsignDAO callsignDAO =  QrzUtil.parse(callsignQuery);
+		callsignDAO.setCall(callsign);
 
-		if (!callsignQuery.getCall().equalsIgnoreCase(callsign)) {
-			return null;
-		}
-
-		return QrzUtil.parse(callsignQuery);
+		return callsignDAO;
 	}
 	
 	private DxccSession getActiveSession() throws FmreContestException {

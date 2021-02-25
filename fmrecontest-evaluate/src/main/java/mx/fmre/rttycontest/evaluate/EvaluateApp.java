@@ -40,18 +40,18 @@ public class EvaluateApp implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		completeDxccService.completeDxccEntityQsos();
-		completeDxccService.completeDxccEntityLogs();
-		completeDxccService.completeBandsOnQsos();
-		
-		List<Edition> editions = editionRepository.getActiveEditionOfContest();
-		for (Edition edition : editions) {
-			String description = "conteo for edition id " + edition.getId();
-			Conteo conteo = evaluateService.createConteo(edition, description);
-			evaluateService.findForErrorsOnQsos(conteo, edition);
-			evaluateService.setPointsForQssos(conteo);
-			evaluateService.setMultipliesQsos(conteo);
-			evaluateService.evaluateActiveEditions(conteo);
-		}
+//		completeDxccService.completeDxccEntityLogs();
+//		completeDxccService.completeBandsOnQsos();
+//		
+//		List<Edition> editions = editionRepository.getActiveEditionOfContest();
+//		for (Edition edition : editions) {
+//			String description = "conteo for edition id " + edition.getId();
+//			Conteo conteo = evaluateService.createConteo(edition, description);
+//			evaluateService.findForErrorsOnQsos(conteo, edition);
+//			evaluateService.setPointsForQssos(conteo);
+//			evaluateService.setMultipliesQsos(conteo);
+//			evaluateService.evaluateActiveEditions(conteo);
+//		}
 	}
 }
 

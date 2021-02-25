@@ -27,7 +27,7 @@ public class DxccEntityServiceImpl implements IDxccEntityService {
 
 	@Override
 	public DxccEntityDTO findById(Long dxccEntityId) throws FmreContestException {
-		DxccEntity dxccEntity = this.dxccEntityRepository.findById(dxccEntityId).orElse(null);
+		DxccEntity dxccEntity = this.dxccEntityRepository.findByDxccEntityCodeBeforeYear(dxccEntityId);
 		if(dxccEntity == null) {
 			log.error("Cannot find dxccEntity with ID {}", dxccEntityId);
 			throw new FmreContestException("Cannot find DxccEnttiy");

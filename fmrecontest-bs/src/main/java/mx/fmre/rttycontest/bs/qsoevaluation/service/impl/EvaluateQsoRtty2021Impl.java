@@ -110,7 +110,7 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 		DxccEntity contestLogDxccEntity = null;
 		if (contestLog.getDxccEntity() != null) {
 			Long contestLogDxccEntityId = contestLog.getDxccEntity().getId();
-			contestLogDxccEntity = dxccEntityRepository.findById(contestLogDxccEntityId).orElse(null);
+			contestLogDxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(contestLogDxccEntityId);
 		}
 		
 		if(contestLogDxccEntity != null && contestLogDxccEntity.equals(this.mexicoDxccEntity)) {
@@ -140,7 +140,7 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 			Long dxccEntityHomeId = contestLog.getDxccEntity().getId();
 			if (dxccEntityHomeId == null)
 				return null;
-			dxccEntityHome = dxccEntityRepository.findById(dxccEntityHomeId).orElse(null);
+			dxccEntityHome = dxccEntityRepository.findByDxccEntityCodeBeforeYear(dxccEntityHomeId);
 		}
 		if(dxccEntityHome == null)
 			return null;
@@ -151,7 +151,7 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 		
 		if(dxccEntityCalledId == null)
 			return null;
-		DxccEntity dxccEntityCalled = dxccEntityRepository.findById(dxccEntityCalledId).orElse(null);
+		DxccEntity dxccEntityCalled = dxccEntityRepository.findByDxccEntityCodeBeforeYear(dxccEntityCalledId);
 		
 		if(dxccEntityCalled == null)
 			return null;

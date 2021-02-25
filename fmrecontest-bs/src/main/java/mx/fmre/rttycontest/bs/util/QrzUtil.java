@@ -2,6 +2,7 @@ package mx.fmre.rttycontest.bs.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -14,6 +15,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
+import mx.fmre.rttycontest.bs.dxcc.dao.DxccentityModelDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
@@ -81,11 +83,14 @@ public class QrzUtil {
 	
 	public static DxccEntity parse(CallsignDAO callsignDAO) {
 		DxccEntity dxccEntity = new DxccEntity();
-		dxccEntity.setId(callsignDAO.getDxcc());
+		//dxccEntity.setId(callsignDAO.getDxcc());
+		dxccEntity.setId(null);
+		dxccEntity.setEntityCode(callsignDAO.getDxcc());
 		dxccEntity.setEntity(callsignDAO.getCountry());
 		dxccEntity.setCont(callsignDAO.getCont());
 		dxccEntity.setItu(callsignDAO.getItuzone());
 		dxccEntity.setCq(callsignDAO.getCqzone());
+		dxccEntity.setUpdatedAt(new Date());
 		return dxccEntity;
 	}
 	
@@ -97,6 +102,7 @@ public class QrzUtil {
 		dxccSession.setGmTime(qrzSessionDAO.getGmTime());
 		dxccSession.setRemark(qrzSessionDAO.getRemark());
 		dxccSession.setError(qrzSessionDAO.getError());
+        dxccSession.setError(qrzSessionDAO.getError());
 		return dxccSession;
 	}
 	
@@ -111,5 +117,17 @@ public class QrzUtil {
 		callsignDAO.setCont(null);
 		return callsignDAO;
 	}
+
+    public static CallsignDAO parse(DxccentityModelDAO callsignQuery) {
+        CallsignDAO callsignDAO = new CallsignDAO();
+        callsignDAO.setCall(null);
+        callsignDAO.setDxcc((long) callsignQuery.getDxcc());
+        callsignDAO.setState(null);
+        callsignDAO.setItuzone(callsignQuery.getItuzone());
+        callsignDAO.setCqzone(callsignQuery.getCqzone());
+        callsignDAO.setCountry(callsignQuery.getName());
+        callsignDAO.setCont(callsignQuery.getContinent());
+        return callsignDAO;
+    }
 
 }

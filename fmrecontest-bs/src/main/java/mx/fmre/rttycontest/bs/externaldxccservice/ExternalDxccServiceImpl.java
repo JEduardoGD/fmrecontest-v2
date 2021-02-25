@@ -22,9 +22,9 @@ public class ExternalDxccServiceImpl {
 		// 3rd attempt, from QRZ
 		IDxccService dxccServiceQrz = appContext.getBean("qrzDxccServiceQrzImpl", IDxccService.class);
 		CallsignDAO resQrz = dxccServiceQrz.getDxccFromCallsign(callsign);
-		if (resQrz != null) {
+		if (resQrz != null && resQrz.getDxcc() != null) {
 			Long dxccEntityNumber = resQrz.getDxcc();
-			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
+			dxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(dxccEntityNumber);
 			if (dxccEntity != null) {
 				log.info("{} from qrz", callsign);
 				return dxccEntity;
@@ -40,9 +40,9 @@ public class ExternalDxccServiceImpl {
 		// 4rd attempt, from Puebla DX
 		IDxccService dxccServicePueblaDx = appContext.getBean("dxccServicePueblaDx", IDxccService.class);
 		CallsignDAO resPueblaDx = dxccServicePueblaDx.getDxccFromCallsign(callsign);
-		if (resPueblaDx != null) {
+		if (resPueblaDx != null && resPueblaDx.getDxcc() != null) {
 			Long dxccEntityNumber = resPueblaDx.getDxcc();
-			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
+			dxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(dxccEntityNumber);
 			if (dxccEntity != null) {
 				log.info("{} from Puebla DX", callsign);
 				return dxccEntity;
