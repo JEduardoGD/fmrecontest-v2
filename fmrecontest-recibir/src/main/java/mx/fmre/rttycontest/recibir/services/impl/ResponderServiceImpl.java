@@ -1,5 +1,6 @@
 package mx.fmre.rttycontest.recibir.services.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -140,14 +141,17 @@ public class ResponderServiceImpl implements IResponderService {
 	}
 	
 	private List<OthersLogs> createOthersLogs(Email email, Edition edition) {
+        if (email.getSubject() == null || "".equals(email.getSubject())) {
+            return new ArrayList<>();
+        }
 		List<Email> listEmails = emailRepository.getAllBySubjectAndEditionBeforeDate(email.getSubject(), edition, email.getSentDate());
 		return listEmails
 				.stream()
 				.filter(e -> !e.equals(email))
 				.map(e -> {
-			ContestLog contestLog = contestLogRepository.findByEmail(email);
+			ContestLog contestLog = contestLogRepository.findByEmail(e);
 			List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-			List<CatEmailError> listErrors = emailErrorRepository.getErrorsOfEmail(email);
+			List<CatEmailError> listErrors = emailErrorRepository.getErrorsOfEmail(e);
 			OthersLogs othersLogs = new OthersLogs();
 			othersLogs.setFromName(e.getRecipientsFromName());
 			othersLogs.setDateOfSend(e.getSentDate());

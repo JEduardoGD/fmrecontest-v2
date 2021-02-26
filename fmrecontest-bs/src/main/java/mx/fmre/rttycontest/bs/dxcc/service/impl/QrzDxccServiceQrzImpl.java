@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
+import mx.fmre.rttycontest.bs.dxcc.dao.DxccentityModelDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
-import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
 import mx.fmre.rttycontest.bs.util.QrzUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.DxccSession;
 import mx.fmre.rttycontest.persistence.repository.IDxccSessionRepository;
 
@@ -28,16 +28,16 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 	
 	@Value("${qrz.password}")
 	private String qrzPassword;
-	private static final String QRZ_URL = "http://xmldata.qrz.com/xml/1.31";
+	private static final String QRZ_URL = "https://xmldata.qrz.com/xml/1.34/";
 
 	@Override
-	public CallsignDAO getDxccFromCallsign(String callsign) throws FmreContestException {
+	public DxccEntity getDxccFromCallsign(String callsign) throws FmreContestException {
 		log.debug("Info from QRZData para {}", callsign);
 		QRZDatabaseDAO qrzdatabase = null;
 		
 		DxccSession session = getActiveSession();
 
-		String url = String.format(QRZ_URL + "?s=%s;callsign=%s", session.getKey(), callsign);
+		String url = String.format(QRZ_URL + "?s=%s;dxcc=%s", session.getKey(), callsign);
 
 		qrzdatabase = QrzUtil.callToQrz(url);
 
@@ -65,18 +65,14 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 			return null;
 		}
 
-		if (qrzdatabase != null && qrzdatabase.getCallsign() == null) {
-			log.error("qrzdatabase es nulo");
-			return null;
-		}
+        if (qrzdatabase == null || qrzdatabase.getDxcc() == null || qrzdatabase.getDxcc().getDxcc() == null) {
+            log.error("qrzdatabase es nulo");
+            return null;
+        }
 
-		QrzCallsignDAO callsignQuery = qrzdatabase.getCallsign();
+		DxccentityModelDAO dxccentityModelDAO = qrzdatabase.getDxcc();
 
-		if (!callsignQuery.getCall().equalsIgnoreCase(callsign)) {
-			return null;
-		}
-
-		return QrzUtil.parse(callsignQuery);
+		return QrzUtil.parse(dxccentityModelDAO);
 	}
 	
 	private DxccSession getActiveSession() throws FmreContestException {
