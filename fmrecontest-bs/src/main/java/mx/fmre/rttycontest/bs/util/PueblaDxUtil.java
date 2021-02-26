@@ -1,20 +1,20 @@
 package mx.fmre.rttycontest.bs.util;
 
-import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.XmlObjectPueblaDX;
 import mx.fmre.rttycontest.bs.dxcc.dao.XmlObjectPueblaDX.Call;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
 
 public abstract class PueblaDxUtil {
-	public static CallsignDAO parse(XmlObjectPueblaDX xmlObjectPueblaDX) {
+	public static DxccEntity parse(XmlObjectPueblaDX xmlObjectPueblaDX) {
 		Call call = xmlObjectPueblaDX.getCalls().get(0);
-		CallsignDAO callsignDAO = new CallsignDAO();
-		callsignDAO.setCall(call.getCallsign());
-		callsignDAO.setDxcc(Long.valueOf(call.getDxcc()));
-		callsignDAO.setState(call.getEntidad());
-		callsignDAO.setItuzone(call.getItu());
-		callsignDAO.setCqzone(call.getCq());
-		callsignDAO.setCountry(call.getEntidad());
-		callsignDAO.setCont(call.getContinente());
-		return callsignDAO;
+		DxccEntity dxccEntity = new DxccEntity();
+//		dxccEntity.setCall(call.getCallsign());
+		dxccEntity.setId(Long.valueOf(call.getDxcc()));
+//		dxccEntity.setState(call.getEntidad());
+		dxccEntity.setItu(call.getItu());
+		dxccEntity.setCq(call.getCq());
+		dxccEntity.setEntity(call.getEntidad());
+		dxccEntity.setCont(call.getContinente());
+		return dxccEntity;
 	}
 }

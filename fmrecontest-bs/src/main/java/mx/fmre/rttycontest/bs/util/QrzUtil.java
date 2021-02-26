@@ -93,6 +93,16 @@ public class QrzUtil {
 		dxccEntity.setUpdatedAt(new Date());
 		return dxccEntity;
 	}
+    
+    public static DxccEntity parse(DxccentityModelDAO dxccentityModelDAO) {
+        DxccEntity dxccEntity = new DxccEntity();
+        dxccEntity.setId((long)dxccentityModelDAO.getDxcc());
+        dxccEntity.setEntity(dxccentityModelDAO.getName());
+        dxccEntity.setCont(dxccentityModelDAO.getContinent());
+        dxccEntity.setItu(dxccentityModelDAO.getItuzone());
+        dxccEntity.setCq(dxccentityModelDAO.getCqzone());
+        return dxccEntity;
+    }
 	
 	public static DxccSession parse(QrzSessionDAO qrzSessionDAO) {
 		DxccSession dxccSession = new DxccSession();
@@ -117,17 +127,5 @@ public class QrzUtil {
 		callsignDAO.setCont(null);
 		return callsignDAO;
 	}
-
-    public static CallsignDAO parse(DxccentityModelDAO callsignQuery) {
-        CallsignDAO callsignDAO = new CallsignDAO();
-        callsignDAO.setCall(null);
-        callsignDAO.setDxcc((long) callsignQuery.getDxcc());
-        callsignDAO.setState(null);
-        callsignDAO.setItuzone(callsignQuery.getItuzone());
-        callsignDAO.setCqzone(callsignQuery.getCqzone());
-        callsignDAO.setCountry(callsignQuery.getName());
-        callsignDAO.setCont(callsignQuery.getContinent());
-        return callsignDAO;
-    }
 
 }
