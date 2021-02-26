@@ -15,7 +15,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.XmlObjectPueblaDX;
 import mx.fmre.rttycontest.bs.dxcc.dao.XmlObjectPueblaDX.Call;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
@@ -24,6 +23,7 @@ import mx.fmre.rttycontest.bs.util.FileUtil;
 import mx.fmre.rttycontest.bs.util.HttpUtil;
 import mx.fmre.rttycontest.bs.util.PueblaDxUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
 
 @Slf4j
 @Service("dxccServicePueblaDx")
@@ -32,7 +32,7 @@ public class DxccServicePueblaDxImpl implements IDxccService {
 	private static final String PUEBLADX_URL = "http://logs.puebladx.org/DXCCinfo.php";
 
 	@Override
-	public CallsignDAO getDxccFromCallsign(String callsign) throws FmreContestException {
+	public DxccEntity getDxccFromCallsign(String callsign) throws FmreContestException {
 		XmlObjectPueblaDX xmlObjectPueblaDX = doRequest(callsign);
 		if (xmlObjectPueblaDX == null || xmlObjectPueblaDX.getCalls() == null || xmlObjectPueblaDX.getCalls().isEmpty()) {
 			return null;
@@ -50,7 +50,7 @@ public class DxccServicePueblaDxImpl implements IDxccService {
 				xmlObjectPueblaDX.setCalls(Arrays.asList(x.get(0)));
 		}
 		
-		CallsignDAO callsignDAO = PueblaDxUtil.parse(xmlObjectPueblaDX);
+		DxccEntity callsignDAO = PueblaDxUtil.parse(xmlObjectPueblaDX);
 		
 		
 		return callsignDAO;
