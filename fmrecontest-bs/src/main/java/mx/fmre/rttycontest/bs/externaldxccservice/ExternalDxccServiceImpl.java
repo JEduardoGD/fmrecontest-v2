@@ -3,9 +3,7 @@ package mx.fmre.rttycontest.bs.externaldxccservice;
 import org.springframework.context.ApplicationContext;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.service.IDxccService;
-import mx.fmre.rttycontest.bs.util.QrzUtil;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
@@ -21,16 +19,16 @@ public class ExternalDxccServiceImpl {
 		
 		// 3rd attempt, from QRZ
 		IDxccService dxccServiceQrz = appContext.getBean("qrzDxccServiceQrzImpl", IDxccService.class);
-		CallsignDAO resQrz = dxccServiceQrz.getDxccFromCallsign(callsign);
+		DxccEntity resQrz = dxccServiceQrz.getDxccFromCallsign(callsign);
 		if (resQrz != null) {
-			Long dxccEntityNumber = resQrz.getDxcc();
+			Long dxccEntityNumber = resQrz.getId();
 			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
 			if (dxccEntity != null) {
 				log.info("{} from qrz", callsign);
 				return dxccEntity;
 			}
 			if (dxccEntity == null && resQrz != null) {
-				dxccEntity = QrzUtil.parse(resQrz);
+				dxccEntity = resQrz;
 				dxccEntity.setOrigen(QRZ_ORIGEN);
 				dxccEntity = dxccEntityRepository.save(dxccEntity);
 				return dxccEntity;
@@ -39,9 +37,9 @@ public class ExternalDxccServiceImpl {
 		
 		// 4rd attempt, from Puebla DX
 		IDxccService dxccServicePueblaDx = appContext.getBean("dxccServicePueblaDx", IDxccService.class);
-		CallsignDAO resPueblaDx = dxccServicePueblaDx.getDxccFromCallsign(callsign);
+		DxccEntity resPueblaDx = dxccServicePueblaDx.getDxccFromCallsign(callsign);
 		if (resPueblaDx != null) {
-			Long dxccEntityNumber = resPueblaDx.getDxcc();
+			Long dxccEntityNumber = resPueblaDx.getId();
 			dxccEntity = dxccEntityRepository.findById(dxccEntityNumber).orElse(null);
 			if (dxccEntity != null) {
 				log.info("{} from Puebla DX", callsign);
@@ -49,7 +47,7 @@ public class ExternalDxccServiceImpl {
 			}
 			if (dxccEntity == null && resPueblaDx != null) {
 				log.info("{} from Puebla DX", callsign);
-				dxccEntity = QrzUtil.parse(resPueblaDx);
+				dxccEntity = resPueblaDx;
 				dxccEntity.setOrigen(PUEBLA_DX_ORIGEN);
 				dxccEntity = dxccEntityRepository.save(dxccEntity);
 				return dxccEntity;
