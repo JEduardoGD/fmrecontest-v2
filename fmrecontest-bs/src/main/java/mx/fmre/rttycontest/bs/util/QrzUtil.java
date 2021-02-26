@@ -14,6 +14,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import mx.fmre.rttycontest.bs.dxcc.dao.CallsignDAO;
+import mx.fmre.rttycontest.bs.dxcc.dao.DxccentityModelDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QRZDatabaseDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzCallsignDAO;
 import mx.fmre.rttycontest.bs.dxcc.dao.QrzSessionDAO;
@@ -88,6 +89,16 @@ public class QrzUtil {
 		dxccEntity.setCq(callsignDAO.getCqzone());
 		return dxccEntity;
 	}
+    
+    public static DxccEntity parse(DxccentityModelDAO dxccentityModelDAO) {
+        DxccEntity dxccEntity = new DxccEntity();
+        dxccEntity.setId((long)dxccentityModelDAO.getDxcc());
+        dxccEntity.setEntity(dxccentityModelDAO.getName());
+        dxccEntity.setCont(dxccentityModelDAO.getContinent());
+        dxccEntity.setItu(dxccentityModelDAO.getItuzone());
+        dxccEntity.setCq(dxccentityModelDAO.getCqzone());
+        return dxccEntity;
+    }
 	
 	public static DxccSession parse(QrzSessionDAO qrzSessionDAO) {
 		DxccSession dxccSession = new DxccSession();
