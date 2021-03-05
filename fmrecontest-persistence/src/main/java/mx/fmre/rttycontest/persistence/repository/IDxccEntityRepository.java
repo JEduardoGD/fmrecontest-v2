@@ -50,4 +50,10 @@ public interface IDxccEntityRepository extends JpaRepository<DxccEntity, Long> {
             "WHERE DATEDIFF(NOW(), D_UPDATED_AT) < 365 AND D_ENTITY_CODE = :dxccEntityNumber", nativeQuery = true)
     public DxccEntity findByDxccEntityCodeBeforeYear(
             @Param("dxccEntityNumber") Long dxccEntityNumber);
+    
+    @Query( value = "" +
+            "SELECT E.* FROM CAT_DXCC_ENTITY E " +
+            "WHERE DATEDIFF(NOW(), D_UPDATED_AT) < 365 AND S_ENTITY LIKE :dxccEntityName", nativeQuery = true)
+    public DxccEntity findByDxccEntityNameBeforeYear(
+            @Param("dxccEntityName") String dxccEntityName);
 }

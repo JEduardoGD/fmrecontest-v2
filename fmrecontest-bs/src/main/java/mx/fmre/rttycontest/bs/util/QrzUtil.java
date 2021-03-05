@@ -96,14 +96,16 @@ public class QrzUtil {
     
     public static DxccEntity parse(DxccentityModelDAO dxccentityModelDAO) {
         DxccEntity dxccEntity = new DxccEntity();
-        dxccEntity.setId((long)dxccentityModelDAO.getDxcc());
+        dxccEntity.setId(null);
+        dxccEntity.setEntityCode((long)dxccentityModelDAO.getDxcc());
         dxccEntity.setEntity(dxccentityModelDAO.getName());
         dxccEntity.setCont(dxccentityModelDAO.getContinent());
         dxccEntity.setItu(dxccentityModelDAO.getItuzone());
         dxccEntity.setCq(dxccentityModelDAO.getCqzone());
+        dxccEntity.setUpdatedAt(new Date());
         return dxccEntity;
     }
-	
+
 	public static DxccSession parse(QrzSessionDAO qrzSessionDAO) {
 		DxccSession dxccSession = new DxccSession();
 		dxccSession.setKey(qrzSessionDAO.getKey());

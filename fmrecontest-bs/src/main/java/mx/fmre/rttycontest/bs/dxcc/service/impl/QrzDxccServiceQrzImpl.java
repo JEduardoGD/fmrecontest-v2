@@ -1,5 +1,7 @@
 package mx.fmre.rttycontest.bs.dxcc.service.impl;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,16 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 		
 		DxccSession session = getActiveSession();
 
-		String url = String.format(QRZ_URL + "?s=%s;dxcc=%s", session.getKey(), callsign);
+        String url = null;
+        try {
+            url = String.format(QRZ_URL + "?s=%s;dxcc=%s", session.getKey(), URLEncoder.encode(callsign, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (url == null) {
+            return null;
+        }
 
 		qrzdatabase = QrzUtil.callToQrz(url);
 
