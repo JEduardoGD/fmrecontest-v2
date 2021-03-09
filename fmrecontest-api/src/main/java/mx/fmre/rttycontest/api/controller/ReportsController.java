@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.common.BaseController;
 import mx.fmre.rttycontest.api.common.StdResponse;
@@ -78,6 +79,7 @@ public class ReportsController extends BaseController {
 	}
 	
 	@GetMapping("/callsignwithoutdxccentityreport/{editionId}")
+	@ApiOperation(value = "Read all users matching given filter",  notes = "Will get all the users for the given filter")
 	public ResponseEntity<Resource> getCallsignWithoutDxccEntityReport(
 			@PathVariable("editionId") Integer editionId) {
 		HttpHeaders headers = new HttpHeaders();

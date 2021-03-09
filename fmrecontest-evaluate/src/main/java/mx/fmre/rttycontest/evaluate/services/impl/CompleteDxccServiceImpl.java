@@ -58,14 +58,18 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 					.map(LastEmail::getEmailId)
 					.collect(Collectors.toList());
 			
+			@SuppressWarnings("unused")
+            LastEmail e430 =lastEmails.stream().filter(e-> e.getEmailId() == 1430).findFirst().get();
+			
 			Map<String, DxccEntity> map = this.fillDxccMap(edition);
 			
-			List<Email> emails = emailRepository.getAllWithLogfileByEditionWithoutDxcc(edition);
+//			List<Email> emails = emailRepository.getAllWithLogfileByEditionWithoutDxcc(edition);
+			List<Email> emails = emailRepository.specialQuery(edition);
 			List<Email> filtered = emails
 					.stream()
 					.filter(e -> lastEmailIdsList.contains(e.getId()))
 					.collect(Collectors.toList());
-
+			
 			Date startDate = new Date();
 			int current = 1;
 			
@@ -95,6 +99,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 				log.info("{} de {}; time remaining: {}", current, filtered.size(),
 						DateTimeUtil.timeRemaining(startDate, current++, filtered.size()));
 			}
+			System.out.println();
 		}
 	}
 

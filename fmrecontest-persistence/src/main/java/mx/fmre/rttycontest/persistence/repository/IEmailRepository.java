@@ -93,6 +93,28 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 	public List<Email>getAllWithLogfileByEditionDxccNotFound(@Param("edition") Edition edition);
 	
 	public List<Email> findByEditionAndSubject(Edition edition, String subject);
+	
+    /**
+     * obtener todos los Email que contienen QSOS a lo que les falta la entidad
+     * DXCC, estos no han sido marcados y el email esta en estatus 5 (parseado el
+     * log y los qsos) por edition
+     * 
+     * @param edition
+     * @return email
+     */
+	@Query(value = "" +
+	        "SELECT EMAIL.* FROM TBL_EMAIL EMAIL " +
+	        "INNER JOIN TBL_EDITION EDITION ON EDITION.N_ID_EDITION = EMAIL.N_ID_EDITION " +
+	        "INNER JOIN TBL_CONTEST_LOG LOG ON LOG.N_ID_EMAIL = EMAIL.N_ID_EMAIL " +
+	        "INNER JOIN TBL_CONTEST_QSO QSO ON QSO.N_ID_CONTEST_LOG = LOG.N_ID_CONTEST_LOG " +
+	        "WHERE 1 = 1 " +
+	        "AND EMAIL.N_ID_EMAIL_STATUS = 5 " +
+	        "AND EDITION.N_ID_EDITION = :edition " +
+	        "AND QSO.N_ID_DXCCENTITY IS NULL AND (QSO.N_MARKED_AS_ERROR IS NULL OR QSO.N_MARKED_AS_ERROR = 0) " +
+	        "GROUP BY EMAIL.N_ID_EMAIL, EMAIL.N_EMAIL_COUNT, EMAIL.N_ID_EDITION, EMAIL.S_RECIPIENTS_FROM_NAME, "
+	        + "EMAIL.S_RECIPIENTS_FROM_ADDRESS, EMAIL.D_RECEIVED_DATE, EMAIL.S_RECIPIENTS_TO, EMAIL.D_SENT_DATE, "
+	        + "EMAIL.S_SUBJECT, EMAIL.N_ID_EMAIL_STATUS, EMAIL.VERIFIED_AT, EMAIL.ANSWERED_AT; ", nativeQuery = true )
+    public List<Email> specialQuery(@Param("edition") Edition edition);
 }
 
 
