@@ -10,4 +10,6 @@ public interface IDxccEntityService {
 	public List<DxccEntityDTO> getAll() throws FmreContestException;
 
 	public DxccEntityDTO findById(Long dxccEntityId) throws FmreContestException;
+
+    DxccEntityDTO findByCallsign(String dxccEntityName) throws FmreContestException;
 }

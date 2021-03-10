@@ -1,11 +1,14 @@
 package mx.fmre.rttycontest.persistence.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -22,9 +25,12 @@ public class DxccEntity implements Serializable {
 	private static final long serialVersionUID = -5379087720321735976L;
 	
 	@Id
-//	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name = "D_ENTITY_CODE")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name = "D_N_ID_DXCCENTITY")
 	private Long id;
+	
+    @Column(name = "D_ENTITY_CODE")
+    private Long entityCode;
 	
 	@Column(name = "S_ENTITY")
 	private String entity;
@@ -40,6 +46,9 @@ public class DxccEntity implements Serializable {
 
 	@Column(name = "S_ORIGEN")
 	private String origen;
+
+    @Column(name = "D_UPDATED_AT")
+    private Date updatedAt;
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "dxccEntity", fetch = FetchType.LAZY)

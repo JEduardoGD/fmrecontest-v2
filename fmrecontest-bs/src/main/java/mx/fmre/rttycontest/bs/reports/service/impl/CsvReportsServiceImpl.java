@@ -37,7 +37,6 @@ import mx.fmre.rttycontest.persistence.repository.ICatQsoErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
-import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
@@ -58,7 +57,6 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	@Autowired private IEmailEstatusRepository emailEstatusRepository;
 	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;
 	@Autowired private IRelQsoConteoRepository relQsoConteoRepository;
-	@Autowired private IDxccEntityRepository dxccEntityRepository;
 	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
 	@Autowired private ICatQsoErrorRepository catQsoErrorRepository;
 	@Autowired private ICatBandRepository catBandRepository;
@@ -66,7 +64,6 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 	
 	private Map<Integer, String> emailStatusesArray;
 	private Map<Integer, String> mapEmmailError;
-	private List<DxccEntity> listDxccEntities;
 	private List<CatQsoError> listCatQsoError;
 	private List<CatBand> listBands;
 	
@@ -83,8 +80,6 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 				.findAll()
 				.stream()
 				.collect(Collectors.toMap(CatEmailError::getId, CatEmailError::getDescripcion));
-		
-		this.listDxccEntities = dxccEntityRepository.findAll();
 		
 		this.listCatQsoError = catQsoErrorRepository.findAll();
 		
@@ -190,19 +185,14 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 			
 			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
 			
-			Long dxccEntityId = qso.getDxccEntity() != null ? qso.getDxccEntity().getId() : null;
-			DxccEntity dxccEntity = null;
-			if(dxccEntityId != null) {
-				dxccEntity = this.listDxccEntities
-						.stream()
-						.filter(x -> x.getId().longValue() == dxccEntityId.longValue())
-						.findFirst()
-						.orElse(null);
-			}
+			DxccEntity dxccEntity =  qso.getDxccEntity();
 			
 			List<RelQsoConteoQsoError> relQsoConteoQsoErrors = relQsoConteoQsoErrorRepository.findByRelQsoConteo(relQsoConteo);
 			
-			List<Integer> idsQsoErrors = relQsoConteoQsoErrors.stream().map(x -> x.getCatQsoError().getId()).collect(Collectors.toList());
+			List<Integer> idsQsoErrors = relQsoConteoQsoErrors
+			        .stream()
+			        .filter(x -> x.getCatQsoError() != null)
+			        .map(x -> x.getCatQsoError().getId()).collect(Collectors.toList());
 			
 			List<CatQsoError> qsosErrors = listCatQsoError.stream().filter(x  -> idsQsoErrors.contains(x.getId())).collect(Collectors.toList());
 			
@@ -228,7 +218,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 					qso.getExchanger(),
 					qso.getRste(),
 					qso.getRstr(),
-					qso.getDxccNotFound() ? "NOT FOUND" : "",
+					(qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) ? "NOT FOUND" : "",
 					dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getId(), dxccEntity.getEntity())) : "",
 					relQsoConteo.getPoints() != null ? relQsoConteo.getPoints()  + "" : "",
 					relQsoConteo.isMultiply() ? "1" : "",

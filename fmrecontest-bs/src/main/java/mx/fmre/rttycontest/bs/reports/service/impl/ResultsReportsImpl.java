@@ -46,7 +46,7 @@ public class ResultsReportsImpl implements IResultsReports {
 
 	@PostConstruct
 	private void init() {
-		this.mexicoDxccEntity = dxccEntityRepository.findById(50l).orElse(null);
+		this.mexicoDxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(50l);
 	}
 
 	@Override

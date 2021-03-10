@@ -95,7 +95,7 @@ public class ContestLog implements Serializable {
 	private Email email;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "D_ENTITY_CODE")
+	@JoinColumn(name = "N_ID_DXCCENTITY")
 	private DxccEntity dxccEntity;
 
 	// bi-directional many-to-one association to Contestqso

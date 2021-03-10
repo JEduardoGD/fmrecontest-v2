@@ -9,7 +9,7 @@ public abstract class PueblaDxUtil {
 		Call call = xmlObjectPueblaDX.getCalls().get(0);
 		DxccEntity dxccEntity = new DxccEntity();
 //		dxccEntity.setCall(call.getCallsign());
-		dxccEntity.setId(Long.valueOf(call.getDxcc()));
+		dxccEntity.setId(null);
 //		dxccEntity.setState(call.getEntidad());
 		dxccEntity.setItu(call.getItu());
 		dxccEntity.setCq(call.getCq());
