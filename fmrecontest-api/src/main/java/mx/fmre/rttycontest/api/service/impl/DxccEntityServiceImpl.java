@@ -27,13 +27,23 @@ public class DxccEntityServiceImpl implements IDxccEntityService {
 
 	@Override
 	public DxccEntityDTO findById(Long dxccEntityId) throws FmreContestException {
-		DxccEntity dxccEntity = this.dxccEntityRepository.findById(dxccEntityId).orElse(null);
+		DxccEntity dxccEntity = this.dxccEntityRepository.findByDxccEntityCodeBeforeYear(dxccEntityId);
 		if(dxccEntity == null) {
 			log.error("Cannot find dxccEntity with ID {}", dxccEntityId);
 			throw new FmreContestException("Cannot find DxccEnttiy");
 		}
 		return this.map(dxccEntity);
 	}
+
+    @Override
+    public DxccEntityDTO findByCallsign(String dxccEntityName) throws FmreContestException {
+        DxccEntity dxccEntity = this.dxccEntityRepository.findByDxccEntityNameBeforeYear(dxccEntityName);
+        if(dxccEntity == null) {
+            log.error("Cannot find dxccEntity with ID {}", dxccEntityName);
+            throw new FmreContestException("Cannot find DxccEnttiy");
+        }
+        return this.map(dxccEntity);
+    }
 
 	public DxccEntityDTO map(DxccEntity dxccEntity) {
 		DxccEntityDTO dxccEntityDTO = new DxccEntityDTO();

@@ -69,15 +69,15 @@ public class ContestQso implements Serializable {
 	@ToString.Exclude private ContestLog contestLog;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "D_ENTITY_CODE")
-	@ToString.Exclude private DxccEntity dxccEntity;
-
-	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_BAND")
 	@ToString.Exclude private CatBand band;
 
 	@Column(name = "N_MARKED_AS_ERROR")
 	private Boolean error;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "N_ID_DXCCENTITY")
+    private DxccEntity dxccEntity;
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "contestQso", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

@@ -2,6 +2,8 @@ package mx.fmre.rttycontest.bs.dxcc.service.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,7 +62,15 @@ public class DxccServicePueblaDxImpl implements IDxccService {
 		XmlObjectPueblaDX xmlObjectPueblaDX = null;
 
 		log.debug("Info from PueblaDX para {}", callsign);
-		String url = String.format(PUEBLADX_URL + "?CALL=%s", callsign);
+        String url = null;
+        try {
+            url = String.format(PUEBLADX_URL + "?CALL=%s", URLEncoder.encode(callsign, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            log.error(e.getMessage());
+        }
+        if (url == null) {
+            return null;
+        }
 
 		byte[] targetArray = null;
 		try {

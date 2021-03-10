@@ -3,12 +3,14 @@ package mx.fmre.rttycontest.recibir.business.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.externaldxccservice.ExternalDxccServiceImpl;
+import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.AttachedFile;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
@@ -21,7 +23,6 @@ import mx.fmre.rttycontest.persistence.repository.IAttachedFileRepository;
 import mx.fmre.rttycontest.persistence.repository.ICatEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
-import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.recibir.business.IVerificacionEmail;
 
@@ -33,8 +34,10 @@ public class VerificacionEmailRtty2021Impl implements IVerificacionEmail {
 	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;
 	@Autowired private IContestLogRepository    contestLogRepository;
 	@Autowired private IContestQsoRepository    contestQsoRepository;
-	@Autowired private IDxccEntityRepository    dxccEntityRepository;
-	@Autowired private ApplicationContext       appContext;
+	@Autowired private ExternalDxccService      externalDxccService;
+	
+	@Value("${FMRE_CALLSIGN}")
+	private String FMRE_CALLSIG;
 
 	private final String EMAIL_WITHOUT_SUBJECT                  = "EMAIL_WITHOUT_SUBJECT";
 	private final String EMAIL_WITHOUT_ATTACHED_FILES           = "EMAIL_WITHOUT_ATTACHED_FILES";
@@ -42,6 +45,20 @@ public class VerificacionEmailRtty2021Impl implements IVerificacionEmail {
 	private final String EMAIL_WITHOUT_CONTSTLOG                = "EMAIL_WITHOUT_CONTSTLOG";
 	private final String SUBJECT_WITH_MORE_THAN_ONE_WORD        = "SUBJECT_WITH_MORE_THAN_ONE_WORD";
 	private final String WRONG_CHANGE_CODE                      = "WRONG_CHANGE_CODE";
+	
+	private DxccEntity mexicoDxccEntity;
+	
+    @PostConstruct
+    private void init() {
+        try {
+            mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByEntityName("mexico");
+            if (mexicoDxccEntity == null) {
+                mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByCallsign(FMRE_CALLSIG);
+            }
+        } catch (FmreContestException e) {
+            log.error(e.getLocalizedMessage());
+        }
+    }
 
 	@Override
 	public List<CatEmailError> verify(Email email) throws FmreContestException {
@@ -148,29 +165,17 @@ public class VerificacionEmailRtty2021Impl implements IVerificacionEmail {
 		return false;
 	}
 
-	private boolean verify_WRONG_CHANGE_CODE(Email email, Edition edition, List<AttachedFile> attachedFiles) {
+	private boolean verify_WRONG_CHANGE_CODE(Email email, Edition edition, List<AttachedFile> attachedFiles) throws FmreContestException {
 		ContestLog contestLog = contestLogRepository.findByEmail(email);
 		if(null == contestLog){
 			return false;
 		}
-		DxccEntity mexicoDxccEntity = dxccEntityRepository.findAll().stream()
-				.filter(entity -> entity.getEntity().equalsIgnoreCase("mexico")).findFirst().get();
-		DxccEntity dxccEntity = contestLog.getDxccEntity();
-		List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
 		
-		if(dxccEntity == null) {
-			try {
-				dxccEntity = ExternalDxccServiceImpl.getDxccFromExternalServicesByCallsign(appContext, dxccEntityRepository, contestLog.getCallsign());
-			} catch (FmreContestException e) {
-				log.error(e.getLocalizedMessage());
-			}
-		}
+		DxccEntity dxccLogEntity = externalDxccService.getDxccFromExternalServicesByCallsign(contestLog.getCallsign());
+		
+		List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
 
-		if (null == dxccEntity || contestQsos.size() <= 0) {
-			return false;
-		}
-
-		if (!mexicoDxccEntity.equals(dxccEntity)) {
+		if (!mexicoDxccEntity.equals(dxccLogEntity)) {
 			// validacion para paises distintos de mexico
 			boolean allExchangeAreInteger = true;
 			for (ContestQso qso : contestQsos) {

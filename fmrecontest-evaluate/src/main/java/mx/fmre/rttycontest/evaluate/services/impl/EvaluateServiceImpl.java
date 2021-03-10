@@ -18,6 +18,7 @@ import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.LastEmail;
@@ -35,6 +36,7 @@ import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoQsoErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
+@SuppressWarnings("unused")
 @Service
 @Slf4j
 public class EvaluateServiceImpl implements IEvaluateService {
@@ -105,19 +107,19 @@ public class EvaluateServiceImpl implements IEvaluateService {
 		List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 		for(ContestQso qso: qsos) {
 			boolean qsoComplete = true;
-			CatBand qsoBand = qso.getBand();
-			if (qsoBand == null) {
-				log.error("El qso {} no tiene banda", qso.getId());
-				qsoComplete = false;
-			}
-			if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
-				log.error("El qso {} no tiene entidad dxcc", qso.getId());
-				qsoComplete = false;
-			}
+            if (qso.getError() != null && qso.getError().booleanValue() == true) {
+                qsoComplete = true;
+            } else {
+                if (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) {
+                    log.error("El qso {} no tiene entidad dxcc", qso.getId());
+                    qsoComplete = false;
+                }
+            }
 			RelQsoConteo relQsoConteo;
 			relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
-			if(relQsoConteo == null)
+			if(relQsoConteo == null) {
 				relQsoConteo = new RelQsoConteo();
+			}
 			relQsoConteo.setComplete(qsoComplete);
 			relQsoConteo.setConteo(conteo);
 			relQsoConteo.setContestQso(qso);
@@ -131,8 +133,9 @@ public class EvaluateServiceImpl implements IEvaluateService {
 				continue;
 			
 			List<RelQsoConteoQsoError> exsist = relQsoConteoQsoErrorRepository.findByRelQsoConteo(relQsoConteo);
-			if(!exsist.isEmpty())
+			if(!exsist.isEmpty()) {
 				relQsoConteoQsoErrorRepository.deleteAll(exsist);
+			}
 			
 			List<RelQsoConteoQsoError> relQsoConteoQsoErrorList = new ArrayList<>();
 			for (CatQsoError x : resEvaluation) {
