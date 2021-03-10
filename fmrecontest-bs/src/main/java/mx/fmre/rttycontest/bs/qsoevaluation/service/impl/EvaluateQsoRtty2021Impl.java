@@ -110,7 +110,7 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 		DxccEntity contestLogDxccEntity = null;
 		if (contestLog.getDxccEntity() != null) {
 			Long contestLogDxccEntityId = contestLog.getDxccEntity().getId();
-			contestLogDxccEntity = dxccEntityRepository.findById(contestLogDxccEntityId).orElse(null);
+			contestLogDxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(contestLogDxccEntityId);
 		}
 		
 		if(contestLogDxccEntity != null && contestLogDxccEntity.equals(this.mexicoDxccEntity)) {
@@ -135,30 +135,19 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 
 	@Override
 	public Integer getPoints(ContestLog contestLog, ContestQso qso) {
-		DxccEntity dxccEntityHome = null;
-		if (contestLog.getDxccEntity() != null) {
-			Long dxccEntityHomeId = contestLog.getDxccEntity().getId();
-			if (dxccEntityHomeId == null)
-				return null;
-			dxccEntityHome = dxccEntityRepository.findById(dxccEntityHomeId).orElse(null);
-		}
+		DxccEntity dxccEntityHome = contestLog.getDxccEntity();
+		
 		if(dxccEntityHome == null)
 			return null;
 		
-		Long dxccEntityCalledId = null;
-		if (qso.getDxccEntity() != null)
-			dxccEntityCalledId = qso.getDxccEntity().getId();
+		DxccEntity dxccEntityCalled = null;
+		if (qso.getDxccEntity() != null) {
+		    dxccEntityCalled = qso.getDxccEntity();
+		}
 		
-		if(dxccEntityCalledId == null)
+		if(dxccEntityCalled == null) {
 			return null;
-		DxccEntity dxccEntityCalled = dxccEntityRepository.findById(dxccEntityCalledId).orElse(null);
-		
-		if(dxccEntityCalled == null)
-			return null;
-		
-		CatBand qsoBand = qso.getBand();
-		if(qsoBand == null)
-			return null;
+		}
 		
 		boolean CALLER_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityHome);
 		boolean CALLED_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityCalled);

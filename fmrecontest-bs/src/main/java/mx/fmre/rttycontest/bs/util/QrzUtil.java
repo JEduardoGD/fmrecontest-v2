@@ -2,6 +2,7 @@ package mx.fmre.rttycontest.bs.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -82,24 +83,29 @@ public class QrzUtil {
 	
 	public static DxccEntity parse(CallsignDAO callsignDAO) {
 		DxccEntity dxccEntity = new DxccEntity();
-		dxccEntity.setId(callsignDAO.getDxcc());
+		//dxccEntity.setId(callsignDAO.getDxcc());
+		dxccEntity.setId(null);
+		dxccEntity.setEntityCode(callsignDAO.getDxcc());
 		dxccEntity.setEntity(callsignDAO.getCountry());
 		dxccEntity.setCont(callsignDAO.getCont());
 		dxccEntity.setItu(callsignDAO.getItuzone());
 		dxccEntity.setCq(callsignDAO.getCqzone());
+		dxccEntity.setUpdatedAt(new Date());
 		return dxccEntity;
 	}
     
     public static DxccEntity parse(DxccentityModelDAO dxccentityModelDAO) {
         DxccEntity dxccEntity = new DxccEntity();
-        dxccEntity.setId((long)dxccentityModelDAO.getDxcc());
+        dxccEntity.setId(null);
+        dxccEntity.setEntityCode((long)dxccentityModelDAO.getDxcc());
         dxccEntity.setEntity(dxccentityModelDAO.getName());
         dxccEntity.setCont(dxccentityModelDAO.getContinent());
         dxccEntity.setItu(dxccentityModelDAO.getItuzone());
         dxccEntity.setCq(dxccentityModelDAO.getCqzone());
+        dxccEntity.setUpdatedAt(new Date());
         return dxccEntity;
     }
-	
+
 	public static DxccSession parse(QrzSessionDAO qrzSessionDAO) {
 		DxccSession dxccSession = new DxccSession();
 		dxccSession.setKey(qrzSessionDAO.getKey());
@@ -108,6 +114,7 @@ public class QrzUtil {
 		dxccSession.setGmTime(qrzSessionDAO.getGmTime());
 		dxccSession.setRemark(qrzSessionDAO.getRemark());
 		dxccSession.setError(qrzSessionDAO.getError());
+        dxccSession.setError(qrzSessionDAO.getError());
 		return dxccSession;
 	}
 	

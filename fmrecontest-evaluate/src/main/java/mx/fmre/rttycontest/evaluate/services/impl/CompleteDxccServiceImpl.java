@@ -9,11 +9,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.externaldxccservice.ExternalDxccServiceImpl;
+import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
 import mx.fmre.rttycontest.bs.frequency.service.IFrequencyBsService;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
@@ -42,9 +41,9 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Autowired private IContestLogRepository           contestLogRepository;
 	@Autowired private IContestQsoRepository           contestQsoRepository;
 	@Autowired private IDxccEntityRepository           dxccEntityRepository;
-	@Autowired private ApplicationContext              appContext;
 	@Autowired private ILastEmailRepository            lastEmailRepository;
 	@Autowired private IFrequencyBsService             frequencyService;
+	@Autowired private ExternalDxccService             externalDxccService;
 	
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
@@ -59,14 +58,18 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 					.map(LastEmail::getEmailId)
 					.collect(Collectors.toList());
 			
+			@SuppressWarnings("unused")
+            LastEmail e430 =lastEmails.stream().filter(e-> e.getEmailId() == 1430).findFirst().get();
+			
 			Map<String, DxccEntity> map = this.fillDxccMap(edition);
 			
-			List<Email> emails = emailRepository.getAllWithLogfileByEditionWithoutDxcc(edition);
+//			List<Email> emails = emailRepository.getAllWithLogfileByEditionWithoutDxcc(edition);
+			List<Email> emails = emailRepository.specialQuery(edition);
 			List<Email> filtered = emails
 					.stream()
 					.filter(e -> lastEmailIdsList.contains(e.getId()))
 					.collect(Collectors.toList());
-
+			
 			Date startDate = new Date();
 			int current = 1;
 			
@@ -120,7 +123,10 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 					.collect(Collectors.toList());
 			for(ContestLog contestLog: filteredLogs) {
 				try {
-					DxccEntity dxccEntity = this.getDxccOf(map, contestLog.getCallsign(), edition);
+                    DxccEntity dxccEntity = null;
+                    if (null != contestLog.getCallsign() && !"".equals(contestLog.getCallsign())) {
+                        dxccEntity = this.getDxccOf(map, contestLog.getCallsign(), edition);
+                    }
 					if(dxccEntity != null) {
 						contestLog.setDxccEntity(dxccEntity);
 						contestLog.setDxccNotFound(false);
@@ -157,16 +163,9 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 			return dxccEntity;
 		}
 		
-		// 2nd attempt, from de db, others saved
-		List<DxccEntity> dxccEntities = dxccEntityRepository.getByCallsignOnEdition(callsign, edition);
-		if(!dxccEntities.isEmpty()) {
-			log.info("{} from db, others saved", callsign);
-			dxccEntity = dxccEntities.get(0);
-			map.put(callsign, dxccEntity);
-			return dxccEntity;
-		}
+		// 2nd and 3rd atempts, from external services
+		dxccEntity = externalDxccService.getDxccFromExternalServicesByCallsign(callsign);
 		
-		dxccEntity = ExternalDxccServiceImpl.getDxccFromExternalServicesByCallsign(appContext, dxccEntityRepository, callsign);
 		if(dxccEntity != null) {
 			log.info("{} from external Services", callsign);
 			map.put(callsign, dxccEntity);
