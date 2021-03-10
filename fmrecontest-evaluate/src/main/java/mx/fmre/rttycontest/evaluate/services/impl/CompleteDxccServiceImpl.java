@@ -99,7 +99,6 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 				log.info("{} de {}; time remaining: {}", current, filtered.size(),
 						DateTimeUtil.timeRemaining(startDate, current++, filtered.size()));
 			}
-			System.out.println();
 		}
 	}
 
