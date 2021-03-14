@@ -10,4 +10,6 @@ public interface ICsvReportsService {
 	public byte[] generateLogReport(int conteoId, long logId);
 	public byte[] getCallsignWithoutDxccEntityReport(int editionId);
 	public List<String> getUniques(int editionId) throws FmreContestException;
+    byte[] getCallersByEntity(int editionId) throws FmreContestException;
+    byte[] getCalledByEntity(int editionId) throws FmreContestException;
 }

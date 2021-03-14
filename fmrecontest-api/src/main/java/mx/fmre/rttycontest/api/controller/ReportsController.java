@@ -107,4 +107,50 @@ public class ReportsController extends BaseController {
 			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+    
+    @GetMapping("/getCallersByEntity/{editionId}")
+    public ResponseEntity<ByteArrayResource> getCallersByEntity(
+            @PathVariable("editionId") Integer editionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        byte[] bytesrray;
+        try {
+            bytesrray = csvReportsService.getCallersByEntity(editionId);
+            ByteArrayResource resource = new ByteArrayResource(bytesrray);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(bytesrray.length)
+                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .body(resource);
+        } catch (FmreContestException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    @GetMapping("/getCalledByEntity/{editionId}")
+    public ResponseEntity<ByteArrayResource> getCalledByEntity(
+            @PathVariable("editionId") Integer editionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        byte[] bytesrray;
+        try {
+            bytesrray = csvReportsService.getCalledByEntity(editionId);
+            ByteArrayResource resource = new ByteArrayResource(bytesrray);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(bytesrray.length)
+                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .body(resource);
+        } catch (FmreContestException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

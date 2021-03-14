@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -305,4 +306,99 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
 				.collect(Collectors.toList());
 		
 	}
+    
+    @Override
+    public byte[] getCallersByEntity(int editionId) throws FmreContestException {
+        List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(editionId);
+        Edition edition = editionRepository.findById(editionId).orElse(null);
+        List<Email> emails = emailRepository.findByEdition(edition);
+
+        List<Integer> lastEmailsIdList = lastEmails.stream()
+                .map(e -> e.getEmailId())
+                .collect(Collectors.toList());
+
+        List<Email> filteredEmails = emails.stream()
+                .filter(e -> lastEmailsIdList.contains(e.getId()))
+                .collect(Collectors.toList());
+
+        List<ContestLog> logs = filteredEmails.stream()
+                .map(email -> contestLogRepository.findByEmail(email))
+                .collect(Collectors.toList());
+        
+        Map<DxccEntity, Integer> counting = new HashMap<>();
+
+        for (ContestLog log : logs) {
+            if (log.getDxccEntity() == null) {
+                continue;
+            }
+            
+            DxccEntity dxccEntity = log.getDxccEntity();
+            if (counting.containsKey(dxccEntity)) {
+                counting.put(dxccEntity, counting.get(dxccEntity) + 1);
+            } else {
+                counting.put(dxccEntity, 1);
+            }
+        }
+
+        String[] header = { "DXCC ENTIY", "DXCC ENTITY NAME", "COUNT"};
+        List<String[]> listStringsContent = new ArrayList<>();
+        for ( Entry<DxccEntity, Integer> entry : counting.entrySet()) {
+            listStringsContent.add(new String[] { entry.getKey().getEntityCode().toString(), entry.getKey().getEntity(), entry.getValue() + "" });
+        }
+
+        return CsvUtil.createCsvByteArray(header, listStringsContent);
+
+    }
+    
+    @Override
+    public byte[] getCalledByEntity(int editionId) throws FmreContestException {
+        List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(editionId);
+        Edition edition = editionRepository.findById(editionId).orElse(null);
+        List<Email> emails = emailRepository.findByEdition(edition);
+
+        List<Integer> lastEmailsIdList = lastEmails.stream()
+                .map(e -> e.getEmailId())
+                .collect(Collectors.toList());
+
+        List<Email> filteredEmails = emails.stream()
+                .filter(e -> lastEmailsIdList.contains(e.getId()))
+                .collect(Collectors.toList());
+
+        List<ContestLog> logs = filteredEmails.stream()
+                .map(email -> contestLogRepository.findByEmail(email))
+                .collect(Collectors.toList());
+        
+        Map<DxccEntity, Integer> counting = new HashMap<>();
+
+        for (ContestLog log : logs) {
+            if (log.getDxccEntity() == null) {
+                continue;
+            }
+
+            List<ContestQso> qsos = contestQsoRepository
+                    .findByContestLog(log)
+                    .stream()
+                    .filter(qso -> qso.getError() == null || qso.getError() == Boolean.FALSE)
+                    .filter(qso -> qso.getDxccEntity() != null)
+                    .collect(Collectors.toList());
+            
+            for (ContestQso qso : qsos) {
+                DxccEntity dxccEntity = qso.getDxccEntity();
+                if (counting.containsKey(dxccEntity)) {
+                    counting.put(dxccEntity, counting.get(dxccEntity) + 1);
+                } else {
+                    counting.put(dxccEntity, 1);
+                }
+            }
+        }
+
+        String[] header = { "DXCC ENTIY", "DXCC ENTITY NAME", "COUNT"};
+        List<String[]> listStringsContent = new ArrayList<>();
+        for ( Entry<DxccEntity, Integer> entry : counting.entrySet()) {
+            listStringsContent.add(new String[] { entry.getKey().getEntityCode().toString(), entry.getKey().getEntity(), entry.getValue() + "" });
+        }
+
+        return CsvUtil.createCsvByteArray(header, listStringsContent);
+
+    }
 }
