@@ -43,8 +43,7 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
         try {
             url = String.format(QRZ_URL + "?s=%s;dxcc=%s", session.getKey(), URLEncoder.encode(callsign, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new FmreContestException(e);
         }
         if (url == null) {
             return null;

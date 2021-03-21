@@ -94,4 +94,11 @@ public class EmailServiceImpl implements IEmailService {
 		}).collect(Collectors.toList());
 		return listEmailDTO;
 	}
+
+    @Override
+    public List<Email> getEmailsWithErrores(Integer editionId) throws FmreContestException {
+        Edition edition = editionRepository.findById(editionId).orElse(null);
+        
+        return emailRepository.getEmailsWithErroresByEditionId(edition.getId());
+    }
 }
