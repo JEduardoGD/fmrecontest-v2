@@ -10,5 +10,9 @@ public class FmreContestException extends Exception {
 	public FmreContestException(String message) {
 		super(message);
 	}
+    
+    public FmreContestException(Throwable e) {
+        super(e);
+    }
 
 }

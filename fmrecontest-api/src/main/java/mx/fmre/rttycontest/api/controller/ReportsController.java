@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,15 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.api.common.BaseController;
-import mx.fmre.rttycontest.api.common.StdResponse;
 import mx.fmre.rttycontest.bs.reports.service.ICsvReportsService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 
 @RestController
 @RequestMapping("/reports")
-@Slf4j
 public class ReportsController extends BaseController {
 
 	/**
@@ -94,19 +90,6 @@ public class ReportsController extends BaseController {
 	            .contentType(MediaType.parseMediaType("application/octet-stream"))
 	            .body(resource);
 	}
-	
-	@GetMapping("/trace/{editionId}")
-	public ResponseEntity<StdResponse> trace(
-			@PathVariable("editionId") Integer editionId) {
-		try {
-			getResponseServiceVo().setData(csvReportsService.getUniques(editionId));
-			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.OK);
-		} catch (FmreContestException e) {
-			log.error("{}", e.getLocalizedMessage());
-			getResponseServiceVo().setMessageResponse(e.getLocalizedMessage());
-			return new ResponseEntity<StdResponse>(getResponseServiceVo(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
     
     @GetMapping("/getCallersByEntity/{editionId}")
     public ResponseEntity<ByteArrayResource> getCallersByEntity(
@@ -141,6 +124,29 @@ public class ReportsController extends BaseController {
         byte[] bytesrray;
         try {
             bytesrray = csvReportsService.getCalledByEntity(editionId);
+            ByteArrayResource resource = new ByteArrayResource(bytesrray);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(bytesrray.length)
+                    .contentType(MediaType.parseMediaType("application/octet-stream"))
+                    .body(resource);
+        } catch (FmreContestException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    @GetMapping("/emailswitherrors/{editionId}")
+    public ResponseEntity<ByteArrayResource> emailsWithErrors(
+            @PathVariable("editionId") Integer editionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        byte[] bytesrray;
+        try {
+            bytesrray = csvReportsService.getEmailsWithErrors(editionId);
             ByteArrayResource resource = new ByteArrayResource(bytesrray);
             return ResponseEntity.ok()
                     .headers(headers)
