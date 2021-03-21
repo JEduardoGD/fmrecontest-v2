@@ -10,4 +10,6 @@ import mx.fmre.rttycontest.persistence.model.LastEmail;
 @Repository
 public interface ILastEmailRepository extends JpaRepository<LastEmail, Integer> {
 	public List<LastEmail>findByEditionId(Integer editionId);
+	
+	public List<LastEmail>findByEmailSubjectAndEditionId(String subject, Integer editionId);
 }

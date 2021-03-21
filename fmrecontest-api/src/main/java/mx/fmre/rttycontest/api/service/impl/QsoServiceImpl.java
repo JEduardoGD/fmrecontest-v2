@@ -71,7 +71,7 @@ public class QsoServiceImpl implements IQsoServie {
 				Integer qsoBandId = x.getBand().getId();
 				qsoBand = listBands
 						.stream()
-						.filter(y -> y.getId() == qsoBandId)
+						.filter(y -> y.getId().equals(qsoBandId))
 						.findFirst()
 						.orElse(null);
 			}
@@ -108,7 +108,7 @@ public class QsoServiceImpl implements IQsoServie {
 			Integer qsoBandId = contestQso.getBand().getId();
 			qsoBand = listBands
 					.stream()
-					.filter(y -> y.getId() == qsoBandId)
+					.filter(y -> y.getId().equals(qsoBandId))
 					.findFirst()
 					.orElse(null);
 		}

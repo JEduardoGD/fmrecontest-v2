@@ -69,7 +69,7 @@ public final class ResultReportsUtil {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 					return (StaticValues.HIGH_POWER.equalsIgnoreCase(contestLog.getCategoryPower()) &&
-							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
+							contestLog.getDxccEntity().getEntityCode().equals(mexicoDxccEntity.getEntityCode()));
 					})
 				.collect(Collectors.toList());
 		
@@ -96,7 +96,7 @@ public final class ResultReportsUtil {
 					Long contestLogId = rcc.getContestLog().getId();
 					ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 					return ((null == contestLog.getCategoryPower() || StaticValues.LOW_POWER.equalsIgnoreCase(contestLog.getCategoryPower())) &&
-							contestLog.getDxccEntity().getId().longValue() == mexicoDxccEntity.getId().longValue());
+							contestLog.getDxccEntity().getEntityCode().equals(mexicoDxccEntity.getEntityCode()));
 					})
 				.collect(Collectors.toList());
 		
@@ -147,11 +147,17 @@ public final class ResultReportsUtil {
 				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
 				.collect(Collectors.toList());
 		
-		List<DxccEntity> distinctDxccEntity = contestLogList
-				.stream()
-				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity))
-				.map(ContestLog::getDxccEntity)
-				.collect(Collectors.toList());
+        List<Long> repeatedDxccEntityCodes = contestLogList.stream()
+                .map(ContestLog::getDxccEntity)
+                .map(DxccEntity::getEntityCode)
+                .collect(Collectors.toList());
+
+        List<Long> dxccEntityCodes = new ArrayList<>();
+        for (Long r : repeatedDxccEntityCodes) {
+            if (!dxccEntityCodes.contains(r)) {
+                dxccEntityCodes.add(r);
+            }
+        }
 		
 		//filter low power
 		List<RelConteoContestLog> highPowerListRelConteoContestLog = listRelConteoContestLog
@@ -169,7 +175,7 @@ public final class ResultReportsUtil {
 		
 		List<RelConteoContestLog> ordered = new ArrayList<>();
 		
-		for (DxccEntity dxccEntity : distinctDxccEntity) {
+		for (Long dxccEntity : dxccEntityCodes) {
 			List<RelConteoContestLog> rccByDxccEntity = highPowerListRelConteoContestLog
 					.stream()
 					.filter(rcc -> {
@@ -179,7 +185,7 @@ public final class ResultReportsUtil {
 								.filter(cl -> cl.getId().longValue() == contestLogId)
 								.findFirst()
 								.orElse(null);
-						return contestLog.getDxccEntity().getId().longValue() == dxccEntity.getId().longValue();
+						return contestLog.getDxccEntity().getEntityCode().equals(dxccEntity);
 					})
 					.collect(Collectors.toList());
 					
