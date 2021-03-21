@@ -115,6 +115,51 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 	        + "EMAIL.S_RECIPIENTS_FROM_ADDRESS, EMAIL.D_RECEIVED_DATE, EMAIL.S_RECIPIENTS_TO, EMAIL.D_SENT_DATE, "
 	        + "EMAIL.S_SUBJECT, EMAIL.N_ID_EMAIL_STATUS, EMAIL.VERIFIED_AT, EMAIL.ANSWERED_AT; ", nativeQuery = true )
     public List<Email> specialQuery(@Param("edition") Edition edition);
+    
+    /**
+     * Obtener los emails que tienen errores
+     * 
+     * @param edition
+     * @return email
+     */
+    @Query(value = "" +
+            "SELECT " +
+            "   te.N_ID_EMAIL, " +
+            "   te.N_EMAIL_COUNT, " +
+            "   te.N_ID_EDITION, " +
+            "   te.S_RECIPIENTS_FROM_NAME, " +
+            "   te.S_RECIPIENTS_FROM_ADDRESS, " +
+            "   te.D_RECEIVED_DATE, " +
+            "   te.S_RECIPIENTS_TO, " +
+            "   te.D_SENT_DATE, " +
+            "   te.S_SUBJECT, " +
+            "   te.N_ID_EMAIL_STATUS, " +
+            "   te.VERIFIED_AT, " +
+            "   te.ANSWERED_AT " +
+            "FROM " +
+            "   TBL_EMAIL te " +
+            "INNER JOIN REL_EMAIL_EMAIL_ERROR REEE ON " +
+            "   REEE.N_ID_EMAIL = te.N_ID_EMAIL " +
+            "LEFT JOIN V_LAST_EMAIL V ON " +
+            "   V.EMAIL_SUBJECT = te.S_SUBJECT " +
+            "WHERE " +
+            "   N_ID_EDITION = 2 " +
+            "   and V.EMAIL_SUBJECT is null " +
+            "   and te.N_ID_EDITION = :N_ID_EDITION " +
+            "GROUP BY " +
+            "   te.N_ID_EMAIL, " +
+            "   te.N_EMAIL_COUNT, " +
+            "   te.N_ID_EDITION, " +
+            "   te.S_RECIPIENTS_FROM_NAME, " +
+            "   te.S_RECIPIENTS_FROM_ADDRESS, " +
+            "   te.D_RECEIVED_DATE, " +
+            "   te.S_RECIPIENTS_TO, " +
+            "   te.D_SENT_DATE, " +
+            "   te.S_SUBJECT, " +
+            "   te.N_ID_EMAIL_STATUS, " +
+            "   te.VERIFIED_AT, " +
+            "   te.ANSWERED_AT ", nativeQuery = true )
+    public List<Email> getEmailsWithErroresByEditionId(@Param("N_ID_EDITION") long editionId);
 }
 
 

@@ -7,12 +7,15 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
 import mx.fmre.rttycontest.bs.reports.service.IResultsReports;
-import mx.fmre.rttycontest.bs.util.CollectiosUtil;
 import mx.fmre.rttycontest.bs.util.ResultReportsUtil;
 import mx.fmre.rttycontest.bs.util.csv.CsvUtil;
+import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
@@ -22,31 +25,35 @@ import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
 import mx.fmre.rttycontest.persistence.repository.EmailEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
-import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
 
 @Service
+@Slf4j
 public class ResultsReportsImpl implements IResultsReports {
 
-	@Autowired
-	private IConteoRepository conteoRepository;
-	@Autowired
-	private IContestLogRepository contestLogRepository;
-	@Autowired
-	private IRelConteoContestLogRepository relConteoContestLogRepository;
-	@Autowired
-	private ILastEmailRepository lastEmailRepository;
-	@Autowired
-	private EmailEmailErrorRepository emailEmailErrorRepository;
-	@Autowired
-	private IDxccEntityRepository dxccEntityRepository;
+	@Autowired private IConteoRepository conteoRepository;
+	@Autowired private IContestLogRepository contestLogRepository;
+	@Autowired private IRelConteoContestLogRepository relConteoContestLogRepository;
+	@Autowired private ILastEmailRepository lastEmailRepository;
+	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
+    @Autowired private ExternalDxccService      externalDxccService;
 
 	private DxccEntity mexicoDxccEntity;
+    
+    @Value("${FMRE_CALLSIGN}")
+    private String fmreCallsign;
 
 	@PostConstruct
 	private void init() {
-		this.mexicoDxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(50l);
+        try {
+            mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByEntityName("mexico");
+            if (mexicoDxccEntity == null) {
+                mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByCallsign(fmreCallsign);
+            }
+        } catch (FmreContestException e) {
+            log.error(e.getLocalizedMessage());
+        }
 	}
 
 	@Override
@@ -78,9 +85,11 @@ public class ResultsReportsImpl implements IResultsReports {
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 			String[] content = { contestLog.getId() + "", contestLog.getCallsign(),
-					contestLog.getDxccEntity().getId() + "",
+					contestLog.getDxccEntity().getEntityCode() + "",
 					contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
 					contestLog.getCategoryPower(), q.getTotalPoints() + "", place + "" };
+			
+			
 
 			listStringsContent.add(content);
 
@@ -120,7 +129,7 @@ public class ResultsReportsImpl implements IResultsReports {
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 			String[] content = { contestLog.getId() + "", contestLog.getCallsign(),
-					contestLog.getDxccEntity().getId() + "",
+					contestLog.getDxccEntity().getEntityCode() + "",
 					contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
 					contestLog.getCategoryPower(), q.getTotalPoints() + "", place + "" };
 
@@ -161,7 +170,7 @@ public class ResultsReportsImpl implements IResultsReports {
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 			String[] content = { contestLog.getId() + "", contestLog.getCallsign(),
-					contestLog.getDxccEntity().getId() + "",
+					contestLog.getDxccEntity().getEntityCode() + "",
 					contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
 					contestLog.getCategoryPower(), q.getTotalPoints() + "", place + "" };
 
@@ -201,7 +210,7 @@ public class ResultsReportsImpl implements IResultsReports {
 			Long contestLogId = q.getContestLog().getId();
 			ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 			String[] content = { contestLog.getId() + "", contestLog.getCallsign(),
-					contestLog.getDxccEntity().getId() + "",
+					contestLog.getDxccEntity().getEntityCode() + "",
 					contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
 					contestLog.getCategoryPower(), q.getTotalPoints() + "", place + "" };
 
@@ -221,15 +230,23 @@ public class ResultsReportsImpl implements IResultsReports {
 				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
 				.collect(Collectors.toList());
 
-		List<DxccEntity> distinctDxccEntity = contestLogList.stream()
-				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity)).map(ContestLog::getDxccEntity)
-				.collect(Collectors.toList());
-
 		List<RelConteoContestLog> lowPowerListRelConteoContestLog = ResultReportsUtil
 				.filterLowPowerByCountry(listRelConteoContestLog, contestLogRepository, mexicoDxccEntity);
+        
+        List<Long> repeatedDxccEntityCodes = contestLogList.stream()
+                .map(ContestLog::getDxccEntity)
+                .map(DxccEntity::getEntityCode)
+                .collect(Collectors.toList());
+
+        List<Long> dxccEntityCodes = new ArrayList<>();
+        for (Long r : repeatedDxccEntityCodes) {
+            if (!dxccEntityCodes.contains(r)) {
+                dxccEntityCodes.add(r);
+            }
+        }
 
 		List<String[]> listStringsContent = this.createListByCountry(contestLogList,
-				lowPowerListRelConteoContestLog, distinctDxccEntity);
+				lowPowerListRelConteoContestLog, dxccEntityCodes);
 
 		String[] header = { "id", "callsign", "dxcc_country", "state", "power", "total_points", "place" };
 
@@ -247,13 +264,20 @@ public class ResultsReportsImpl implements IResultsReports {
 		List<RelConteoContestLog> highPowerListRelConteoContestLog = ResultReportsUtil.filterHighPowerByCountry(listRelConteoContestLog,
 				contestLogRepository, mexicoDxccEntity);
 
+        List<Long> repeatedDxccEntityCodes = contestLogList.stream()
+                .map(ContestLog::getDxccEntity)
+                .map(DxccEntity::getEntityCode)
+                .collect(Collectors.toList());
 
-		List<DxccEntity> distinctDxccEntity = contestLogList.stream()
-				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity)).map(ContestLog::getDxccEntity)
-				.collect(Collectors.toList());
+        List<Long> dxccEntityCodes = new ArrayList<>();
+        for (Long r : repeatedDxccEntityCodes) {
+            if (!dxccEntityCodes.contains(r)) {
+                dxccEntityCodes.add(r);
+            }
+        }
 		
 		List<String[]> listStringsContent = this.createListByCountry(contestLogList,
-				highPowerListRelConteoContestLog, distinctDxccEntity);
+				highPowerListRelConteoContestLog, dxccEntityCodes);
 
 		String[] header = { "id", "callsign", "dxcc_country", "state", "power", "total_points", "place" };
 
@@ -261,16 +285,16 @@ public class ResultsReportsImpl implements IResultsReports {
 	}
 
 	private List<String[]> createListByCountry(List<ContestLog> contestLogList,
-			List<RelConteoContestLog> highPowerListRelConteoContestLog, List<DxccEntity> distinctDxccEntity) {
+			List<RelConteoContestLog> highPowerListRelConteoContestLog, List<Long> dxccEntityCodes) {
 
 		List<String[]> listStringsContent = new ArrayList<>();
 
-		for (DxccEntity dxccEntity : distinctDxccEntity) {
+		for (Long dxccEntity : dxccEntityCodes) {
 			List<RelConteoContestLog> rccByDxccEntity = highPowerListRelConteoContestLog.stream().filter(rcc -> {
 				long contestLogId = rcc.getContestLog().getId().longValue();
 				ContestLog contestLog = contestLogList.stream().filter(cl -> cl.getId().longValue() == contestLogId)
 						.findFirst().orElse(null);
-				return contestLog.getDxccEntity().getId().longValue() == dxccEntity.getId().longValue();
+				return contestLog.getDxccEntity().getEntityCode().equals(dxccEntity);
 			}).collect(Collectors.toList());
 
 			if (rccByDxccEntity.isEmpty())
@@ -292,7 +316,7 @@ public class ResultsReportsImpl implements IResultsReports {
 				Long contestLogId = q.getContestLog().getId();
 				ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
 				String[] content = { contestLog.getId() + "", contestLog.getCallsign(),
-						contestLog.getDxccEntity().getId() + "",
+						contestLog.getDxccEntity().getEntityCode() + "",
 						contestLog.getAddressStateProvince() == null ? "" : contestLog.getAddressStateProvince(),
 						contestLog.getCategoryPower(), q.getTotalPoints() + "", place + "" };
 
@@ -344,13 +368,21 @@ public class ResultsReportsImpl implements IResultsReports {
 		List<ContestLog> contestLogList = listRelConteoContestLog.stream()
 				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
 				.collect(Collectors.toList());
+        
+        List<Long> repeatedDxccEntityCodes = contestLogList.stream()
+                .map(ContestLog::getDxccEntity)
+                .map(DxccEntity::getEntityCode)
+                .collect(Collectors.toList());
 
-		List<DxccEntity> distinctDxccEntity = contestLogList.stream()
-				.filter(CollectiosUtil.distinctByKey(ContestLog::getDxccEntity)).map(ContestLog::getDxccEntity)
-				.collect(Collectors.toList());
+        List<Long> dxccEntityCodes = new ArrayList<>();
+        for (Long r : repeatedDxccEntityCodes) {
+            if (!dxccEntityCodes.contains(r)) {
+                dxccEntityCodes.add(r);
+            }
+        }
 
 		ArrayList<String[]> allResults = new ArrayList<>();
-		int id = 202000001;
+		int id = 202100001;
 
 		{
 			List<RelConteoContestLog> highPowerListRelConteoContestLog = ResultReportsUtil
@@ -365,8 +397,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						/*r[4]*/ "HIGH", 
 						r[5], 
 						r[6], 
-						"2020", 
-						r[1] + "-" + "2020" };
+						"2021", 
+						r[1] + "-" + "2021" };
 				allResults.add(l);
 			}
 		}
@@ -383,8 +415,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						/*r[3]*/   null, 
 						/*r[4]*/   "LOW", 
 						r[5], 
-						r[6], "2020", 
-						r[1] + "-" + "2020" };
+						r[6], "2021", 
+						r[1] + "-" + "2021" };
 				allResults.add(l);
 			}
 		}
@@ -401,8 +433,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						r[3], 
 						/*r[4]*/   "HIGH", 
 						r[5], 
-						r[6], "2020", 
-						r[1] + "-" + "2020" };
+						r[6], "2021", 
+						r[1] + "-" + "2021" };
 				allResults.add(l);
 			}
 		}
@@ -419,8 +451,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						r[3], 
 						/*r[4]*/   "LOW", 
 						r[5], 
-						r[6], "2020", 
-						r[1] + "-" + "2020" };
+						r[6], "2021", 
+						r[1] + "-" + "2021" };
 				allResults.add(l);
 			}
 		}
@@ -428,7 +460,7 @@ public class ResultsReportsImpl implements IResultsReports {
 		{
 			List<RelConteoContestLog> highPowerListRelConteoContestLog = ResultReportsUtil
 					.filterHighPowerByCountry(listRelConteoContestLog, contestLogRepository, mexicoDxccEntity);
-			List<String[]> listStringsContent = this.createListByCountry(contestLogList, highPowerListRelConteoContestLog, distinctDxccEntity);
+			List<String[]> listStringsContent = this.createListByCountry(contestLogList, highPowerListRelConteoContestLog, dxccEntityCodes);
 			for (String[] r : listStringsContent) {
 				String[] l = { 
 						id++ + "", 
@@ -437,8 +469,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						null, 
 						/*r[4]*/   "HIGH", 
 						r[5], 
-						r[6], "2020", 
-						r[1] + "-" + "2020" };
+						r[6], "2021", 
+						r[1] + "-" + "2021" };
 				allResults.add(l);
 			}
 		}
@@ -446,7 +478,7 @@ public class ResultsReportsImpl implements IResultsReports {
 		{
 			List<RelConteoContestLog> lowPowerListRelConteoContestLog = ResultReportsUtil
 					.filterLowPowerByCountry(listRelConteoContestLog, contestLogRepository, mexicoDxccEntity);
-			List<String[]> listStringsContent = this.createListByCountry(contestLogList, lowPowerListRelConteoContestLog, distinctDxccEntity);
+			List<String[]> listStringsContent = this.createListByCountry(contestLogList, lowPowerListRelConteoContestLog, dxccEntityCodes);
 			for (String[] r : listStringsContent) {
 				String[] l = { 
 						id++ + "", 
@@ -455,8 +487,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						null, 
 						/*r[4]*/   "LOW", 
 						r[5], 
-						r[6], "2020", 
-						r[1] + "-" + "2020" };
+						r[6], "2021", 
+						r[1] + "-" + "2021" };
 				allResults.add(l);
 			}
 		}

@@ -58,12 +58,8 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 					.map(LastEmail::getEmailId)
 					.collect(Collectors.toList());
 			
-			@SuppressWarnings("unused")
-            LastEmail e430 =lastEmails.stream().filter(e-> e.getEmailId() == 1430).findFirst().get();
-			
 			Map<String, DxccEntity> map = this.fillDxccMap(edition);
 			
-//			List<Email> emails = emailRepository.getAllWithLogfileByEditionWithoutDxcc(edition);
 			List<Email> emails = emailRepository.specialQuery(edition);
 			List<Email> filtered = emails
 					.stream()
