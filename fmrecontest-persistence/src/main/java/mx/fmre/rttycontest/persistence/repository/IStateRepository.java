@@ -9,5 +9,5 @@ import mx.fmre.rttycontest.persistence.model.State;
 
 @Repository
 public interface IStateRepository extends JpaRepository<State, Long> {
-    public List<State> findByNombre(String nombre);
+    public List<State> findByGridLocatorEntity(String gridLocatorEntity);
 }

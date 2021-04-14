@@ -172,14 +172,13 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 	    Location originLocation;
         if (gridLocator != null) {
             originLocation = gridLocatorService.getLocationOf(gridLocator);
+            if(originLocation == null) {
+                return null;
+            }
             String region = originLocation.getRegion();
-            if (region != null) {
-                String[] arr = region.split("\\/");
-                List<State> location;
-                location = stateRepository.findByNombre(arr[1]);
-                if(location!=null && !location.isEmpty()) {
-                    return location.get(0);
-                }
+            List<State> locations = stateRepository.findByGridLocatorEntity(region);
+            if(locations!=null && !locations.isEmpty()) {
+                return locations.get(0);
             }
         }
         return null;

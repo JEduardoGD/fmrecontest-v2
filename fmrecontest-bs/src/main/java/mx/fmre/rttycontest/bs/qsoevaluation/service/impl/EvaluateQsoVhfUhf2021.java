@@ -23,15 +23,14 @@ import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
-@Service("evaluateQsoRtty2021")
-public class evaluateQsoVhfUhf2021 implements IEvaluateQso {
+@Service("evaluateQsoVhfUhf2021")
+public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 	
 	@Autowired private IDxccEntityRepository       dxccEntityRepository;
 	@Autowired private IRelQsoConteoRepository     relQsoConteoRepository;
 	@Autowired private ICatBandRepository          catBandRepository;
 	
 	private DxccEntity mexicoDxccEntity;
-	private List<String> prohibitedWarcBands;
 	private List<String> frequencyBandsAllowed;
 	
 	@PostConstruct private void fillMexicoDxccEntity() {
@@ -69,12 +68,6 @@ public class evaluateQsoVhfUhf2021 implements IEvaluateQso {
 				.filter(e -> "QSO_OUT_OF_BAND".equals(e.getKey()))
 				.findFirst().orElse(null);
 		
-		CatQsoError error_QSO_ON_WARC_BAND = qsoErrors
-				.stream()
-				.filter(e -> "QSO_ON_WARC_BAND".equals(e.getKey()))
-				.findFirst().orElse(null);
-
-		
 		if(calendarQso.before(calendarEditionStartDate)) {
 			listErrors.add(error_QSO_MADE_BEFORE_CONTEST_START);
 		}
@@ -92,13 +85,6 @@ public class evaluateQsoVhfUhf2021 implements IEvaluateQso {
 				listErrors.add(error_QSO_OUT_OF_BAND);
 			}
 		}
-		
-		if (qsoBand != null) {
-			if (prohibitedWarcBands.contains(qsoBand.getBand())) {
-				listErrors.add(error_QSO_ON_WARC_BAND);
-			}
-		}
-		
 		
 		return listErrors;
 	}

@@ -30,6 +30,9 @@ public class State {
     @Column(name = "S_STATE")
     private String nombre;
 
+    @Column(name = "S_GRID_LOCATOR_ENTITY")
+    private String gridLocatorEntity;
+
     // bi-directional many-to-one association to Contestqso
     @OneToMany(mappedBy = "originState", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ContestQso> contestQsosOrigin;
