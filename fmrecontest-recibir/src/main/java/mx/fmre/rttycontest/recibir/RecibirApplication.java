@@ -25,7 +25,8 @@ import mx.fmre.rttycontest.recibir.services.IVerifierService;
 	"mx.fmre.rttycontest.recibir.business.impl", 
 	"mx.fmre.rttycontest.bs.parsers.rtty2020",
 	"mx.fmre.rttycontest.bs.services",
-	"mx.fmre.rttycontest.bs.dxcc.service"})
+	"mx.fmre.rttycontest.bs.dxcc.service",
+	"mx.fmre.rttycontest.bs.location.service"})
 
 @Slf4j
 public class RecibirApplication {
