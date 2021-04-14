@@ -15,5 +15,5 @@ public class OthersLogs implements Serializable {
 	private Date dateOfSend;
 	private String sDateOfSend;
 	private int noQsos;
-	private boolean hasErrors;
+//	private boolean hasErrors;
 }

@@ -64,6 +64,12 @@ public class ContestQso implements Serializable {
 	@Column(name = "D_DXCC_NOT_FOUND")
 	@ToString.Exclude private Boolean dxccNotFound;
 
+    @Column(name = "S_ORIGIN_GRID_LOCATOR")
+    private String originGridLocator;
+
+    @Column(name = "S_DEST_GRID_LOCATOR")
+    private String destGridLocator;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST_LOG")
 	@ToString.Exclude private ContestLog contestLog;
@@ -82,6 +88,14 @@ public class ContestQso implements Serializable {
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "contestQso", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	@ToString.Exclude private List<RelQsoConteo> relQsoConteos;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "N_ID_STATE_ORIGIN")
+    @ToString.Exclude private State originState;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "N_ID_STATE_DEST")
+    @ToString.Exclude private State destState;
 
 	@Override
 	public boolean equals(Object obj) {

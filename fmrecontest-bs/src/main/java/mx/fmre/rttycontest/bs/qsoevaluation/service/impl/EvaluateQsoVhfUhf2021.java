@@ -23,23 +23,22 @@ import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
-@Service("evaluateQsoRtty2021")
-public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
+@Service("evaluateQsoVhfUhf2021")
+public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 	
 	@Autowired private IDxccEntityRepository       dxccEntityRepository;
 	@Autowired private IRelQsoConteoRepository     relQsoConteoRepository;
 	@Autowired private ICatBandRepository          catBandRepository;
 	
 	private DxccEntity mexicoDxccEntity;
-	private List<String> allowedMexicoEntities;
-	private String patternForNoMexicano = "^\\d+$";
-	private List<String> prohibitedWarcBands;
 	private List<String> frequencyBandsAllowed;
 	
 	@PostConstruct private void fillMexicoDxccEntity() {
 		this.mexicoDxccEntity = dxccEntityRepository
 				.findById(50l)
 				.orElse(null);
+		
+		frequencyBandsAllowed = Arrays.asList("6 meters", "2 meters", "70 centimeters");
 	}
 	
 	@Override
@@ -69,17 +68,6 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 				.filter(e -> "QSO_OUT_OF_BAND".equals(e.getKey()))
 				.findFirst().orElse(null);
 		
-		CatQsoError error_NOT_VALID_EXCHANGE_EMMITED = qsoErrors
-				.stream()
-				.filter(e -> "NOT_VALID_EXCHANGE_EMMITED".equals(e.getKey()))
-				.findFirst().orElse(null);
-		
-		CatQsoError error_QSO_ON_WARC_BAND = qsoErrors
-				.stream()
-				.filter(e -> "QSO_ON_WARC_BAND".equals(e.getKey()))
-				.findFirst().orElse(null);
-
-		
 		if(calendarQso.before(calendarEditionStartDate)) {
 			listErrors.add(error_QSO_MADE_BEFORE_CONTEST_START);
 		}
@@ -97,31 +85,6 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 				listErrors.add(error_QSO_OUT_OF_BAND);
 			}
 		}
-		
-		String qsoExchangeEmmited = qso.getExchangee();
-		
-		DxccEntity contestLogDxccEntity = null;
-		if (contestLog.getDxccEntity() != null) {
-			Long contestLogDxccEntityId = contestLog.getDxccEntity().getId();
-			contestLogDxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(contestLogDxccEntityId);
-		}
-		
-		if(contestLogDxccEntity != null && contestLogDxccEntity.equals(this.mexicoDxccEntity)) {
-			if(!allowedMexicoEntities.contains(qso.getExchangee())) {
-				listErrors.add(error_NOT_VALID_EXCHANGE_EMMITED);
-			}
-		} else {
-			if(!qsoExchangeEmmited.matches(patternForNoMexicano)) {
-				listErrors.add(error_NOT_VALID_EXCHANGE_EMMITED);
-			}
-		}
-		
-		if (qsoBand != null) {
-			if (prohibitedWarcBands.contains(qsoBand.getBand())) {
-				listErrors.add(error_QSO_ON_WARC_BAND);
-			}
-		}
-		
 		
 		return listErrors;
 	}
@@ -154,42 +117,28 @@ public class EvaluateQsoRtty2021Impl implements IEvaluateQso {
 		return return_val;
 	}
 
-	@Override
-	public void setMultiplies(Conteo conteo, List<ContestQso> qsos) {
-		List<String> multpliesList = new ArrayList<>();
-		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
-		for(ContestQso qso:qsos) {
-			String exchangeR = qso.getExchanger();
-			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
+    @Override
+    public void setMultiplies(Conteo conteo, List<ContestQso> qsos) {
+        List<String> multpliesList = new ArrayList<>();
+        List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
+        for (ContestQso qso : qsos) {
+            String desGridLocator = qso.getDestGridLocator();
+            RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
 
-			if(qso.getDxccEntity() == null) {
-				relQsoConteo.setMultiply(false);
-				continue;	
-			}
-			
-			DxccEntity qsoDxccEntity = dxccEntityRepository
-					.findById(qso.getDxccEntity().getId())
-					.orElse(null);
-			
-			if(qsoDxccEntity.equals(this.mexicoDxccEntity)) {
-				if(this.allowedMexicoEntities.contains(exchangeR) && !multpliesList.contains(exchangeR)) {
-					relQsoConteo.setMultiply(true);
-					multpliesList.add(exchangeR);
-				} else {
-					relQsoConteo.setMultiply(false);
-				}
-			} else {
-				exchangeR = qso.getDxccEntity().getId() + "";
-				if(!multpliesList.contains(exchangeR)) {
-					relQsoConteo.setMultiply(true);
-					multpliesList.add(exchangeR);
-				} else {
-					relQsoConteo.setMultiply(false);
-				}
-			}
+            if (qso.getDxccEntity() == null) {
+                relQsoConteo.setMultiply(false);
+                continue;
+            }
 
-			listRelQsoConteo.add(relQsoConteo);
-		}
-		relQsoConteoRepository.saveAll(listRelQsoConteo);
-	}
+            if (!multpliesList.contains(desGridLocator)) {
+                relQsoConteo.setMultiply(true);
+                multpliesList.add(desGridLocator);
+            } else {
+                relQsoConteo.setMultiply(false);
+            }
+
+            listRelQsoConteo.add(relQsoConteo);
+        }
+        relQsoConteoRepository.saveAll(listRelQsoConteo);
+    }
 }
