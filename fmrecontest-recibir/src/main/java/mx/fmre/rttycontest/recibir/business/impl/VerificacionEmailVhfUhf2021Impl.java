@@ -28,9 +28,7 @@ public class VerificacionEmailVhfUhf2021Impl extends BaseVerificationsService im
 
     private final String EMAIL_WITHOUT_SUBJECT = "EMAIL_WITHOUT_SUBJECT";
     private final String EMAIL_WITHOUT_ATTACHED_FILES = "EMAIL_WITHOUT_ATTACHED_FILES";
-    private final String SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN = "SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN";
     private final String EMAIL_WITHOUT_CONTSTLOG = "EMAIL_WITHOUT_CONTSTLOG";
-    private final String SUBJECT_WITH_MORE_THAN_ONE_WORD = "SUBJECT_WITH_MORE_THAN_ONE_WORD"; 
 
     @Override
     public List<CatEmailError> verify(Email email) throws FmreContestException {
@@ -62,26 +60,7 @@ public class VerificacionEmailVhfUhf2021Impl extends BaseVerificationsService im
             throw new FmreContestException(
                     "The test \"" + EMAIL_WITHOUT_ATTACHED_FILES + "\" is not found for editon with ID " + editionId);
 
-        /* SUBJECT_WITH_MORE_THAN_ONE_WORD */
-        x = catEmailErrorRepository.findByEditionAndDescripcion(edition, SUBJECT_WITH_MORE_THAN_ONE_WORD);
-        if (x != null) {
-            if (this.verify_SUBJECT_WITH_MORE_THAN_ONE_WORD(email, edition, attachedFiles)) {
-                listCatEmailError.add(x);
-            }
-        } else
-            throw new FmreContestException(
-                    "The test \"" + SUBJECT_WITH_MORE_THAN_ONE_WORD + "\" is not found for editon with ID " + editionId);
-
-        /*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
-        x = catEmailErrorRepository.findByEditionAndDescripcion(edition, SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN);
-        if(x != null) {
-            if(this.verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(email, edition, attachedFiles, contestLogRepository)) {
-                listCatEmailError.add(x);
-            }
-        } else
-            throw new FmreContestException("The test \"" + SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN + "\" is not found for editon with ID " + editionId);
-
-        /*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
+        /*EMAIL_WITHOUT_CONTSTLOG*/
         x = catEmailErrorRepository.findByEditionAndDescripcion(edition, EMAIL_WITHOUT_CONTSTLOG);
         if(x != null) {
             if(this.verify_EMAIL_WITHOUT_CONTSTLOG(email, edition, attachedFiles, contestLogRepository)) {

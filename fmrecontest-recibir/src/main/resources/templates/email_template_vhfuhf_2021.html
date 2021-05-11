@@ -392,12 +392,14 @@
 	                       			<td>De</td>
 	                       			<td>Fecha de envio</td>
 	                       			<td>QSOS</td>
+	                       			<td>Rover</td>
 	                       			<td>Tiene errores</td>
 	                       		</tr>
 	                       		<tr th:each="othersLogs : ${listOthersLogs}">
 	                       			<td th:text="${othersLogs.fromName}">De</td>
 	                       			<td th:text="${othersLogs.sDateOfSend}">Fecha de envio</td>
 	                       			<td th:text="${othersLogs.noQsos}">QSOS</td>
+	                       			<td th:text="${othersLogs.roverLog}">Is rover</td>
 	                       			<td th:text="${othersLogs.hasErrors}">Tiene errores</td>
 	                       		</tr>
 	                       	</table>
@@ -452,12 +454,14 @@
 	                       			<td>From</td>
 	                       			<td>Date of send</td>
 	                       			<td>QSOS</td>
+	                       			<td>Is rover</td>
 	                       			<td>Has errors</td>
 	                       		</tr>
 	                       		<tr th:each="othersLogs : ${listOthersLogs}">
 	                       			<td th:text="${othersLogs.fromName}">From</td>
 	                       			<td th:text="${othersLogs.sDateOfSend}">Date of send</td>
 	                       			<td th:text="${othersLogs.noQsos}">QSOS</td>
+	                       			<td th:text="${othersLogs.roverLog}">Is rover</td>
 	                       			<td th:text="${othersLogs.hasErrors}">Has errors</td>
 	                       		</tr>
 	                       	</table>
