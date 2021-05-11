@@ -34,10 +34,6 @@ public class State {
     private String gridLocatorEntity;
 
     // bi-directional many-to-one association to Contestqso
-    @OneToMany(mappedBy = "originState", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "state", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ContestQso> contestQsosOrigin;
-
-    // bi-directional many-to-one association to Contestqso
-    @OneToMany(mappedBy = "destState", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    private List<ContestQso> contestQsosDest;
 }

@@ -22,6 +22,7 @@ import mx.fmre.rttycontest.bs.parsers.IQsoParserService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
+import mx.fmre.rttycontest.persistence.model.Edition;
 
 @Slf4j
 @Service("qsoParserRtty2020ServiceImpl")
@@ -47,7 +48,7 @@ public class QsoParserRtty2020ServiceImpl implements IQsoParserService {
 			"startoflog=START-OF-LOG";
 
 	@Override
-	public ContestLog parse(List<String> stringList) throws FmreContestException {
+	public ContestLog parse(Edition edition, List<String> stringList) throws FmreContestException {
 		Map<String, String> m = getPropertiesMap(propertiesMap);
 
 		ContestLog contestlog = new ContestLog();
