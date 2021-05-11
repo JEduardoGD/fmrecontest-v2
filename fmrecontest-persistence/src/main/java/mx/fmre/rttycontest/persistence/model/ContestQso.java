@@ -64,11 +64,8 @@ public class ContestQso implements Serializable {
 	@Column(name = "D_DXCC_NOT_FOUND")
 	@ToString.Exclude private Boolean dxccNotFound;
 
-    @Column(name = "S_ORIGIN_GRID_LOCATOR")
-    private String originGridLocator;
-
-    @Column(name = "S_DEST_GRID_LOCATOR")
-    private String destGridLocator;
+    @Column(name = "S_GRID_LOCATOR")
+    private String gridLocator;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_CONTEST_LOG")
@@ -90,12 +87,8 @@ public class ContestQso implements Serializable {
 	@ToString.Exclude private List<RelQsoConteo> relQsoConteos;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "N_ID_STATE_ORIGIN")
-    @ToString.Exclude private State originState;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "N_ID_STATE_DEST")
-    @ToString.Exclude private State destState;
+    @JoinColumn(name = "N_ID_STATE")
+    @ToString.Exclude private State state;
 
 	@Override
 	public boolean equals(Object obj) {

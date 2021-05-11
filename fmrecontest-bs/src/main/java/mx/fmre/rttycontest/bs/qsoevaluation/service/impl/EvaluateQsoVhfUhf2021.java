@@ -122,7 +122,7 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
         List<String> multpliesList = new ArrayList<>();
         List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
         for (ContestQso qso : qsos) {
-            String desGridLocator = qso.getDestGridLocator();
+            String desGridLocator = qso.getGridLocator();
             RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
 
             if (qso.getDxccEntity() == null) {

@@ -4,8 +4,9 @@ import java.util.List;
 
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
+import mx.fmre.rttycontest.persistence.model.Edition;
 
 public interface IQsoParserService {
 
-	public ContestLog parse(List<String> stringList) throws FmreContestException;
+    ContestLog parse(Edition edition, List<String> stringList) throws FmreContestException;
 }

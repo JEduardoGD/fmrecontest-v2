@@ -84,6 +84,8 @@ public class ResponderServiceImpl implements IResponderService {
 			if (emails.size() > messagesPerminute)
 				emails = emails.subList(0, messagesPerminute);
 			for (Email email : emails) {
+                ContestLog contestLog = contestLogRepository.findByEmail(email);
+                List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				
 				List<CatEmailError> errors = emailErrorRepository.getErrorsOfEmail(email);
 				List<ErrorDTO> errorsDto = errors.stream()
@@ -92,7 +94,13 @@ public class ResponderServiceImpl implements IResponderService {
 				
 				EmailDataDTO emailDataDTO = new EmailDataDTO();
 				emailDataDTO.setErrors(errorsDto);
-				emailDataDTO.setOthersLogs(this.createOthersLogs(email, edition));
+				
+                if (contestLog != null && 
+                    contestLog.getCallsign() != null && 
+                    contestLog.getCallsign().toLowerCase().endsWith("/m")) {
+                } else {
+                    emailDataDTO.setOthersLogs(this.createOthersLogs(email, edition));
+                }
 
 				//desde donde llego el correo actual
 				emailDataDTO.setEmailSubject(email.getSubject());
@@ -116,8 +124,6 @@ public class ResponderServiceImpl implements IResponderService {
 				emailDataDTO.setCallsign(email.getSubject());
 				emailDataDTO.setDebugData(email.getId() + "");
 				
-				ContestLog contestLog = contestLogRepository.findByEmail(email);
-				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				emailDataDTO.setNoQsos(qsos.size());
 				
 				if(errors.isEmpty()) {
@@ -157,6 +163,7 @@ public class ResponderServiceImpl implements IResponderService {
 			othersLogs.setDateOfSend(e.getSentDate());
 			othersLogs.setNoQsos(qsos.size());
 			othersLogs.setHasErrors(listErrors.size() > 0);
+			othersLogs.setRoverLog(contestLog.getGroup() != null);
 			return othersLogs;
 		}).collect(Collectors.toList());
 	}

@@ -90,13 +90,16 @@ public class ContestLog implements Serializable {
 	@Column(name = "D_IS_CHECKLOG")
 	private boolean checklog;
 
-	@OneToOne
-	@JoinColumn(name = "N_ID_EMAIL")
-	private Email email;
+    @Column(name = "N_GROUP")
+    private Long group;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_DXCCENTITY")
 	private DxccEntity dxccEntity;
+
+    @OneToOne
+    @JoinColumn(name = "N_ID_EMAIL")
+    private Email email;
 
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)

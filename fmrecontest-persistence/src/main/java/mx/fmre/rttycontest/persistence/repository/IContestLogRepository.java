@@ -39,5 +39,18 @@ public interface IContestLogRepository extends JpaRepository<ContestLog, Long> {
 			"JOIN RelConteoContestLog R ON R.contestLog.id = LOG.id " +
 			"WHERE R.conteo = :conteo ")
 	public List<ContestLog> findByConteo(@Param("conteo") Conteo conteo);
+    
+	@Query(value = "" +
+            "select LOG " +
+            "from ContestLog LOG " +
+            "JOIN Email E ON LOG.email.id = E.id " +
+            "WHERE E.edition = :edition and " +
+            "      LOG.callsign like :callsign")
+    public List<ContestLog> findByEditionAndCallsign(@Param("edition") Edition edition, @Param("callsign") String callsign);
+    
+    @Query(value = "" +
+            "select max(LOG.group) " +
+            "from ContestLog LOG ")
+    public Long getMaxGroup();
 }
 

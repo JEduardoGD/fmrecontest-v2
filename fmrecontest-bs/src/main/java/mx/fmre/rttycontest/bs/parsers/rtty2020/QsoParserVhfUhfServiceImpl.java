@@ -19,21 +19,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.location.exception.GridLocatorException;
 import mx.fmre.rttycontest.bs.location.service.IGridLocatorService;
 import mx.fmre.rttycontest.bs.parsers.IQsoParserService;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.geo.dto.Location;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
+import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.State;
+import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IStateRepository;
 
 @Slf4j
 @Service("qsoParserVhfUhfServiceImpl")
 public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
     
-    @Autowired private IGridLocatorService gridLocatorService;
-    @Autowired private IStateRepository stateRepository;
+    @Autowired private IGridLocatorService   gridLocatorService;
+    @Autowired private IStateRepository      stateRepository;
+    @Autowired private IContestLogRepository contestLogRepository;
     
 	private final String propertiesMap = "" + 
 			"address=ADDRESS\n" + 
@@ -56,7 +60,7 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 			"startoflog=START-OF-LOG";
 
 	@Override
-	public ContestLog parse(List<String> stringList) throws FmreContestException {
+	public ContestLog parse(Edition edition, List<String> stringList) throws FmreContestException {
 		Map<String, String> m = getPropertiesMap(propertiesMap);
 
 		ContestLog contestlog = new ContestLog();
@@ -89,7 +93,22 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 			}
 		}
 		contestlog.setContestqsos(listContest);
-
+		
+        if (       contestlog != null
+                && contestlog.getOperators() != null
+                && contestlog.getOperators().toLowerCase().endsWith("/m")) {
+            List<ContestLog> contestlogGroup = contestLogRepository.findByEditionAndCallsign(edition, contestlog.getCallsign());
+            contestlogGroup = contestlogGroup.stream().filter(log -> log.getGroup() != null).collect(Collectors.toList());
+            Long group;
+            if (contestlogGroup != null && !contestlogGroup.isEmpty()) {
+                group = contestlogGroup.get(0).getGroup();
+            } else {
+                Long maxGroup = contestLogRepository.getMaxGroup();
+                group = maxGroup == null ? 1l : contestLogRepository.getMaxGroup().longValue() + 1;
+            }
+            contestlog.setGroup(group);
+        }
+		
 		return contestlog;
 	}
 	
@@ -104,11 +123,11 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 		String dateS = null;
 		String hourS = null;
 		String callsignES = null;
-		String originGridLocator = null;
+		String gridLocator = null;
 		String exchangeES = null;
 		String callsignRS = null;
-		String rstRS = null;
-		String destGridLocator = null;
+		String rstE = null;
+		String rstR = null;
 
 		Matcher m1 = p1.matcher(l);
 
@@ -122,9 +141,10 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 				dateS = s[3];
 				hourS = s[4];
 				callsignES = s[5];
-				originGridLocator = s[6];
+				rstE = s[6];
 				callsignRS = s[7];
-				destGridLocator = s[8];
+				rstR = s[8];
+				gridLocator = s[9];
 			} catch (IndexOutOfBoundsException e) {
 				log.error(e.getLocalizedMessage());
 			}
@@ -142,23 +162,20 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 			String callsignE = callsignES;
 			String exchangeE = exchangeES;
 			String callsignR = callsignRS;
-			String rstR = rstRS;
 
 			qso = new ContestQso();
 			qso.setFrequency(freq);
 			qso.setMode(mode);
 			qso.setDatetime(datetime);
 			qso.setCallsigne(callsignE);
-			qso.setRste(null);
+			qso.setRste(rstE);
 			qso.setExchangee(exchangeE);
 			qso.setCallsignr(callsignR);
 			qso.setRstr(rstR);
 			qso.setExchanger(null);
 			qso.setError(null);
-			qso.setOriginGridLocator(originGridLocator);
-			qso.setDestGridLocator(destGridLocator);
-			qso.setOriginState(getStateOfGridLocator(originGridLocator));
-			qso.setDestState(getStateOfGridLocator(destGridLocator));
+			qso.setGridLocator(gridLocator);
+			qso.setState(getStateOfGridLocator(gridLocator));
             
             
 		} else {
@@ -169,9 +186,13 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 	}
 	
 	private State getStateOfGridLocator(String gridLocator) {
-	    Location originLocation;
+	    Location originLocation = null;
         if (gridLocator != null) {
-            originLocation = gridLocatorService.getLocationOf(gridLocator);
+            try {
+                originLocation = gridLocatorService.getLocationOf(gridLocator);
+            } catch (GridLocatorException e) {
+                log.error(e.getLocalizedMessage());
+            }
             if(originLocation == null) {
                 return null;
             }
@@ -232,5 +253,5 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 	
 
 	private static final Pattern p1 = Pattern.compile(
-			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s*$");
+			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s*");
 }
