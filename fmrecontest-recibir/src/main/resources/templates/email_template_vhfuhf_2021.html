@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8">
+    <title>Simple Transactional Email</title>
+    <style>
+      /* -------------------------------------
+          GLOBAL RESETS
+      ------------------------------------- */
+      
+      /*All the styling goes here*/
+      
+      img {
+        border: none;
+        -ms-interpolation-mode: bicubic;
+        max-width: 100%; 
+      }
+
+      body {
+        background-color: #f6f6f6;
+        font-family: sans-serif;
+        -webkit-font-smoothing: antialiased;
+        font-size: 14px;
+        line-height: 1.4;
+        margin: 0;
+        padding: 0;
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%; 
+      }
+
+      table {
+        border-collapse: separate;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+        width: 100%; }
+        table td {
+          font-family: arial;
+          font-size: 22px;
+          vertical-align: top; 
+      }
+
+      /* -------------------------------------
+          BODY & CONTAINER
+      ------------------------------------- */
+
+      .body {
+        background-color: #f6f6f6;
+        width: 100%; 
+      }
+
+      /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
+      .container {
+        display: block;
+        margin: 0 auto !important;
+        /* makes it centered */
+        max-width: 580px;
+        padding: 10px;
+        width: 580px; 
+      }
+
+      /* This should also be a block element, so that it will fill 100% of the .container */
+      .content {
+        box-sizing: border-box;
+        display: block;
+        margin: 0 auto;
+        max-width: 580px;
+        padding: 10px; 
+      }
+
+      /* -------------------------------------
+          HEADER, FOOTER, MAIN
+      ------------------------------------- */
+      .main {
+        background: #ffffff;
+        border-radius: 3px;
+        width: 100%; 
+      }
+
+      .wrapper {
+        box-sizing: border-box;
+        padding: 20px; 
+      }
+
+      .content-block {
+        padding-bottom: 10px;
+        padding-top: 10px;
+      }
+
+      .footer {
+        clear: both;
+        margin-top: 10px;
+        text-align: center;
+        width: 100%; 
+      }
+        .footer td,
+        .footer p,
+        .footer span,
+        .footer a {
+          color: #999999;
+          font-size: 12px;
+          text-align: center; 
+      }
+
+      /* -------------------------------------
+          TYPOGRAPHY
+      ------------------------------------- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        color: #000000;
+        font-family: sans-serif;
+        font-weight: 400;
+        line-height: 1.4;
+        margin: 0;
+        margin-bottom: 30px; 
+      }
+
+      h1 {
+        font-size: 35px;
+        font-weight: 300;
+        text-align: center;
+        text-transform: capitalize; 
+      }
+        
+        .error {
+        	color: red;
+        	font-weight: bold;
+        }
+
+      p,
+      ul,
+      ol {
+        font-family: sans-serif;
+        font-size: 18px;
+        font-weight: normal;
+        margin: 0;
+        margin-bottom: 15px; 
+      }
+        p li,
+        ul li,
+        ol li {
+          list-style-position: inside;
+          margin-left: 5px; 
+      }
+
+      a {
+        color: #3498db;
+        text-decoration: underline; 
+      }
+
+      /* -------------------------------------
+          BUTTONS
+      ------------------------------------- */
+      .btn {
+        box-sizing: border-box;
+        width: 100%; }
+        .btn > tbody > tr > td {
+          padding-bottom: 15px; }
+        .btn table {
+          width: auto; 
+      }
+        .btn table td {
+          background-color: #ffffff;
+          border-radius: 5px;
+          text-align: center; 
+      }
+        .btn a {
+          background-color: #ffffff;
+          border: solid 1px #3498db;
+          border-radius: 5px;
+          box-sizing: border-box;
+          color: #3498db;
+          cursor: pointer;
+          display: inline-block;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 0;
+          padding: 12px 25px;
+          text-decoration: none;
+          text-transform: capitalize; 
+      }
+
+      .btn-primary table td {
+        background-color: #3498db; 
+      }
+
+      .btn-primary a {
+        background-color: #3498db;
+        border-color: #3498db;
+        color: #ffffff; 
+      }
+
+      /* -------------------------------------
+          OTHER STYLES THAT MIGHT BE USEFUL
+      ------------------------------------- */
+      .last {
+        margin-bottom: 0; 
+      }
+
+      .first {
+        margin-top: 0; 
+      }
+
+      .align-center {
+        text-align: center; 
+      }
+
+      .align-right {
+        text-align: right; 
+      }
+
+      .align-left {
+        text-align: left; 
+      }
+
+      .clear {
+        clear: both; 
+      }
+
+      .mt0 {
+        margin-top: 0; 
+      }
+
+      .mb0 {
+        margin-bottom: 0; 
+      }
+
+      .preheader {
+        color: transparent;
+        display: none;
+        height: 0;
+        max-height: 0;
+        max-width: 0;
+        opacity: 0;
+        overflow: hidden;
+        mso-hide: all;
+        visibility: hidden;
+        width: 0; 
+      }
+
+      .powered-by a {
+        text-decoration: none; 
+      }
+
+      hr {
+        border: 0;
+        border-bottom: 1px solid #f6f6f6;
+        margin: 20px 0; 
+      }
+
+      /* -------------------------------------
+          RESPONSIVE AND MOBILE FRIENDLY STYLES
+      ------------------------------------- */
+      @media only screen and (max-width: 620px) {
+        table[class=body] h1 {
+          font-size: 28px !important;
+          margin-bottom: 10px !important; 
+        }
+        table[class=body] p,
+        table[class=body] ul,
+        table[class=body] ol,
+        table[class=body] td,
+        table[class=body] span,
+        table[class=body] a {
+          font-size: 16px !important; 
+        }
+        table[class=body] .wrapper,
+        table[class=body] .article {
+          padding: 10px !important; 
+        }
+        table[class=body] .content {
+          padding: 0 !important; 
+        }
+        table[class=body] .container {
+          padding: 0 !important;
+          width: 100% !important; 
+        }
+        table[class=body] .main {
+          border-left-width: 0 !important;
+          border-radius: 0 !important;
+          border-right-width: 0 !important; 
+        }
+        table[class=body] .btn table {
+          width: 100% !important; 
+        }
+        table[class=body] .btn a {
+          width: 100% !important; 
+        }
+        table[class=body] .img-responsive {
+          height: auto !important;
+          max-width: 100% !important;
+          width: auto !important; 
+        }
+      }
+
+      /* -------------------------------------
+          PRESERVE THESE STYLES IN THE HEAD
+      ------------------------------------- */
+      @media all {
+        .ExternalClass {
+          width: 100%; 
+        }
+        .ExternalClass,
+        .ExternalClass p,
+        .ExternalClass span,
+        .ExternalClass font,
+        .ExternalClass td,
+        .ExternalClass div {
+          line-height: 100%; 
+        }
+        .apple-link a {
+          color: inherit !important;
+          font-family: inherit !important;
+          font-size: inherit !important;
+          font-weight: inherit !important;
+          line-height: inherit !important;
+          text-decoration: none !important; 
+        }
+        #MessageViewBody a {
+          color: inherit;
+          text-decoration: none;
+          font-size: inherit;
+          font-family: inherit;
+          font-weight: inherit;
+          line-height: inherit;
+        }
+        .btn-primary table td:hover {
+          background-color: #34495e !important; 
+        }
+        .btn-primary a:hover {
+          background-color: #34495e !important;
+          border-color: #34495e !important; 
+        } 
+      }
+
+    </style>
+  </head>
+  <body class="">
+    <span class="preheader">This is preheader text. Some clients will show this text as a preview.</span>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+      <tr>
+        <td>&nbsp;</td>
+        <td class="container">
+          <div class="content">
+          
+            <img src="data:image/png;base64,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">
+            <!-- START CENTERED WHITE CONTAINER -->
+            <table role="presentation" class="main">
+              <!-- START MAIN CONTENT AREA -->
+              <tr>
+                <td class="wrapper">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td>
+                        <p>Hola,</p>
+                        <p>Gracias por haber enviado tu log al 14 concurso VHF - UHF.</p>
+                        <div>
+                          <p>La informacion que pudimos encontrar en el correo electronico es la siguiente:</p>
+                          <table>
+                            <tr>
+                              <td>Asunto</td><td th:text="${emailSubject}"></td>
+                            </tr>
+                            <tr>
+                              <td>Fecha de env&iacute;o </td><td th:text="${dateOfSendEs}"></td>
+                            </tr>
+                            <tr>
+                              <td>Direcci&oacute;n de env&iacute;o</td><td th:text="${recipientFromAddress}"></td>
+                            </tr>
+                            <tr>
+                              <td>Nombre de env&iacute;o</td><td th:text="${recipientFromName}"></td>
+                            </tr>
+                            <tr>
+                              <td>Numero de QSO's encontrados</td><td th:text="${noQsos}"></td>
+                            </tr>
+                          </table>
+                        </div>
+                        <div th:if="${not #lists.isEmpty(errors)}">
+                        	<p class="error">Desafortunadamene hemos encontrado algunas errores:</p>
+                        	<ul>
+						    	<li th:each="error : ${errors}">
+						    		<span th:text="${error.suggestionEs}"> suggestionEs </span>
+						    	</li>
+						    </ul>
+                        </div>
+                        <div th:if="${not #lists.isEmpty(listOthersLogs)}">
+                       		<p>Otros Logs enviados para la edicion actual de este concurso son:</p>
+	                       	<table role="presentation" border="1" >
+	                       		<tr>
+	                       			<td>De</td>
+	                       			<td>Fecha de envio</td>
+	                       			<td>QSOS</td>
+	                       			<td>Rover</td>
+	                       			<td>Tiene errores</td>
+	                       		</tr>
+	                       		<tr th:each="othersLogs : ${listOthersLogs}">
+	                       			<td th:text="${othersLogs.fromName}">De</td>
+	                       			<td th:text="${othersLogs.sDateOfSend}">Fecha de envio</td>
+	                       			<td th:text="${othersLogs.noQsos}">QSOS</td>
+	                       			<td th:text="${othersLogs.roverLog}">Is rover</td>
+	                       			<td th:text="${othersLogs.hasErrors}">Tiene errores</td>
+	                       		</tr>
+	                       	</table>
+                        </div>
+                        <p>Usted puede enviar su log la cantidad de veces que desee pero solo se tomara en cuenta el ultimo que haya sido recibido correctamente.</p>
+                        
+                        <p>Por favor, no responda este correo electronico ya que fue generado de manera automatica y no sera contestado.</p>
+                        
+                        <p>Dudas y aclaraciones sobre el concurso se pueden dirigir al correo electronico del manager a rttymanager@fmre.mx con Alejandro Valdez XE1EE</p>
+                      </td>
+                    </tr>
+                  </table>
+                  <hr />
+                  
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td>
+                        <p>Hello,</p>
+                        <p>Thank you for sending your log to 14 VHF - UHF contest.</p>
+                        <div>
+                       		<p>The information we can find in the email is as follows:</p>
+	                       	<table>
+	                       		<tr>
+	                       			<td>Subject</td><td th:text="${emailSubject}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Date of send </td><td th:text="${dateOfSendEn}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Recipient from address</td><td th:text="${recipientFromAddress}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Recipient from name</td><td th:text="${recipientFromName}"></td>
+	                       		</tr>
+	                       		<tr>
+	                       			<td>Number of QSO's found</td><td th:text="${noQsos}"></td>
+	                       		</tr>
+	                       	</table>
+                        </div>
+                        <div th:if="${not #lists.isEmpty(errors)}">
+                        	<p class="error">Unfortunately we have found some errors:</p>
+                        	<ul>
+						    	<li th:each="error : ${errors}">
+						    		<span th:text="${error.suggestionEn}"> suggestionEs </span>
+						    	</li>
+						    </ul>
+                        </div>
+                        <div th:if="${not #lists.isEmpty(listOthersLogs)}">
+                       		<p>Other Logs sent for the current edition of this contest are:</p>
+	                       	<table role="presentation" border="1" >
+	                       		<tr>
+	                       			<td>From</td>
+	                       			<td>Date of send</td>
+	                       			<td>QSOS</td>
+	                       			<td>Is rover</td>
+	                       			<td>Has errors</td>
+	                       		</tr>
+	                       		<tr th:each="othersLogs : ${listOthersLogs}">
+	                       			<td th:text="${othersLogs.fromName}">From</td>
+	                       			<td th:text="${othersLogs.sDateOfSend}">Date of send</td>
+	                       			<td th:text="${othersLogs.noQsos}">QSOS</td>
+	                       			<td th:text="${othersLogs.roverLog}">Is rover</td>
+	                       			<td th:text="${othersLogs.hasErrors}">Has errors</td>
+	                       		</tr>
+	                       	</table>
+                        </div>
+                        <p>You can send your file as many times as you need. Only the last one will be considered as final.</p>
+                        
+                        <p>Please do not reply to this email as it was generated automatically and will not be answered.</p>
+                        
+                        <p>Questions and clarifications about the contest can be asked by email to the conetst manager Alejandro Valdez, XE1EE at rttymanager@fmre.mx</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+            <!-- END MAIN CONTENT AREA -->
+            </table>
+            <!-- END CENTERED WHITE CONTAINER -->
+
+            <!-- START FOOTER -->
+            <div class="footer">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td class="content-block">
+                    <span class="apple-link">Federacion Mexicana de Radioexperimentadores A.C. 2020</span>
+                  </td>
+                </tr>
+                <tr>
+                	<td class="content-block">
+                		<span class="apple-link" th:text="${debugData}">debugData</span>
+                	</td>
+                </tr>
+                <tr>
+                  <td class="content-block powered-by">
+                    Powered by <a href="http://htmlemail.io">HTMLemail</a>.
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <!-- END FOOTER -->
+
+          </div>
+        </td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+  </body>
+</html>

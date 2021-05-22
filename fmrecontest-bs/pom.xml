@@ -45,6 +45,21 @@
 			<artifactId>opencsv</artifactId>
 			<version>4.1</version>
 		</dependency>
+		
+		<!-- START JERSEY FOR WEB CLIENT -->
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jackson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.inject</groupId>
+			<artifactId>jersey-hk2</artifactId>
+		</dependency>
+		<!-- ENND JERSEY FOR WEB CLIENT -->
 	</dependencies>
 	<build>
 		<plugins>

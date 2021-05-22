@@ -16,4 +16,5 @@ public class OthersLogs implements Serializable {
 	private String sDateOfSend;
 	private int noQsos;
 	private boolean hasErrors;
+	private boolean roverLog;
 }

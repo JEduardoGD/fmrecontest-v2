@@ -170,51 +170,60 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 		
 		return null;
 	}
-
-	@Override
-	public void completeBandsOnQsos() {
-		List<Edition> editions = editionRepository.getActiveEditionOfContest();
-		for (Edition edition : editions) {
-			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
-			List<Integer> lastEmailIdsList = lastEmails
-					.stream()
-					.map(LastEmail::getEmailId)
-					.collect(Collectors.toList());
-			
-			List<Email> emails = emailRepository.findByEdition(edition);
-			List<Email> filtered = emails
-					.stream()
-					.filter(e -> lastEmailIdsList.contains(e.getId()))
-					.collect(Collectors.toList());
-
-			Date startDate = new Date();
-			int current = 1;
-			
-			for (Email email : filtered) {
-				ContestLog contestLog = contestLogRepository.findByEmail(email);
-				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				qsos = qsos
-						.stream()
-						.filter(q -> q.getBand() == null)
-						.filter(q -> q.getError() == null || q.getError().booleanValue() == false)
-						.collect(Collectors.toList());
-				List<ContestQso> newQsos = qsos.stream().map(qso -> {
-					BigDecimal bdFrequency = BigDecimal.valueOf(qso.getFrequency());
-					bdFrequency = bdFrequency.divide(BigDecimal.valueOf(1000));
-					CatBand band = frequencyService.getFrequencyBandOf(bdFrequency);
-					if (band != null) {
-						qso.setBand(band);
-					} else 
-						log.warn("Frequency not found for freq {} on qso id {}", bdFrequency, qso.getId());
-					return qso;
-				}).collect(Collectors.toList());
-				contestQsoRepository.saveAll(newQsos);
-
-				log.info("{} de {}; time remaining: {}", current, filtered.size(),
-						DateTimeUtil.timeRemaining(startDate, current++, filtered.size()));
-			}
-		}
+	
+	private CatBand gettingBandOfFrequency(Map<Integer, CatBand> mapFrequencyMaps, Integer frequency) {
+	    if(mapFrequencyMaps.containsKey(frequency)) {
+	        return mapFrequencyMaps.get(frequency);
+	    }
+	    CatBand band = frequencyService.getFrequencyBandOf(BigDecimal.valueOf(frequency));
+        if (band != null) {
+            mapFrequencyMaps.put(frequency, band);
+            return band;
+        }
+        return null;
 	}
+	
+    @Override
+    public void completeBandsOnQsos() {
+        Map<Integer, CatBand> mapFrequencyMaps = new HashMap<>();
+        List<Edition> editions = editionRepository.getActiveEditionOfContest();
+        for (Edition edition : editions) {
+            List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
+            List<Integer> lastEmailIdsList = lastEmails.stream().map(LastEmail::getEmailId)
+                    .collect(Collectors.toList());
+
+            List<Email> emails = emailRepository.findByEdition(edition);
+            List<Email> filtered = emails.stream().filter(e -> lastEmailIdsList.contains(e.getId()))
+                    .collect(Collectors.toList());
+
+            Date startDate = new Date();
+            int current = 1;
+
+            for (Email email : filtered) {
+                ContestLog contestLog = contestLogRepository.findByEmail(email);
+                List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+                qsos = qsos.stream().filter(q -> q.getBand() == null)
+                        .filter(q -> q.getError() == null || q.getError().booleanValue() == false)
+                        .collect(Collectors.toList());
+                if (qsos.isEmpty()) {
+                    continue;
+                }
+                List<ContestQso> newQsos = qsos.stream().map(qso -> {
+//					bdFrequency = bdFrequency.divide(BigDecimal.valueOf(1000));
+                    CatBand catBand = gettingBandOfFrequency(mapFrequencyMaps, qso.getFrequency());
+                    if (catBand == null) {
+                        log.warn("Frequency not found for freq {} on qso id {}", qso.getFrequency(), qso.getId());
+                    }
+                    qso.setBand(catBand);
+                    return qso;
+                }).collect(Collectors.toList());
+                contestQsoRepository.saveAll(newQsos);
+
+                log.info("{} de {}; time remaining: {}", current, filtered.size(),
+                        DateTimeUtil.timeRemaining(startDate, current++, filtered.size()));
+            }
+        }
+    }
 }
 
 

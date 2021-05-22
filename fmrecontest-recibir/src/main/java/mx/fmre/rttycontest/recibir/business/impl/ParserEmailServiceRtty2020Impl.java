@@ -78,7 +78,7 @@ public class ParserEmailServiceRtty2020Impl implements IParserEmail {
 		try {
 			String oneString = FileUtil.inputStreamToString(is);
 			String[] stringArray = oneString.split("\\n");
-			ContestLog contestLog = qsoParser.parse(Arrays.asList(stringArray));
+			ContestLog contestLog = qsoParser.parse(edition, Arrays.asList(stringArray));
 			contestLog.setEmail(email);
 			return contestLog;
 		} catch (IOException e) {
