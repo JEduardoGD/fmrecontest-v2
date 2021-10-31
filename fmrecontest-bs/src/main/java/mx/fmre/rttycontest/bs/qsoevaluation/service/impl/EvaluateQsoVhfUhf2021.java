@@ -86,19 +86,13 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 	}
 
     @Override
-    public Integer getPoints(ContestLog contestLog, ContestQso qso) {
-        try {
-            CatGridlocatorState catGridlocatorStateLog = locatorService.getGridLocatorstateOfGridlocator(contestLog.getGridlocator());
-            CatGridlocatorState catGridlocatorStateQso = locatorService.getGridLocatorstateOfGridlocator(qso.getGridLocator());
-            if (null == catGridlocatorStateQso || null == catGridlocatorStateQso) {
-                return 0;
-            }
-            return catGridlocatorStateLog.isTheSame(catGridlocatorStateQso) ? 10 : 15;
-        } catch (LocatorServiceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    public Integer getPoints(ContestLog contestLog, ContestQso qso) throws LocatorServiceException {
+        CatGridlocatorState catGridlocatorStateLog = locatorService.getGridLocatorstateOfGridlocator(contestLog.getGridlocator());
+        CatGridlocatorState catGridlocatorStateQso = locatorService.getGridLocatorstateOfGridlocator(qso.getGridLocator());
+        if (null == catGridlocatorStateLog || null == catGridlocatorStateQso) {
+            return 0;
         }
-        return 0;
+        return catGridlocatorStateLog.isTheSame(catGridlocatorStateQso) ? 10 : 15;
     }
 
     @Override
