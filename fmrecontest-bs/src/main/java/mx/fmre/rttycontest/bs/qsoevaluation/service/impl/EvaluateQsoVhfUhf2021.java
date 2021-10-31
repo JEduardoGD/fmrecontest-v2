@@ -10,34 +10,30 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import mx.fmre.rttycontest.bs.gridlocator.service.ILocatorService;
+import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
 import mx.fmre.rttycontest.persistence.model.CatBand;
+import mx.fmre.rttycontest.persistence.model.CatGridlocatorState;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
-import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
 import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
-import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
 @Service("evaluateQsoVhfUhf2021")
 public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 	
-	@Autowired private IDxccEntityRepository       dxccEntityRepository;
-	@Autowired private IRelQsoConteoRepository     relQsoConteoRepository;
-	@Autowired private ICatBandRepository          catBandRepository;
+	@Autowired private IRelQsoConteoRepository        relQsoConteoRepository;
+	@Autowired private ICatBandRepository             catBandRepository;
+	@Autowired private ILocatorService                locatorService;
 	
-	private DxccEntity mexicoDxccEntity;
 	private List<String> frequencyBandsAllowed;
 	
 	@PostConstruct private void fillMexicoDxccEntity() {
-		this.mexicoDxccEntity = dxccEntityRepository
-				.findById(50l)
-				.orElse(null);
-		
 		frequencyBandsAllowed = Arrays.asList("6 meters", "2 meters", "70 centimeters");
 	}
 	
@@ -89,33 +85,21 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 		return listErrors;
 	}
 
-	@Override
-	public Integer getPoints(ContestLog contestLog, ContestQso qso) {
-		DxccEntity dxccEntityHome = contestLog.getDxccEntity();
-		
-		if(dxccEntityHome == null)
-			return null;
-		
-		DxccEntity dxccEntityCalled = null;
-		if (qso.getDxccEntity() != null) {
-		    dxccEntityCalled = qso.getDxccEntity();
-		}
-		
-		if(dxccEntityCalled == null) {
-			return null;
-		}
-		
-		boolean CALLER_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityHome);
-		boolean CALLED_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityCalled);
-		
-		int return_val = 3;
-
-		if (CALLER_IS_MEXICANO && CALLED_IS_MEXICANO) {
-			return_val = 4;
-		}
-
-		return return_val;
-	}
+    @Override
+    public Integer getPoints(ContestLog contestLog, ContestQso qso) {
+        try {
+            CatGridlocatorState catGridlocatorStateLog = locatorService.getGridLocatorstateOfGridlocator(contestLog.getGridlocator());
+            CatGridlocatorState catGridlocatorStateQso = locatorService.getGridLocatorstateOfGridlocator(qso.getGridLocator());
+            if (null == catGridlocatorStateQso || null == catGridlocatorStateQso) {
+                return 0;
+            }
+            return catGridlocatorStateLog.isTheSame(catGridlocatorStateQso) ? 10 : 15;
+        } catch (LocatorServiceException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
     @Override
     public void setMultiplies(Conteo conteo, List<ContestQso> qsos) {

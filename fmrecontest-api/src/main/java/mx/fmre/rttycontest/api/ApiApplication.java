@@ -22,7 +22,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 	"mx.fmre.rttycontest.bs.qso.service",
 	"mx.fmre.rttycontest.bs.log.service",
 	"mx.fmre.rttycontest.bs.email.service",
-	"mx.fmre.rttycontest.bs.dxcc.service"})
+	"mx.fmre.rttycontest.bs.dxcc.service",
+	"mx.fmre.rttycontest.bs.gridlocator.service",
+	"mx.fmre.rttycontest.bs.location.service"})
 public class ApiApplication {
 
 	public static void main(String[] args) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
+import mx.fmre.rttycontest.evaluate.services.IGeneralServiceUtils;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
@@ -45,13 +47,13 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	@Autowired private IContestLogRepository           contestLogRepository;
 	@Autowired private IContestQsoRepository           contestQsoRepository;
 	@Autowired private ApplicationContext              appContext;
-	@Autowired private ILastEmailRepository            lastEmailRepository;
 	@Autowired private IConteoRepository               conteoRepository;
 	@Autowired private ICatQsoErrorRepository          catQsoErrorRepository;
 	@Autowired private IRelQsoConteoRepository         relQsoConteoRepository;
 	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
 	@Autowired private IRelConteoContestLogRepository  relConteoContestLogRepository;
 	@Autowired private IEmailRepository                emailRepository;
+    @Autowired private IGeneralServiceUtils            generalServiceUtils;
 	
 	@Override
 	public Conteo createConteo(Edition edition, String description) {
@@ -67,24 +69,17 @@ public class EvaluateServiceImpl implements IEvaluateService {
 		IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 		
 		List<CatQsoError> catQsoErrors = catQsoErrorRepository.findByEdition(edition);
-		List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
 
-		List<Integer> lastLogsIdsList = lastEmails
-				.stream()
-				.map(LastEmail::getContestLogId)
-				.collect(Collectors.toList());
+        List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
+        List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
 		
-		List<ContestLog> logs = contestLogRepository.findByEdition(edition);
-		List<ContestLog> filteredLogs = logs
-				.stream()
-				.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
-				.collect(Collectors.toList());
-
 		Date startDate = new Date();
 		int current = 1;
-		for(ContestLog contestLog: filteredLogs) {
-			log.info("{} de {}; time remaining: {}", current, filteredLogs.size(),
-					DateTimeUtil.timeRemaining(startDate, current++, filteredLogs.size()));
+		
+		for (Email emailFiltered : emailsFiltered) {
+            ContestLog contestLog = emailFiltered.getContestLog();
+			log.info("{} de {}; time remaining: {}", current, emailsFiltered.size(),
+					DateTimeUtil.timeRemaining(startDate, current++, emailsFiltered.size()));
 			this.findForErrorsOnQsosOfLog(contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
 		}
 	}
@@ -155,23 +150,14 @@ public class EvaluateServiceImpl implements IEvaluateService {
 		for (Edition edition : editions) {
 			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 			
-			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
-
-			List<Integer> lastLogsIdsList = lastEmails
-					.stream()
-					.map(LastEmail::getContestLogId)
-					.collect(Collectors.toList());
-			
-			List<ContestLog> logs = contestLogRepository.findByEdition(edition);
-			List<ContestLog> filteredLogs = logs
-					.stream()
-					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
-					.collect(Collectors.toList());
+			List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
+	        List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
 			
 			int i = 1;
 
-			for(ContestLog contestLog: filteredLogs) {
-				log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, filteredLogs.size());
+			for (Email emailFiltered : emailsFiltered) {
+	            ContestLog contestLog = emailFiltered.getContestLog();
+				log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				qsos = contestQsoRepository.findByContestLog(contestLog);
 				qsos = qsos
@@ -195,31 +181,35 @@ public class EvaluateServiceImpl implements IEvaluateService {
 		for (Edition edition : editions) {
 			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 			
-			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
+			List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
+            List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
 
-			List<Integer> lastLogsIdsList = lastEmails
-					.stream()
-					.map(LastEmail::getContestLogId)
-					.collect(Collectors.toList());
-			
-			List<ContestLog> logs = contestLogRepository.findByEdition(edition);
-			List<ContestLog> filteredLogs = logs
-					.stream()
-					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
-					.collect(Collectors.toList());
-			
 			int i = 1;
 
-			for(ContestLog contestLog: filteredLogs) {
-				log.info("Setting multipliers log id {} ({} / {})", contestLog.getId(), i++, filteredLogs.size());
-				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				qsos = qsos
-						.stream()
-						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
-						.collect(Collectors.toList());
-				qsos = contestQsoRepository.findByContestLog(contestLog);
-				dxccServiceQrz.setMultiplies(conteo, qsos);
-			}
+            for (Email emailFiltered : emailsFiltered) {
+                ContestLog contestLog = emailFiltered.getContestLog();
+
+                Long contestLogGroup = contestLog.getGroup();
+                if (null != contestLogGroup) {
+                    List<ContestLog> groupContestlogs = emailsFiltered.stream()
+                            .filter(e -> e.getContestLog().getGroup() != null
+                                    && e.getContestLog().getGroup().equals(contestLogGroup.longValue())
+                                    && !e.getContestLog().getId().equals(contestLog.getId()))
+                            .map(Email::getContestLog).collect(Collectors.toList());
+
+                    List<ContestQso> contestQsos = contestQsoRepository.findByContestLogs(groupContestlogs);
+
+                    List<String> workedGridLocators = contestQsos.stream().map(qso -> qso.getGridLocator())
+                            .collect(Collectors.toList());
+                }
+
+                log.info("Setting multipliers log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
+                List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+                qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+                        .collect(Collectors.toList());
+                qsos = contestQsoRepository.findByContestLog(contestLog);
+                dxccServiceQrz.setMultiplies(conteo, qsos);
+            }
 		}
 	}
 
@@ -227,23 +217,14 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	public void evaluateActiveEditions(Conteo conteo) {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
-			
-			List<Integer> lastLogsIdsList = lastEmails
-					.stream()
-					.map(LastEmail::getContestLogId)
-					.collect(Collectors.toList());
-			
-			List<ContestLog> logs = contestLogRepository.findByEdition(edition);
-			List<ContestLog> filteredLogs = logs
-					.stream()
-					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
-					.collect(Collectors.toList());
+		    List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
+            List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
 			
 			int i = 1;
 
-			for(ContestLog contestLog: filteredLogs) {
-				log.info("Evaluating log id {} ({} / {})", contestLog.getId(), i++, filteredLogs.size());
+			for (Email emailFiltered : emailsFiltered) {
+                ContestLog contestLog = emailFiltered.getContestLog();
+				log.info("Evaluating log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog)
 						.stream()
 						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
