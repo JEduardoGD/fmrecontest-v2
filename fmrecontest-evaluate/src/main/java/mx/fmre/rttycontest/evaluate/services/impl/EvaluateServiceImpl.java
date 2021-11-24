@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
@@ -155,23 +156,26 @@ public class EvaluateServiceImpl implements IEvaluateService {
 			
 			int i = 1;
 
-			for (Email emailFiltered : emailsFiltered) {
-	            ContestLog contestLog = emailFiltered.getContestLog();
-				log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
-				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-				qsos = contestQsoRepository.findByContestLog(contestLog);
-				qsos = qsos
-						.stream()
-						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
-						.collect(Collectors.toList());
-				List<RelQsoConteo> relQsoConteos = qsos.stream().map(qso -> {
-					Integer points = dxccServiceQrz.getPoints(contestLog, qso);
-					RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
-					relQsoConteo.setPoints(points);
-					return relQsoConteo;
-				}).collect(Collectors.toList());
-				relQsoConteoRepository.saveAll(relQsoConteos);
-			}
+            for (Email emailFiltered : emailsFiltered) {
+                ContestLog contestLog = emailFiltered.getContestLog();
+                log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
+                List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+                qsos = contestQsoRepository.findByContestLog(contestLog);
+                qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+                        .collect(Collectors.toList());
+                List<RelQsoConteo> relQsoConteos = qsos.stream().map(qso -> {
+                    Integer points = null;
+                    try {
+                        points = dxccServiceQrz.getPoints(contestLog, qso);
+                    } catch (LocatorServiceException e) {
+                        log.error(e.getLocalizedMessage());
+                    }
+                    RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
+                    relQsoConteo.setPoints(points);
+                    return relQsoConteo;
+                }).collect(Collectors.toList());
+                relQsoConteoRepository.saveAll(relQsoConteos);
+            }
 		}
 	}
 
