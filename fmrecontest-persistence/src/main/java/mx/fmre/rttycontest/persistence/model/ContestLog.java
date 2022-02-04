@@ -93,6 +93,9 @@ public class ContestLog implements Serializable {
     @Column(name = "N_GROUP")
     private Long group;
 
+    @Column(name = "S_GRIDLOCATOR")
+    private String gridlocator;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "N_ID_DXCCENTITY")
 	private DxccEntity dxccEntity;
