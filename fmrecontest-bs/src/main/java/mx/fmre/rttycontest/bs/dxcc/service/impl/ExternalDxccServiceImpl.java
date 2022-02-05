@@ -26,7 +26,7 @@ public class ExternalDxccServiceImpl implements ExternalDxccService {
         // 2rd attempt, from QRZ
         DxccEntity resQrz = qrzDxccServiceQrzImpl.getDxccFromCallsign(callsign);
         if (resQrz != null) {
-            log.info("{} from qrz", callsign);
+            log.info("{} from qrz: {}", callsign, resQrz.getEntityCode());
             DxccEntity persistedEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(resQrz.getEntityCode());
             if (persistedEntity != null) {
                 return persistedEntity;
@@ -39,7 +39,7 @@ public class ExternalDxccServiceImpl implements ExternalDxccService {
         // 3rd attempt, from Puebla DX
         DxccEntity resPueblaDx = dxccServicePueblaDx.getDxccFromCallsign(callsign);
         if (resPueblaDx != null && resPueblaDx.getEntityCode() != null) {
-            log.info("{} from qrz", callsign);
+            log.info("{} from PueblaDX: {}", callsign, resPueblaDx.getEntityCode());
             DxccEntity persistedEntity = dxccEntityRepository
                     .findByDxccEntityCodeBeforeYear(resPueblaDx.getEntityCode());
             if (persistedEntity != null) {

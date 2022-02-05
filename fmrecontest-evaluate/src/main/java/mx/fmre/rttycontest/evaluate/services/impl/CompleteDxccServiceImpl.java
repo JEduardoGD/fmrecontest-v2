@@ -16,6 +16,7 @@ import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
 import mx.fmre.rttycontest.bs.frequency.service.IFrequencyBsService;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
+import mx.fmre.rttycontest.evaluate.services.IGeneralServiceUtils;
 import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.dxcc.dao.DxccEntityCallsignDAO;
 import mx.fmre.rttycontest.persistence.model.CatBand;
@@ -24,13 +25,11 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
-import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
-import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
 
 @Slf4j
 @Service
@@ -41,9 +40,9 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	@Autowired private IContestLogRepository           contestLogRepository;
 	@Autowired private IContestQsoRepository           contestQsoRepository;
 	@Autowired private IDxccEntityRepository           dxccEntityRepository;
-	@Autowired private ILastEmailRepository            lastEmailRepository;
 	@Autowired private IFrequencyBsService             frequencyService;
 	@Autowired private ExternalDxccService             externalDxccService;
+	@Autowired private IGeneralServiceUtils            generalServiceUtils;
 	
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;
@@ -52,22 +51,14 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	public void completeDxccEntityQsos() {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
-			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
-			List<Integer> lastEmailIdsList = lastEmails
-					.stream()
-					.map(LastEmail::getEmailId)
-					.collect(Collectors.toList());
 			
 			Map<String, DxccEntity> map = this.fillDxccMap(edition);
 			
-			List<Email> emails = emailRepository.specialQuery(edition);
-			List<Email> filtered = emails
-					.stream()
-					.filter(e -> lastEmailIdsList.contains(e.getId()))
-					.collect(Collectors.toList());
-			
-			Date startDate = new Date();
-			int current = 1;
+            Date startDate = new Date();
+            int current = 1;
+
+            List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
+            List<Email> filtered = generalServiceUtils.filter(emailsOfEdition, edition);
 			
 			for (Email email : filtered) {
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
@@ -98,47 +89,42 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 		}
 	}
 
-	@Override
-	public void completeDxccEntityLogs() {
-		Date startDate = new Date();
-		int current = 1;
-		
-		List<Edition> editions = editionRepository.getActiveEditionOfContest();
-		for (Edition edition : editions) {
-			List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
-			List<Integer> lastLogsIdsList = lastEmails
-					.stream()
-					.map(LastEmail::getContestLogId)
-					.collect(Collectors.toList());
-			
-			Map<String, DxccEntity> map = this.fillDxccMap(edition);
-			List<ContestLog> logs = contestLogRepository.getContestLogWithoutDxccEntityByEdition(edition);
-			List<ContestLog> filteredLogs = logs
-					.stream()
-					.filter(l -> lastLogsIdsList.contains(l.getId().intValue()))
-					.collect(Collectors.toList());
-			for(ContestLog contestLog: filteredLogs) {
-				try {
+    @Override
+    public void completeDxccEntityLogs() {
+        Date startDate = new Date();
+        int current = 1;
+        
+        List<Edition> editions = editionRepository.getActiveEditionOfContest();
+
+        for (Edition edition : editions) {
+            Map<String, DxccEntity> map = this.fillDxccMap(edition);
+            List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
+            List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
+
+            for (Email emailFiltered : emailsFiltered) {
+                ContestLog contestLog = emailFiltered.getContestLog();
+
+                try {
                     DxccEntity dxccEntity = null;
                     if (null != contestLog.getCallsign() && !"".equals(contestLog.getCallsign())) {
                         dxccEntity = this.getDxccOf(map, contestLog.getCallsign(), edition);
                     }
-					if(dxccEntity != null) {
-						contestLog.setDxccEntity(dxccEntity);
-						contestLog.setDxccNotFound(false);
-					} else {
-						contestLog.setDxccEntity(null);
-						contestLog.setDxccNotFound(true);
-					}
-					contestLogRepository.save(contestLog);
-				} catch (FmreContestException e) {
-					e.printStackTrace();
-				}
-				log.info("{} de {}; time remaining: {}", current, filteredLogs.size(),
-						DateTimeUtil.timeRemaining(startDate, current++, filteredLogs.size()));
-			}
-		}
-	}
+                    if (dxccEntity != null) {
+                        contestLog.setDxccEntity(dxccEntity);
+                        contestLog.setDxccNotFound(false);
+                    } else {
+                        contestLog.setDxccEntity(null);
+                        contestLog.setDxccNotFound(true);
+                    }
+                    contestLogRepository.save(contestLog);
+                } catch (FmreContestException e) {
+                    e.printStackTrace();
+                }
+                log.info("{} de {}; time remaining: {}", current, emailsFiltered.size(),
+                        DateTimeUtil.timeRemaining(startDate, current++, emailsFiltered.size()));
+            }
+        }
+    }
 	
 	private Map<String, DxccEntity> fillDxccMap(Edition edition) {
 		Map<String, DxccEntity> map = new HashMap<>();
@@ -163,7 +149,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 		dxccEntity = externalDxccService.getDxccFromExternalServicesByCallsign(callsign);
 		
 		if(dxccEntity != null) {
-			log.info("{} from external Services", callsign);
+			log.debug("{} from external Services", callsign);
 			map.put(callsign, dxccEntity);
 			return dxccEntity;
 		}
@@ -188,16 +174,13 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
         Map<Integer, CatBand> mapFrequencyMaps = new HashMap<>();
         List<Edition> editions = editionRepository.getActiveEditionOfContest();
         for (Edition edition : editions) {
-            List<LastEmail> lastEmails = lastEmailRepository.findByEditionId(edition.getId());
-            List<Integer> lastEmailIdsList = lastEmails.stream().map(LastEmail::getEmailId)
-                    .collect(Collectors.toList());
-
-            List<Email> emails = emailRepository.findByEdition(edition);
-            List<Email> filtered = emails.stream().filter(e -> lastEmailIdsList.contains(e.getId()))
-                    .collect(Collectors.toList());
 
             Date startDate = new Date();
             int current = 1;
+            
+            List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
+            
+            List<Email> filtered = generalServiceUtils.filter(emailsOfEdition, edition);
 
             for (Email email : filtered) {
                 ContestLog contestLog = contestLogRepository.findByEmail(email);
