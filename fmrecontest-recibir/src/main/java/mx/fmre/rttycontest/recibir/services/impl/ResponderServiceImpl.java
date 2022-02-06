@@ -156,14 +156,21 @@ public class ResponderServiceImpl implements IResponderService {
 				.filter(e -> !e.equals(email))
 				.map(e -> {
 			ContestLog contestLog = contestLogRepository.findByEmail(e);
-			List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+			List<ContestQso> qsos = null;
+            if (contestLog != null) {
+                qsos = contestQsoRepository.findByContestLog(contestLog);
+            }
 			List<CatEmailError> listErrors = emailErrorRepository.getErrorsOfEmail(e);
 			OthersLogs othersLogs = new OthersLogs();
 			othersLogs.setFromName(e.getRecipientsFromName());
 			othersLogs.setDateOfSend(e.getSentDate());
-			othersLogs.setNoQsos(qsos.size());
+            if (qsos != null) {
+                othersLogs.setNoQsos(qsos.size());
+            }
 			othersLogs.setHasErrors(listErrors.size() > 0);
-			othersLogs.setRoverLog(contestLog.getGroup() != null);
+			if (contestLog != null) {
+			    othersLogs.setRoverLog(contestLog.getGroup() != null);
+			}
 			return othersLogs;
 		}).collect(Collectors.toList());
 	}
