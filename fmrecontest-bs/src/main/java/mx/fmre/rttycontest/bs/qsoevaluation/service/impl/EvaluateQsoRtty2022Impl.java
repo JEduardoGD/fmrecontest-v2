@@ -23,7 +23,7 @@ import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
-@Service("evaluateQsoRtty2022Impl")
+@Service("evaluateQsoRtty2022")
 public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 	
 	@Autowired private IDxccEntityRepository       dxccEntityRepository;
@@ -40,6 +40,13 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 		this.mexicoDxccEntity = dxccEntityRepository
 				.findById(50l)
 				.orElse(null);
+        
+        this.allowedMexicoEntities = Arrays.asList("AGS", "BC", "BCS", "CAM", "CHS", "CHH", "COA", "COL", "CDMX", "EMX",
+                "DGO", "GTO", "GRO", "HGO", "JAL", "MIC", "MOR", "NAY", "NL", "OAX", "PUE", "QRO", "QTR", "SLP", "SIN",
+                "SON", "TAB", "TMS", "TLX", "VER", "YUC", "ZAC");
+        
+        prohibitedWarcBands = Arrays.asList("12 meters", "17 meters", "30 meters");
+        frequencyBandsAllowed = Arrays.asList("80 meters", "60 meters", "40 meters", "20 meters", "15 meters", "10 meters");
 	}
 	
 	@Override

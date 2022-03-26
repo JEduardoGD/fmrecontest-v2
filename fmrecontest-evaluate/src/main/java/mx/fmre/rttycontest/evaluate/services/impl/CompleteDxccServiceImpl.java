@@ -161,7 +161,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 	    if(mapFrequencyMaps.containsKey(frequency)) {
 	        return mapFrequencyMaps.get(frequency);
 	    }
-	    CatBand band = frequencyService.getFrequencyBandOf(BigDecimal.valueOf(frequency));
+	    CatBand band = frequencyService.getBandOfFrequency(BigDecimal.valueOf(frequency));
         if (band != null) {
             mapFrequencyMaps.put(frequency, band);
             return band;

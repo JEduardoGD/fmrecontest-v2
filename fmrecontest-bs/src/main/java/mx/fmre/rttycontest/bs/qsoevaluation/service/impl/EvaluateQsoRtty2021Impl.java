@@ -1,7 +1,6 @@
 package mx.fmre.rttycontest.bs.qsoevaluation.service.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 

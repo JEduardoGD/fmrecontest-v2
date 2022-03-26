@@ -140,8 +140,8 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
             "   REEE.N_ID_EMAIL = te.N_ID_EMAIL " +
             "LEFT JOIN V_LAST_EMAIL V ON " +
             "   V.EMAIL_SUBJECT = te.S_SUBJECT " +
-            "WHERE " +
-            "   N_ID_EDITION = 2 " +
+            "WHERE  1 = 1" +
+            //" and N_ID_EDITION = 2 " +
             "   and V.EMAIL_SUBJECT is null " +
             "   and te.N_ID_EDITION = :N_ID_EDITION " +
             "GROUP BY " +

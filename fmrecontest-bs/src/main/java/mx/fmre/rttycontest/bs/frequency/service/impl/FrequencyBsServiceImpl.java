@@ -32,14 +32,20 @@ public class FrequencyBsServiceImpl implements IFrequencyBsService {
 	
 	private List<CatBand> listBands;
 	
+	private static final BigDecimal cientoOchentaBigDecimal = BigDecimal.valueOf(180);
+	private static final BigDecimal milBigDecimal = BigDecimal.valueOf(1000);
+	
 	@PostConstruct
 	private void postConstruct() {
 		this.listBands = catBandRepository.findAll();
 	}
 
 	@Override
-	public CatBand getFrequencyBandOf(BigDecimal frequency) {
-		List<CatFrequencyBand> multipleFB = catFrequencyBandRepository.getByFrequency(frequency);
+	public CatBand getBandOfFrequency(BigDecimal frequency) {
+	    
+        BigDecimal freq = frequency.compareTo(cientoOchentaBigDecimal) == 1 ? frequency.divide(milBigDecimal) : frequency;
+	    
+		List<CatFrequencyBand> multipleFB = catFrequencyBandRepository.getByFrequency(freq);
 		List<CatFrequencyBand> distinctBands = multipleFB
 				.stream()
 				.filter(CollectiosUtil.distinctByKey(CatFrequencyBand::getId))
@@ -55,7 +61,7 @@ public class FrequencyBsServiceImpl implements IFrequencyBsService {
 		
 		//method 2
 		//find in whole band
-		List<VBandFrequency> bandFrequencies = vBandFrequencyRepository.findByFrequency(frequency);
+		List<VBandFrequency> bandFrequencies = vBandFrequencyRepository.findByFrequency(freq);
 		if(bandFrequencies.size() == 1) {
 			VBandFrequency bandFrequency =  bandFrequencies.get(0);
 			Integer bandId = bandFrequency.getId();
@@ -63,7 +69,7 @@ public class FrequencyBsServiceImpl implements IFrequencyBsService {
 			return band;
 		}
 		
-		StaticFrequency staticFrequency = staticFrequencyRepository.findByFrequency(frequency);
+		StaticFrequency staticFrequency = staticFrequencyRepository.findByFrequency(freq);
 		if(staticFrequency != null) {
 			Integer bandId = staticFrequency.getBand().getId();
 			CatBand band = listBands.stream().filter(b -> b.getId() == bandId).findFirst().orElse(null);
