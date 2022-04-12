@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
@@ -30,45 +32,47 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 	@Autowired private IRelQsoConteoRepository     relQsoConteoRepository;
 	@Autowired private ICatBandRepository          catBandRepository;
 	
-	private DxccEntity mexicoDxccEntity;
+	@Value("${FMRE_CALLSIGN}")
+	private String xe1lmCallsign;
+	
 	private List<String> allowedMexicoEntities;
 	private String patternForNoMexicano = "^\\d+$";
 	private List<String> prohibitedWarcBands;
 	private List<String> frequencyBandsAllowed;
 	
 	@PostConstruct private void fillMexicoDxccEntity() {
-		this.mexicoDxccEntity = dxccEntityRepository
-				.findById(50l)
-				.orElse(null);
-        
         this.allowedMexicoEntities = Arrays.asList("AGS", "BC", "BCS", "CAM", "CHS", "CHH", "COA", "COL", "CDMX", "EMX",
                 "DGO", "GTO", "GRO", "HGO", "JAL", "MIC", "MOR", "NAY", "NL", "OAX", "PUE", "QRO", "QTR", "SLP", "SIN",
-                "SON", "TAB", "TMS", "TLX", "VER", "YUC", "ZAC");
+                "SON", "TAB", "TMS", "TLX", "VER", "YUC", "ZAC", "NLE");
         
         prohibitedWarcBands = Arrays.asList("12 meters", "17 meters", "30 meters");
         frequencyBandsAllowed = Arrays.asList("80 meters", "60 meters", "40 meters", "20 meters", "15 meters", "10 meters");
 	}
 	
 	@Override
-	public List<CatQsoError> findForErrors(Edition edition, ContestLog contestLog, ContestQso qso, List<CatQsoError> qsoErrors) {
+	public List<CatQsoError> findForErrors(DxccEntity mexicoDxccEntity, Edition edition, ContestLog contestLog, ContestQso qso, List<CatQsoError> qsoErrors) {
+	    
 		List<CatQsoError> listErrors = new ArrayList<>();
 		Calendar calendarEditionStartDate = Calendar.getInstance();
 		calendarEditionStartDate.setTime(edition.getStart());
+		calendarEditionStartDate.setTimeZone(TimeZone.getTimeZone("UTC"));
 		
-		Calendar calendarEditionEndDate = Calendar.getInstance();
+		Calendar calendarEditionEndDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendarEditionEndDate.setTime(edition.getEnd());
+		calendarEditionEndDate.setTimeZone(TimeZone.getTimeZone("UTC"));
 		
 		Calendar calendarQso = Calendar.getInstance();
 		calendarQso.setTime(qso.getDatetime());
+		calendarQso.setTimeZone(TimeZone.getTimeZone("UTC"));
 		
 		CatQsoError error_QSO_MADE_BEFORE_CONTEST_START = qsoErrors
 				.stream()
 				.filter(e -> "QSO_MADE_BEFORE_CONTEST_START".equals(e.getKey()))
 				.findFirst().orElse(null);
 		
-		CatQsoError error_QSO_MADE_AFTER_CONTEST_START = qsoErrors
+		CatQsoError error_QSO_MADE_AFTER_CONTEST_END = qsoErrors
 				.stream()
-				.filter(e -> "QSO_MADE_AFTER_CONTEST_START".equals(e.getKey()))
+				.filter(e -> "QSO_MADE_AFTER_CONTEST_END".equals(e.getKey()))
 				.findFirst().orElse(null);
 		
 		CatQsoError error_QSO_OUT_OF_BAND = qsoErrors
@@ -85,14 +89,13 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 				.stream()
 				.filter(e -> "QSO_ON_WARC_BAND".equals(e.getKey()))
 				.findFirst().orElse(null);
-
 		
 		if(calendarQso.before(calendarEditionStartDate)) {
 			listErrors.add(error_QSO_MADE_BEFORE_CONTEST_START);
 		}
 		
 		if(calendarQso.after(calendarEditionEndDate)) {
-			listErrors.add(error_QSO_MADE_AFTER_CONTEST_START);
+			listErrors.add(error_QSO_MADE_AFTER_CONTEST_END);
 		}
 		
 		CatBand band = qso.getBand();
@@ -113,7 +116,7 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 			contestLogDxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(contestLogDxccEntityId);
 		}
 		
-		if(contestLogDxccEntity != null && contestLogDxccEntity.equals(this.mexicoDxccEntity)) {
+		if(contestLogDxccEntity != null && contestLogDxccEntity.equals(mexicoDxccEntity)) {
 			if(!allowedMexicoEntities.contains(qso.getExchangee())) {
 				listErrors.add(error_NOT_VALID_EXCHANGE_EMMITED);
 			}
@@ -134,7 +137,7 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 	}
 
 	@Override
-	public Integer getPoints(ContestLog contestLog, ContestQso qso) {
+	public Integer getPoints(DxccEntity mexicoDxccEntity, ContestLog contestLog, ContestQso qso) {
 		DxccEntity dxccEntityHome = contestLog.getDxccEntity();
 		
 		if(dxccEntityHome == null)
@@ -162,7 +165,7 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 	}
 
 	@Override
-	public void setMultiplies(Conteo conteo, List<ContestQso> qsos) {
+	public void setMultiplies(DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
 		List<String> multpliesList = new ArrayList<>();
 		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
 		for(ContestQso qso:qsos) {
@@ -178,7 +181,7 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 					.findById(qso.getDxccEntity().getId())
 					.orElse(null);
 			
-			if(qsoDxccEntity.equals(this.mexicoDxccEntity)) {
+			if(qsoDxccEntity.equals(mexicoDxccEntity)) {
 				if(this.allowedMexicoEntities.contains(exchangeR) && !multpliesList.contains(exchangeR)) {
 					relQsoConteo.setMultiply(true);
 					multpliesList.add(exchangeR);

@@ -7,10 +7,12 @@ import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 
 public interface IEvaluateQso {
-	public List<CatQsoError> findForErrors(Edition edition, ContestLog contestLog, ContestQso qso, List<CatQsoError> qsoErrors);
-	public Integer getPoints(ContestLog contestLog, ContestQso qso) throws LocatorServiceException;
-	public void setMultiplies(Conteo conteo, List<ContestQso> qsos);
+    List<CatQsoError> findForErrors(DxccEntity mexicoDxccEntity, Edition edition, ContestLog contestLog, ContestQso qso,
+            List<CatQsoError> qsoErrors);
+    Integer getPoints(DxccEntity mexicoDxccEntity, ContestLog contestLog, ContestQso qso);
+    void setMultiplies(DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos);
 }

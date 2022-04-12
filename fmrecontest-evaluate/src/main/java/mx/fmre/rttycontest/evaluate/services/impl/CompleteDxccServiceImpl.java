@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
+import mx.fmre.rttycontest.bs.dxcc.util.DxccUtil;
 import mx.fmre.rttycontest.bs.frequency.service.IFrequencyBsService;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 import mx.fmre.rttycontest.evaluate.services.IGeneralServiceUtils;
 import mx.fmre.rttycontest.exception.FmreContestException;
-import mx.fmre.rttycontest.persistence.dxcc.dao.DxccEntityCallsignDAO;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
@@ -52,7 +52,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
 			
-			Map<String, DxccEntity> map = this.fillDxccMap(edition);
+			Map<String, DxccEntity> map = DxccUtil.fillDxccMap(dxccEntityRepository, edition);
 			
             Date startDate = new Date();
             int current = 1;
@@ -71,7 +71,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 				List<ContestQso> newQsos = f.stream().map(qso -> {
 					DxccEntity dxccEntity = null;
 					try {
-						dxccEntity = getDxccOf(map, qso.getCallsignr(), edition);
+						dxccEntity = DxccUtil.getDxccOf(externalDxccService, map, qso.getCallsignr(), edition);
 						if (dxccEntity == null)
 							qso.setDxccNotFound(true);
 						else
@@ -97,7 +97,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
         List<Edition> editions = editionRepository.getActiveEditionOfContest();
 
         for (Edition edition : editions) {
-            Map<String, DxccEntity> map = this.fillDxccMap(edition);
+            Map<String, DxccEntity> map = DxccUtil.fillDxccMap(dxccEntityRepository, edition);
             List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
             List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
 
@@ -107,7 +107,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
                 try {
                     DxccEntity dxccEntity = null;
                     if (null != contestLog.getCallsign() && !"".equals(contestLog.getCallsign())) {
-                        dxccEntity = this.getDxccOf(map, contestLog.getCallsign(), edition);
+                        dxccEntity = DxccUtil.getDxccOf(externalDxccService, map, contestLog.getCallsign(), edition);
                     }
                     if (dxccEntity != null) {
                         contestLog.setDxccEntity(dxccEntity);
@@ -125,37 +125,6 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
             }
         }
     }
-	
-	private Map<String, DxccEntity> fillDxccMap(Edition edition) {
-		Map<String, DxccEntity> map = new HashMap<>();
-		List<DxccEntityCallsignDAO> listObjectsQsos = dxccEntityRepository.getAllByEditionOnQso(edition);
-		listObjectsQsos.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
-		List<DxccEntityCallsignDAO> listObjectsLogs = dxccEntityRepository.getAllByEditionOnLogs(edition);
-		listObjectsLogs.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
-		return map;
-	}
-
-	private DxccEntity getDxccOf(Map<String, DxccEntity> map, String callsign, Edition edition) throws FmreContestException {
-		DxccEntity dxccEntity;
-		
-		// 1st atempt, from de map.
-		dxccEntity = map.get(callsign);
-		if(dxccEntity != null) {
-			log.info("{} from map", callsign);
-			return dxccEntity;
-		}
-		
-		// 2nd and 3rd atempts, from external services
-		dxccEntity = externalDxccService.getDxccFromExternalServicesByCallsign(callsign);
-		
-		if(dxccEntity != null) {
-			log.debug("{} from external Services", callsign);
-			map.put(callsign, dxccEntity);
-			return dxccEntity;
-		}
-		
-		return null;
-	}
 	
 	private CatBand gettingBandOfFrequency(Map<Integer, CatBand> mapFrequencyMaps, Integer frequency) {
 	    if(mapFrequencyMaps.containsKey(frequency)) {

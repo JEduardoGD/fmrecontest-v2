@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -88,7 +89,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
     private List<CatQsoError> listCatQsoError;
     private List<CatBand> listBands;
 
-    private DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    private DateFormat df;
 
     @PostConstruct
     private void initData() {
@@ -101,6 +102,9 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
         this.listCatQsoError = catQsoErrorRepository.findAll();
 
         this.listBands = catBandRepository.findAll();
+        
+        df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Override

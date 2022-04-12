@@ -19,6 +19,7 @@ import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
 import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
@@ -38,7 +39,7 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 	}
 	
 	@Override
-	public List<CatQsoError> findForErrors(Edition edition, ContestLog contestLog, ContestQso qso, List<CatQsoError> qsoErrors) {
+	public List<CatQsoError> findForErrors(DxccEntity mexicoDxccEntity, Edition edition, ContestLog contestLog, ContestQso qso, List<CatQsoError> qsoErrors) {
 		List<CatQsoError> listErrors = new ArrayList<>();
 		Calendar calendarEditionStartDate = Calendar.getInstance();
 		calendarEditionStartDate.setTime(edition.getStart());
@@ -86,9 +87,16 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 	}
 
     @Override
-    public Integer getPoints(ContestLog contestLog, ContestQso qso) throws LocatorServiceException {
-        CatGridlocatorState catGridlocatorStateLog = locatorService.getGridLocatorstateOfGridlocator(contestLog.getGridlocator());
-        CatGridlocatorState catGridlocatorStateQso = locatorService.getGridLocatorstateOfGridlocator(qso.getGridLocator());
+    public Integer getPoints(DxccEntity mexicoDxccEntity, ContestLog contestLog, ContestQso qso) {
+        CatGridlocatorState catGridlocatorStateLog = null;
+        CatGridlocatorState catGridlocatorStateQso = null;
+        try {
+            catGridlocatorStateLog = locatorService.getGridLocatorstateOfGridlocator(contestLog.getGridlocator());
+            catGridlocatorStateQso = locatorService.getGridLocatorstateOfGridlocator(qso.getGridLocator());
+        } catch (LocatorServiceException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         if (null == catGridlocatorStateLog || null == catGridlocatorStateQso) {
             return 0;
         }
@@ -96,7 +104,7 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
     }
 
     @Override
-    public void setMultiplies(Conteo conteo, List<ContestQso> qsos) {
+    public void setMultiplies(DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
         List<String> multpliesList = new ArrayList<>();
         List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
         for (ContestQso qso : qsos) {

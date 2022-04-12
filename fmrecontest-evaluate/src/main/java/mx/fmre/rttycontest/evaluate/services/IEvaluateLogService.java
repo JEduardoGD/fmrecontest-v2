@@ -1,5 +1,7 @@
 package mx.fmre.rttycontest.evaluate.services;
 
+import mx.fmre.rttycontest.persistence.model.DxccEntity;
+
 public interface IEvaluateLogService {
-	public void evaluateLog(Long logId, Integer conteoId);
+    void evaluateLog(DxccEntity mexicoDxccEntity, Long logId, Integer conteoId);
 }
