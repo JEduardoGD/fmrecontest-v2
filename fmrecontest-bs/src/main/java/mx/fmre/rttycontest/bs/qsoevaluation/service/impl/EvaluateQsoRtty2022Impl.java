@@ -112,7 +112,7 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 		
 		DxccEntity contestLogDxccEntity = null;
 		if (contestLog.getDxccEntity() != null) {
-			Long contestLogDxccEntityId = contestLog.getDxccEntity().getId();
+			Long contestLogDxccEntityId = contestLog.getDxccEntity().getEntityCode();
 			contestLogDxccEntity = dxccEntityRepository.findByDxccEntityCodeBeforeYear(contestLogDxccEntityId);
 		}
 		
