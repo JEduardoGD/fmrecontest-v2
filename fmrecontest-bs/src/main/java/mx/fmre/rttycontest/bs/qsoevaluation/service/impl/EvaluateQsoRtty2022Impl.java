@@ -140,20 +140,18 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 	public Integer getPoints(DxccEntity mexicoDxccEntity, ContestLog contestLog, ContestQso qso) {
 		DxccEntity dxccEntityHome = contestLog.getDxccEntity();
 		
-		if(dxccEntityHome == null)
+		if(dxccEntityHome == null) {
 			return null;
-		
-		DxccEntity dxccEntityCalled = null;
-		if (qso.getDxccEntity() != null) {
-		    dxccEntityCalled = qso.getDxccEntity();
 		}
+		
+		DxccEntity dxccEntityCalled = dxccEntityRepository.findById(qso.getDxccEntity().getId()).orElse(null);
 		
 		if(dxccEntityCalled == null) {
 			return null;
 		}
 		
-		boolean CALLER_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityHome);
-		boolean CALLED_IS_MEXICANO = mexicoDxccEntity.equals(dxccEntityCalled);
+		boolean CALLER_IS_MEXICANO = mexicoDxccEntity.getEntityCode().equals(dxccEntityHome.getEntityCode());
+		boolean CALLED_IS_MEXICANO = mexicoDxccEntity.getEntityCode().equals(dxccEntityCalled.getEntityCode());
 		
 		int return_val = 3;
 

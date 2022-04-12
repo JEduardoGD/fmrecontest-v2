@@ -191,7 +191,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
                     qso.getCallsignr(), df.format(qso.getDatetime()), qso.getExchangee(), qso.getExchanger(),
                     qso.getRste(), qso.getRstr(),
                     (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) ? "NOT FOUND" : "",
-                    dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getId(), dxccEntity.getEntity())) : "",
+                    dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getEntityCode(), dxccEntity.getEntity())) : "",
                     relQsoConteo.getPoints() != null ? relQsoConteo.getPoints() + "" : "",
                     relQsoConteo.isMultiply() ? "1" : "", qsoBand == null ? "NOT FOUND" : "",
                     qsoBand != null ? qsoBand.getBand() : "", String.join(";", keyErrors) };
