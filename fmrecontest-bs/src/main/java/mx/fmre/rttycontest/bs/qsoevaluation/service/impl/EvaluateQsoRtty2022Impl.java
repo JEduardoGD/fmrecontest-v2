@@ -41,9 +41,9 @@ public class EvaluateQsoRtty2022Impl implements IEvaluateQso {
 	private List<String> frequencyBandsAllowed;
 	
 	@PostConstruct private void fillMexicoDxccEntity() {
-        this.allowedMexicoEntities = Arrays.asList("AGS", "BC", "BCS", "CAM", "CHS", "CHH", "COA", "COL", "CDMX", "EMX",
-                "DGO", "GTO", "GRO", "HGO", "JAL", "MIC", "MOR", "NAY", "NL", "OAX", "PUE", "QRO", "QTR", "SLP", "SIN",
-                "SON", "TAB", "TMS", "TLX", "VER", "YUC", "ZAC", "NLE");
+        this.allowedMexicoEntities = Arrays.asList("AGS", "BC", "BCS", "CAM", "CHS", "CHH", "COA", "COL", "CDMX", "CMX",
+                "DF", "EMX", "DGO", "GTO", "GRO", "HGO", "JAL", "MIC", "MOR", "NAY", "NL", "NLE", "OAX", "PUE", "QRO",
+                "QTR", "SLP", "SIN", "SON", "TAB", "TMS", "TLX", "VER", "YUC", "ZAC");
         
         prohibitedWarcBands = Arrays.asList("12 meters", "17 meters", "30 meters");
         frequencyBandsAllowed = Arrays.asList("80 meters", "60 meters", "40 meters", "20 meters", "15 meters", "10 meters");
