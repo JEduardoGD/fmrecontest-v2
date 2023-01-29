@@ -50,7 +50,7 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 	}
 	
 	@Override
-	public List<CatQsoError> findForErrors(Edition edition, ContestLog contestLog, ContestQso qso, List<CatQsoError> qsoErrors) {
+	public List<CatQsoError> findForErrors(DxccEntity mexicoDxccEntity, Edition edition, ContestLog contestLog, ContestQso qso, List<CatQsoError> qsoErrors) {
 		List<CatQsoError> listErrors = new ArrayList<>();
 		Calendar calendarEditionStartDate = Calendar.getInstance();
 		calendarEditionStartDate.setTime(edition.getStart());
@@ -134,7 +134,7 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 	}
 
 	@Override
-	public Integer getPoints(ContestLog contestLog, ContestQso qso) {
+	public Integer getPoints(DxccEntity mexicoDxccEntity, ContestLog contestLog, ContestQso qso) {
 		DxccEntity dxccEntityHome = null;
 		if (contestLog.getDxccEntity() != null) {
 			Long dxccEntityHomeId = contestLog.getDxccEntity().getId();
@@ -173,7 +173,7 @@ public class EvaluateQsoRtty2020Impl implements IEvaluateQso {
 	}
 
 	@Override
-	public void setMultiplies(Conteo conteo, List<ContestQso> qsos) {
+	public void setMultiplies(DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
 		List<String> multpliesList = new ArrayList<>();
 		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
 		for(ContestQso qso:qsos) {

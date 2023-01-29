@@ -12,4 +12,4 @@ initdata/opt
 vars.env
 .history/
 fmrecontest-evaluate.log*
-
+.settings/

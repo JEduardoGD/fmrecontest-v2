@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -88,7 +89,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
     private List<CatQsoError> listCatQsoError;
     private List<CatBand> listBands;
 
-    private DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    private DateFormat df;
 
     @PostConstruct
     private void initData() {
@@ -101,6 +102,9 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
         this.listCatQsoError = catQsoErrorRepository.findAll();
 
         this.listBands = catBandRepository.findAll();
+        
+        df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Override
@@ -187,7 +191,7 @@ public class CsvReportsServiceImpl implements ICsvReportsService {
                     qso.getCallsignr(), df.format(qso.getDatetime()), qso.getExchangee(), qso.getExchanger(),
                     qso.getRste(), qso.getRstr(),
                     (qso.getDxccNotFound() != null && qso.getDxccNotFound() == true) ? "NOT FOUND" : "",
-                    dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getId(), dxccEntity.getEntity())) : "",
+                    dxccEntity != null ? (String.format("(%d) %s", dxccEntity.getEntityCode(), dxccEntity.getEntity())) : "",
                     relQsoConteo.getPoints() != null ? relQsoConteo.getPoints() + "" : "",
                     relQsoConteo.isMultiply() ? "1" : "", qsoBand == null ? "NOT FOUND" : "",
                     qsoBand != null ? qsoBand.getBand() : "", String.join(";", keyErrors) };
