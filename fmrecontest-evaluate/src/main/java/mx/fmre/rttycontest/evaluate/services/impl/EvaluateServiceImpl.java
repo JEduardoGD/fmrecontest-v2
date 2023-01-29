@@ -3,19 +3,24 @@ package mx.fmre.rttycontest.evaluate.services.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
+import mx.fmre.rttycontest.bs.dxcc.util.DxccUtil;
 import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
 import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
 import mx.fmre.rttycontest.evaluate.services.IGeneralServiceUtils;
+import mx.fmre.rttycontest.exception.FmreContestException;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
@@ -32,6 +37,7 @@ import mx.fmre.rttycontest.persistence.repository.ICatQsoErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
+import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
@@ -55,6 +61,11 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	@Autowired private IRelConteoContestLogRepository  relConteoContestLogRepository;
 	@Autowired private IEmailRepository                emailRepository;
     @Autowired private IGeneralServiceUtils            generalServiceUtils;
+    @Autowired private ExternalDxccService             externalDxccService;
+    @Autowired private IDxccEntityRepository           dxccEntityRepository;
+    
+    @Value("${FMRE_CALLSIGN}")
+    private String xe1lmCallsign;
 	
 	@Override
 	public Conteo createConteo(Edition edition, String description) {
@@ -76,31 +87,41 @@ public class EvaluateServiceImpl implements IEvaluateService {
 		
 		Date startDate = new Date();
 		int current = 1;
+        
+        DxccEntity mexicoDxccEntity = null;
+        Map<String, DxccEntity> map = DxccUtil.fillDxccMap(dxccEntityRepository, edition);
+        try {
+            mexicoDxccEntity = DxccUtil.getDxccOf(externalDxccService, map, xe1lmCallsign, edition);
+        } catch (FmreContestException e1) {
+            log.error(e1.getLocalizedMessage());
+        }
 		
 		for (Email emailFiltered : emailsFiltered) {
             ContestLog contestLog = emailFiltered.getContestLog();
 			log.info("{} de {}; time remaining: {}", current, emailsFiltered.size(),
 					DateTimeUtil.timeRemaining(startDate, current++, emailsFiltered.size()));
-			this.findForErrorsOnQsosOfLog(contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
+			this.findForErrorsOnQsosOfLog(mexicoDxccEntity, contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
 		}
 	}
 	
 	@Override
-	public void findForErrorsOnQsosOfLog(ContestLog contestLog, Conteo conteo) {
+	public void findForErrorsOnQsosOfLog(DxccEntity mexicoDxccEntity, ContestLog contestLog, Conteo conteo) {
 		Email email = emailRepository.findById(contestLog.getEmail().getId()).orElse(null);
 		Edition edition = editionRepository.findById(email.getEdition().getId()).orElse(null);
 		IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 		List<CatQsoError> catQsoErrors = catQsoErrorRepository.findByEdition(edition);
-		this.findForErrorsOnQsosOfLog(contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
+		this.findForErrorsOnQsosOfLog(mexicoDxccEntity, contestLog, conteo, dxccServiceQrz, edition, catQsoErrors);
 	}
 	
 	private void findForErrorsOnQsosOfLog(
+	        DxccEntity mexicoDxccEntity,
 			ContestLog contestLog,
 			Conteo conteo,
 			IEvaluateQso dxccServiceQrz,
 			Edition edition,
 			List<CatQsoError> catQsoErrors) {
 		List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
+		
 		for(ContestQso qso: qsos) {
 			boolean qsoComplete = true;
             if (qso.getError() != null && qso.getError().booleanValue() == true) {
@@ -124,9 +145,10 @@ public class EvaluateServiceImpl implements IEvaluateService {
 			
 			relQsoConteo = relQsoConteoRepository.save(relQsoConteo);
 			
-			List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(edition, contestLog, qso, catQsoErrors);
-			if(resEvaluation.isEmpty())
+			List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(mexicoDxccEntity, edition, contestLog, qso, catQsoErrors);
+			if(resEvaluation.isEmpty()) {
 				continue;
+			}
 			
 			List<RelQsoConteoQsoError> exsist = relQsoConteoQsoErrorRepository.findByRelQsoConteo(relQsoConteo);
 			if(!exsist.isEmpty()) {
@@ -146,14 +168,16 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	}
 
 	@Override
-	public void setPointsForQssos(Conteo conteo) {
+	public void setPointsForQssos(DxccEntity mexicoDxccEntity, Conteo conteo) {
+        
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
+	        
 			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 			
 			List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
 	        List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
-			
+	        
 			int i = 1;
 
             for (Email emailFiltered : emailsFiltered) {
@@ -161,15 +185,18 @@ public class EvaluateServiceImpl implements IEvaluateService {
                 log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
                 List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
                 qsos = contestQsoRepository.findByContestLog(contestLog);
-                qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+                qsos = qsos
+                        .stream()
+                        .filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
+                        .filter(q -> {
+                            RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(q, conteo);
+                            List<RelQsoConteoQsoError> listRelQsoConteoQsoError = relQsoConteoQsoErrorRepository.findByRelQsoConteo(relQsoConteo);
+                            return !(listRelQsoConteoQsoError.size() > 0);
+                        })
                         .collect(Collectors.toList());
                 List<RelQsoConteo> relQsoConteos = qsos.stream().map(qso -> {
                     Integer points = null;
-                    try {
-                        points = dxccServiceQrz.getPoints(contestLog, qso);
-                    } catch (LocatorServiceException e) {
-                        log.error(e.getLocalizedMessage());
-                    }
+                    points = dxccServiceQrz.getPoints(mexicoDxccEntity, contestLog, qso);
                     RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
                     relQsoConteo.setPoints(points);
                     return relQsoConteo;
@@ -183,6 +210,13 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	public void setMultipliesQsos(Conteo conteo) {
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
+	        DxccEntity mexicoDxccEntity = null;
+	        Map<String, DxccEntity> map = DxccUtil.fillDxccMap(dxccEntityRepository, edition);
+	        try {
+	            mexicoDxccEntity = DxccUtil.getDxccOf(externalDxccService, map, xe1lmCallsign, edition);
+	        } catch (FmreContestException e1) {
+	            log.error(e1.getLocalizedMessage());
+	        }
 			IEvaluateQso dxccServiceQrz = appContext.getBean(edition.getQsoValidationImpl(), IEvaluateQso.class);
 			
 			List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
@@ -212,7 +246,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
                 qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
                         .collect(Collectors.toList());
                 qsos = contestQsoRepository.findByContestLog(contestLog);
-                dxccServiceQrz.setMultiplies(conteo, qsos);
+                dxccServiceQrz.setMultiplies(mexicoDxccEntity, conteo, qsos);
             }
 		}
 	}

@@ -32,12 +32,12 @@ import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository
 @Slf4j
 public class ResultsReportsImpl implements IResultsReports {
 
-	@Autowired private IConteoRepository conteoRepository;
-	@Autowired private IContestLogRepository contestLogRepository;
+	@Autowired private IConteoRepository              conteoRepository;
+	@Autowired private IContestLogRepository          contestLogRepository;
 	@Autowired private IRelConteoContestLogRepository relConteoContestLogRepository;
-	@Autowired private ILastEmailRepository lastEmailRepository;
-	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
-    @Autowired private ExternalDxccService      externalDxccService;
+	@Autowired private ILastEmailRepository           lastEmailRepository;
+	@Autowired private EmailEmailErrorRepository      emailEmailErrorRepository;
+    @Autowired private ExternalDxccService            externalDxccService;
 
 	private DxccEntity mexicoDxccEntity;
     
@@ -368,7 +368,7 @@ public class ResultsReportsImpl implements IResultsReports {
 		List<ContestLog> contestLogList = listRelConteoContestLog.stream()
 				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
 				.collect(Collectors.toList());
-        
+
         List<Long> repeatedDxccEntityCodes = contestLogList.stream()
                 .map(ContestLog::getDxccEntity)
                 .map(DxccEntity::getEntityCode)
@@ -382,7 +382,7 @@ public class ResultsReportsImpl implements IResultsReports {
         }
 
 		ArrayList<String[]> allResults = new ArrayList<>();
-		int id = 202100001;
+		int id = 202200001;
 
 		{
 			List<RelConteoContestLog> highPowerListRelConteoContestLog = ResultReportsUtil

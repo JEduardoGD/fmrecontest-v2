@@ -1,5 +1,7 @@
 package mx.fmre.rttycontest.bs.qsoevaluation.service.impl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -25,8 +27,8 @@ import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
 import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
-@Service("evaluateQsoVhfUhf2021")
-public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
+@Service("evaluateQsoVhfUhf2022")
+public class EvaluateQsoVhfUhf2022 implements IEvaluateQso {
 	
 	@Autowired private IRelQsoConteoRepository        relQsoConteoRepository;
 	@Autowired private ICatBandRepository             catBandRepository;
@@ -71,6 +73,9 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 		
 		if(calendarQso.after(calendarEditionEndDate)) {
 			listErrors.add(error_QSO_MADE_AFTER_CONTEST_START);
+			DateFormat df = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+			System.out.println(df.format(calendarQso.getTime()));
+			System.out.println(df.format(calendarEditionEndDate.getTime()));
 		}
 		
 		CatBand band = qso.getBand();
@@ -88,6 +93,7 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
 
     @Override
     public Integer getPoints(DxccEntity mexicoDxccEntity, ContestLog contestLog, ContestQso qso) {
+        System.out.println("xxxx");
         CatGridlocatorState catGridlocatorStateLog = null;
         CatGridlocatorState catGridlocatorStateQso = null;
         try {

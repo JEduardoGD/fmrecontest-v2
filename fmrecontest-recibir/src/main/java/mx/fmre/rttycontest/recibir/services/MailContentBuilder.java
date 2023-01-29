@@ -44,10 +44,12 @@ public class MailContentBuilder {
     }
     
     private List<OthersLogs> parseOthersLogs(List<OthersLogs> listOthersLogs) {
-    	return listOthersLogs.stream().map(ol -> {
-    		ol.setSDateOfSend(df_es_MX.format(ol.getDateOfSend()));
-    		return ol;
-    	}).collect(Collectors.toList());
+        if (listOthersLogs == null) {
+            return null;
+        }
+        return listOthersLogs.stream().map(ol -> {
+            ol.setSDateOfSend(df_es_MX.format(ol.getDateOfSend()));
+            return ol;
+        }).collect(Collectors.toList());
     }
-
 }

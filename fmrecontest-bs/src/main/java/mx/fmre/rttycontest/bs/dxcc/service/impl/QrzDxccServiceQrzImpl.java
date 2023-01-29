@@ -41,7 +41,7 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 
         String url = null;
         try {
-            url = String.format(QRZ_URL + "?s=%s;dxcc=%s", session.getKey(), URLEncoder.encode(callsign, "UTF-8"));
+            url = makeQrzUrl(session, callsign);
         } catch (UnsupportedEncodingException e) {
             throw new FmreContestException(e);
         }
@@ -63,7 +63,11 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 						"Session Timeout".equalsIgnoreCase(qrzdatabase.getSession().getError())
 						)) {
 			session = getNewSession(qrzUsername, qrzPassword);
-			url = String.format(QRZ_URL + "?s=%s;callsign=%s", session.getKey(), callsign);
+            try {
+                url = makeQrzUrl(session, callsign);
+            } catch (UnsupportedEncodingException e) {
+                log.error(e.getLocalizedMessage());
+            }
 			qrzdatabase = QrzUtil.callToQrz(url);
 			if (qrzdatabase == null) {
 				return null;
@@ -108,4 +112,8 @@ public class QrzDxccServiceQrzImpl implements IDxccService {
 		}
 		return session;
 	}
+    
+    private String makeQrzUrl(DxccSession session, String callsign) throws UnsupportedEncodingException {
+        return String.format(QRZ_URL + "?s=%s;dxcc=%s", session.getKey(), URLEncoder.encode(callsign.toUpperCase(), "UTF-8"));
+    }
 }

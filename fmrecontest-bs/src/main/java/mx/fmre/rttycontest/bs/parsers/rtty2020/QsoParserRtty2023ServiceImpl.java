@@ -15,30 +15,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import mx.fmre.rttycontest.bs.location.exception.GridLocatorException;
-import mx.fmre.rttycontest.bs.location.service.IGridLocatorService;
 import mx.fmre.rttycontest.bs.parsers.IQsoParserService;
 import mx.fmre.rttycontest.exception.FmreContestException;
-import mx.fmre.rttycontest.persistence.geo.dto.Location;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.Edition;
-import mx.fmre.rttycontest.persistence.model.State;
-import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
-import mx.fmre.rttycontest.persistence.repository.IStateRepository;
 
 @Slf4j
-@Service("qsoParserVhfUhfServiceImpl")
-public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
-    
-    @Autowired private IGridLocatorService   gridLocatorService;
-    @Autowired private IStateRepository      stateRepository;
-    @Autowired private IContestLogRepository contestLogRepository;
-    
+@Service("qsoParserRtty2023ServiceImpl")
+public class QsoParserRtty2023ServiceImpl implements IQsoParserService {
 	private final String propertiesMap = "" + 
 			"address=ADDRESS\n" + 
 			"addressCity=ADDRESS-CITY\n" + 
@@ -93,22 +81,7 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 			}
 		}
 		contestlog.setContestqsos(listContest);
-		
-        if (       contestlog != null
-                && contestlog.getOperators() != null
-                && contestlog.getOperators().toLowerCase().endsWith("/m")) {
-            List<ContestLog> contestlogGroup = contestLogRepository.findByEditionAndCallsign(edition, contestlog.getCallsign());
-            contestlogGroup = contestlogGroup.stream().filter(log -> log.getGroup() != null).collect(Collectors.toList());
-            Long group;
-            if (contestlogGroup != null && !contestlogGroup.isEmpty()) {
-                group = contestlogGroup.get(0).getGroup();
-            } else {
-                Long maxGroup = contestLogRepository.getMaxGroup();
-                group = maxGroup == null ? 1l : contestLogRepository.getMaxGroup().longValue() + 1;
-            }
-            contestlog.setGroup(group);
-        }
-		
+
 		return contestlog;
 	}
 	
@@ -123,14 +96,16 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 		String dateS = null;
 		String hourS = null;
 		String callsignES = null;
-		String gridLocator = null;
+		String rstES = null;
 		String exchangeES = null;
 		String callsignRS = null;
-		String rstE = null;
-		String rstR = null;
+		String rstRS = null;
+		String exchangeRS = null;
 
 		Matcher m1 = p1.matcher(l);
-        Matcher m2 = p2.matcher(l);
+		Matcher m2 = p2.matcher(l);
+		Matcher m3 = p3.matcher(l);
+		Matcher m4 = p4.matcher(l);
 
 		String[] s = l.split("\\s+");
 
@@ -142,30 +117,70 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 				dateS = s[3];
 				hourS = s[4];
 				callsignES = s[5];
-				rstE = s[6];
-				callsignRS = s[7];
-				rstR = s[8];
-				gridLocator = s[9];
+				rstES = s[6];
+				exchangeES = s[7];
+				callsignRS = s[8];
+				rstRS = s[9];
+				exchangeRS = s[10];
 			} catch (IndexOutOfBoundsException e) {
 				log.error(e.getLocalizedMessage());
 			}
 		}
 
-        if (m2.matches()) {
-            matched = true;
-            try {
-                freqS = s[1];
-                modeS = s[2];
-                dateS = s[3];
-                hourS = s[4];
-                callsignES = s[5];
-                //String gridLocatorOrigin = s[6];
-                callsignRS = s[7];
-                gridLocator/*Destiny*/ = s[8];
-            } catch (IndexOutOfBoundsException e) {
-                log.error(e.getLocalizedMessage());
-            }
-        }
+		if (m2.matches()) {
+			matched = true;
+			try {
+				freqS = s[1];
+				modeS = s[2];
+				dateS = s[3];
+				hourS = s[4];
+				callsignES = s[5];
+				String[] arr2 = s[6].split("\\-");
+				rstES = arr2[0];
+				exchangeES = arr2[1];
+				callsignRS = s[7];
+				rstRS = s[8];
+				exchangeRS = s[9];
+			} catch (IndexOutOfBoundsException e) {
+				log.error(e.getLocalizedMessage());
+			}
+		}
+
+		if (m3.matches()) {
+			matched = true;
+			try {
+				freqS = s[1];
+				modeS = s[2];
+				dateS = s[3];
+				hourS = s[4];
+				callsignES = s[5];
+				rstES = s[6];
+				exchangeES = s[7];
+				callsignRS = s[8];
+				rstRS = s[9];
+				exchangeRS = s[10];
+			} catch (IndexOutOfBoundsException e) {
+				log.error(e.getLocalizedMessage());
+			}
+		}
+
+		if (m4.matches()) {
+			matched = true;
+			try {
+				freqS = s[1];
+				modeS = s[2];
+				dateS = s[3];
+				hourS = s[7];
+				callsignES = s[4];
+				rstES = s[5];
+				exchangeES = s[6];
+				callsignRS = s[8];
+				rstRS = s[9];
+				exchangeRS = s[10];
+			} catch (IndexOutOfBoundsException e) {
+				log.error(e.getLocalizedMessage());
+			}
+		}
 		
 		if (matched) {
 			Integer freq = new Integer(freqS);
@@ -177,8 +192,11 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 				log.error(e.getLocalizedMessage());
 			}
 			String callsignE = callsignES;
+			String rstE = rstES;
 			String exchangeE = exchangeES;
 			String callsignR = callsignRS;
+			String rstR = rstRS;
+			String exchangeR = exchangeRS;
 
 			qso = new ContestQso();
 			qso.setFrequency(freq);
@@ -189,37 +207,13 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 			qso.setExchangee(exchangeE);
 			qso.setCallsignr(callsignR);
 			qso.setRstr(rstR);
-			qso.setExchanger(null);
+			qso.setExchanger(exchangeR);
 			qso.setError(null);
-			qso.setGridLocator(gridLocator);
-			qso.setState(getStateOfGridLocator(gridLocator));
-            
-            
 		} else {
 			log.warn(String.format("Not parset %s", l));
 		}
 		
 		return qso;
-	}
-	
-	private State getStateOfGridLocator(String gridLocator) {
-	    Location originLocation = null;
-        if (gridLocator != null) {
-            try {
-                originLocation = gridLocatorService.getLocationOf(gridLocator);
-            } catch (GridLocatorException e) {
-                log.error(e.getLocalizedMessage());
-            }
-            if(originLocation == null) {
-                return null;
-            }
-            String region = originLocation.getRegion();
-            List<State> locations = stateRepository.findByGridLocatorEntity(region);
-            if(locations!=null && !locations.isEmpty()) {
-                return locations.get(0);
-            }
-        }
-        return null;
 	}
 
 	private void fill(ContestLog contestlog, String property, String value)
@@ -267,10 +261,27 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 		}
 		return m;
 	}
-	
+
+	// ^(QSO:)\s+\d+\s+\w+\s+(\d{4}-\d{2}-\d{2})\s+\d+\s+(\w|\/)+\s+\d+\s+\w+\s+(\w|\/)+\s+\d+\s+(\d|\w)+\s*$
+	// QSO: 14091 RY 2018-02-04 1751 VE2BVV 599 0132 W4UK 599 0193
+	// QSO: 14093 RY 2018-02-04 1752 VE2BVV 599 0133 XE2YWB 599 ZAC
+	// QSO: 14082 RY 2018-02-04 2049 VE2BVV 599 0183 K8RGI/4 599 0038
+
+	// ^(QSO:)\s+\d+\s+\w+\s+(\d{4}-\d{2}-\d{2})\s+\d+\s+(\w|\/)+\s+\d+-\w+\s+\w+\s+(\w|\/)+\s+(\d|\w)+$
+
+	// ^(QSO:)\s+\d+\s+\w+\s+(\d{4}-\d{2}-\d{2})\s+\d+\s+(\w|\/)+\s+\d+\s+\w+\s+(\w|\/)+\s+\d+\s+(\d|\w)+\s*(0)$
+	// QSO: 14081 RY 2018-02-03 1532 UT4RZ 599 005 ON8HW 599 AGU 0
+	// QSO: 14081 RY 2018-02-03 1531 UT4RZ 599 004 G4SJX 599 022 0
+
+	// ^(QSO:)\s+\d+\s+\w+\s+(\d{4}-\d{2}-\d{2})\s+(\w|\/)+\s+\d+\s+\d+\s+\w+\s+(\w|\/)+\s+\d+\s+(\d|\w)+\s*$
+	// QSO: 14071 RY 2018-02-03 G3SNU 599 001 1250 S57YK 599 000
 
 	private static final Pattern p1 = Pattern.compile(
-			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s*");
+			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d+\\s+(\\w|\\/)+\\s+\\d+\\s+\\w+\\s+(\\w|\\/)+\\s+\\d+\\s+(\\d|\\w)+\\s*$");
 	private static final Pattern p2 = Pattern.compile(
-	        "^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d{4}\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s*$");
+			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d+\\s+(\\w|\\/)+\\s+\\d+-\\w+\\s+\\w+\\s+(\\w|\\/)+\\s+(\\d|\\w)+$");
+	private static final Pattern p3 = Pattern.compile(
+			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d+\\s+(\\w|\\/)+\\s+\\d+\\s+\\w+\\s+(\\w|\\/)+\\s+\\d+\\s+(\\d|\\w)+\\s*(0)$");
+	private static final Pattern p4 = Pattern.compile(
+			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+(\\w|\\/)+\\s+\\d+\\s+\\d+\\s+\\w+\\s+(\\w|\\/)+\\s+\\d+\\s+(\\d|\\w)+\\s*$");
 }
