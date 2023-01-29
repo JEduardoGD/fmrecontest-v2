@@ -130,6 +130,7 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 		String rstR = null;
 
 		Matcher m1 = p1.matcher(l);
+        Matcher m2 = p2.matcher(l);
 
 		String[] s = l.split("\\s+");
 
@@ -149,6 +150,22 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 				log.error(e.getLocalizedMessage());
 			}
 		}
+
+        if (m2.matches()) {
+            matched = true;
+            try {
+                freqS = s[1];
+                modeS = s[2];
+                dateS = s[3];
+                hourS = s[4];
+                callsignES = s[5];
+                //String gridLocatorOrigin = s[6];
+                callsignRS = s[7];
+                gridLocator/*Destiny*/ = s[8];
+            } catch (IndexOutOfBoundsException e) {
+                log.error(e.getLocalizedMessage());
+            }
+        }
 		
 		if (matched) {
 			Integer freq = new Integer(freqS);
@@ -254,4 +271,6 @@ public class QsoParserVhfUhfServiceImpl implements IQsoParserService {
 
 	private static final Pattern p1 = Pattern.compile(
 			"^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s*");
+	private static final Pattern p2 = Pattern.compile(
+	        "^(QSO:)\\s+\\d+\\s+\\w+\\s+(\\d{4}-\\d{2}-\\d{2})\\s+\\d{4}\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s+(\\w|\\/)+\\s*$");
 }
