@@ -45,6 +45,7 @@ public class VerificacionEmailRtty2023Impl implements IVerificacionEmail {
 	private final String EMAIL_WITHOUT_CONTSTLOG                = "EMAIL_WITHOUT_CONTSTLOG";
 	private final String SUBJECT_WITH_MORE_THAN_ONE_WORD        = "SUBJECT_WITH_MORE_THAN_ONE_WORD";
 	private final String WRONG_CHANGE_CODE                      = "WRONG_CHANGE_CODE";
+    private final String LOG_WITHOUT_CALLSIGN                   = "LOG_WITHOUT_CALLSIGN";
 	
 	private DxccEntity mexicoDxccEntity;
 	
@@ -126,6 +127,16 @@ public class VerificacionEmailRtty2023Impl implements IVerificacionEmail {
 			}
 		} else
 			throw new FmreContestException("The test \"" + WRONG_CHANGE_CODE + "\" is not found for editon with ID " + editionId);
+		
+		/*LOG_WITHOUT_CALLSIGN*/
+        x = catEmailErrorRepository.findByEditionAndDescripcion(edition, LOG_WITHOUT_CALLSIGN);
+        if(x != null) {
+            if(this.verify_LOG_WITHOUT_CALLSIGN(email)) {
+                listCatEmailError.add(x);
+            }
+        } else
+            throw new FmreContestException("The test \"" + WRONG_CHANGE_CODE + "\" is not found for editon with ID " + editionId);
+		
 
 		return listCatEmailError;
 	}
@@ -166,10 +177,16 @@ public class VerificacionEmailRtty2023Impl implements IVerificacionEmail {
 	}
 
 	private boolean verify_WRONG_CHANGE_CODE(Email email, Edition edition, List<AttachedFile> attachedFiles) throws FmreContestException {
-		ContestLog contestLog = contestLogRepository.findByEmail(email);
-		if(null == contestLog){
-			return false;
-		}
+        ContestLog contestLog = contestLogRepository.findByEmail(email);
+        if (null == contestLog) {
+            log.error("ContestLog es nulo");
+            return false;
+        }
+
+        if (contestLog.getCallsign() == null || contestLog.getCallsign().equals("")) {
+            log.error("ContestLog.callsign es nulo o cadena vacía");
+            return false;
+        }
 		
 		DxccEntity dxccLogEntity = externalDxccService.getDxccFromExternalServicesByCallsign(contestLog.getCallsign());
 		
@@ -206,6 +223,20 @@ public class VerificacionEmailRtty2023Impl implements IVerificacionEmail {
 			return !allExchangeAreText;
 		}
 	}
+    
+    private boolean verify_LOG_WITHOUT_CALLSIGN(Email email) {
+        ContestLog contestLog = contestLogRepository.findByEmail(email);
+        if (null == contestLog) {
+            log.error("ContestLog es nulo");
+            return false;
+        }
+
+        if (contestLog.getCallsign() == null || contestLog.getCallsign().equals("")) {
+            log.error("ContestLog.callsign es nulo o cadena vacía");
+            return true;
+        }
+        return false;
+    }
 }
 
 
