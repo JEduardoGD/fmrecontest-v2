@@ -22,7 +22,7 @@ import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.EmailEmailError;
 import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
-import mx.fmre.rttycontest.persistence.repository.EmailEmailErrorRepository;
+import mx.fmre.rttycontest.persistence.repository.IEmailEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
@@ -36,7 +36,7 @@ public class ResultsReportsImpl implements IResultsReports {
 	@Autowired private IContestLogRepository          contestLogRepository;
 	@Autowired private IRelConteoContestLogRepository relConteoContestLogRepository;
 	@Autowired private ILastEmailRepository           lastEmailRepository;
-	@Autowired private EmailEmailErrorRepository      emailEmailErrorRepository;
+	@Autowired private IEmailEmailErrorRepository      emailEmailErrorRepository;
     @Autowired private ExternalDxccService            externalDxccService;
 
 	private DxccEntity mexicoDxccEntity;
