@@ -14,7 +14,7 @@ import mx.fmre.rttycontest.api.service.ExternalImportService;
 @RestController
 @RequestMapping("/external")
 //@Slf4j
-public class ExternalSistemController extends BaseController {
+public class ExternalDbController extends BaseController {
 
     /**
      * 
