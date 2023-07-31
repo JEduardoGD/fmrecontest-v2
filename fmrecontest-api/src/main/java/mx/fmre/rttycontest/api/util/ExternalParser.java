@@ -40,7 +40,7 @@ public abstract class ExternalParser {
         return Integer.valueOf(externalQsoFreque);
     }
 
-    public static ContestLog parse(ExternalLogs externalLog, List<ContestQso> contestqsos) {
+    public static ContestLog parse(ExternalLogs externalLog) {
         ExternalLogs e = externalLog;
         ContestLog cl = new ContestLog();
 
@@ -66,7 +66,6 @@ public abstract class ExternalParser {
         cl.setGroup(null);
         cl.setGridlocator(null);
         cl.setDxccEntity(null);
-        cl.setContestqsos(contestqsos);
         cl.setDxccNotFound(null);
 
         return cl;
