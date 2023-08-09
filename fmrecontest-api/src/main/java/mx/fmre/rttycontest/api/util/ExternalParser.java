@@ -1,7 +1,5 @@
 package mx.fmre.rttycontest.api.util;
 
-import java.util.List;
-
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.ExternalLogs;

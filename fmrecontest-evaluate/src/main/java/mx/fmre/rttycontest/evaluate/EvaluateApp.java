@@ -59,9 +59,10 @@ public class EvaluateApp implements CommandLineRunner {
 		completeDxccService.completeDxccEntityQsos();
 		completeDxccService.completeDxccEntityLogs();
 		completeDxccService.completeBandsOnQsos();
-		
+
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
+		    /*
             DxccEntity mexicoDxccEntity = null;
             Map<String, DxccEntity> map = DxccUtil.fillDxccMap(dxccEntityRepository, edition);
             try {
@@ -69,13 +70,16 @@ public class EvaluateApp implements CommandLineRunner {
             } catch (FmreContestException e1) {
                 log.error(e1.getLocalizedMessage());
             }
+            */
 		    
 			String description = "conteo for edition id " + edition.getId();
 			Conteo conteo = evaluateService.createConteo(edition, description);
 			evaluateService.findForErrorsOnQsos(conteo, edition);
+			/*
 			evaluateService.setPointsForQssos(mexicoDxccEntity, conteo);
 			evaluateService.setMultipliesQsos(conteo);
 			evaluateService.evaluateActiveEditions(conteo);
+			*/
 		}
 	}
 }
