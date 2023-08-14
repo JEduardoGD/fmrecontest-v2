@@ -31,7 +31,7 @@ public class DxccUtil {
         // 1st atempt, from de map.
         dxccEntity = map.get(callsign);
         if(dxccEntity != null) {
-            log.info("{} from map", callsign);
+            log.debug("{} from map", callsign);
             return dxccEntity;
         }
         
