@@ -197,10 +197,25 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	        List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
 	        
 			int i = 1;
+	        
+	        List<ContestLog> contestLogToEvaluate = new ArrayList<>();
+	        
+	        for (Email emailFiltered : emailsFiltered) {
+	            ContestLog contestLog = emailFiltered.getContestLog();
+	            contestLogToEvaluate.add(contestLog);
+	        }
+	        
+	        List<RelExternallogEdition> relExternallogEditionList = relExternallogEditionRepository.findAll()
+	                .stream()
+	                .filter(r -> r.getEdition().getId().equals(edition.getId()))
+	                .collect(Collectors.toList());
+	        
+	        for (RelExternallogEdition relExternallogEdition : relExternallogEditionList) {
+	            contestLogToEvaluate.add(contestLogRepository.findById(relExternallogEdition.getContestLog().getId()).orElse(null));
+	        }
 
-            for (Email emailFiltered : emailsFiltered) {
-                ContestLog contestLog = emailFiltered.getContestLog();
-                log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
+            for (ContestLog contestLog : contestLogToEvaluate) {
+                log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, contestLogToEvaluate.size());
                 List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
                 qsos = contestQsoRepository.findByContestLog(contestLog);
                 qsos = qsos

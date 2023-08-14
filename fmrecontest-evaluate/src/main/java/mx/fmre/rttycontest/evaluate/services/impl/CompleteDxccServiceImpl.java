@@ -139,7 +139,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
                 contestLogToEvaluate.add(contestLog);
             }
             
-            for(ContestLog contestLog:contestLogToEvaluate) {
+            for (ContestLog contestLog : contestLogToEvaluate) {
                 try {
                     DxccEntity dxccEntity = null;
                     if (null != contestLog.getCallsign() && !"".equals(contestLog.getCallsign())) {
@@ -186,9 +186,24 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
             List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
             
             List<Email> filtered = generalServiceUtils.filter(emailsOfEdition, edition);
-
+            
+            List<ContestLog> contestLogToEvaluate = new ArrayList<>();
+            
+            List<RelExternallogEdition> relExternallogEditionList = relExternallogEditionRepository.findAll()
+                    .stream()
+                    .filter(r -> r.getEdition().getId().equals(edition.getId()))
+                    .collect(Collectors.toList());
+            
+            for (RelExternallogEdition relExternallogEdition : relExternallogEditionList) {
+                contestLogToEvaluate.add(contestLogRepository.findById(relExternallogEdition.getContestLog().getId()).orElse(null));
+            }
+            
             for (Email email : filtered) {
                 ContestLog contestLog = contestLogRepository.findByEmail(email);
+                contestLogToEvaluate.add(contestLog);
+            }
+
+            for (ContestLog contestLog : contestLogToEvaluate) {
                 List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
                 qsos = qsos.stream().filter(q -> q.getBand() == null)
                         .filter(q -> q.getError() == null || q.getError().booleanValue() == false)
@@ -200,15 +215,15 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 //					bdFrequency = bdFrequency.divide(BigDecimal.valueOf(1000));
                     CatBand catBand = gettingBandOfFrequency(mapFrequencyMaps, qso.getFrequency());
                     if (catBand == null) {
-                        log.warn("Frequency not found for freq {} on qso id {}", qso.getFrequency(), qso.getId());
+                        log.warn("Band not found in catalog for freq {} on qso id {}", qso.getFrequency(), qso.getId());
                     }
                     qso.setBand(catBand);
                     return qso;
                 }).collect(Collectors.toList());
                 contestQsoRepository.saveAll(newQsos);
 
-                log.info("{} de {}; time remaining: {}", current, filtered.size(),
-                        DateTimeUtil.timeRemaining(startDate, current++, filtered.size()));
+                log.info("{} de {}; time remaining: {}", current, contestLogToEvaluate.size(),
+                        DateTimeUtil.timeRemaining(startDate, current++, contestLogToEvaluate.size()));
             }
         }
     }
