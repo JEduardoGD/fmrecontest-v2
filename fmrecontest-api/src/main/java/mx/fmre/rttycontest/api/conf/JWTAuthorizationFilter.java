@@ -17,42 +17,39 @@ import io.jsonwebtoken.Jwts;
 import mx.fmre.rttycontest.api.util.Constants;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-	
-	private String jwtSecretkey;
-	
-	public JWTAuthorizationFilter(AuthenticationManager authManager, String jwtSecretkey) {
-		super(authManager);
-		this.jwtSecretkey = jwtSecretkey;
-	}
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-			throws IOException, ServletException {
-		String header = req.getHeader(Constants.HEADER_AUTHORIZACION_KEY);
-		if (header == null || !header.startsWith(Constants.TOKEN_BEARER_PREFIX)) {
-			chain.doFilter(req, res);
-			return;
-		}
-		UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		chain.doFilter(req, res);
-	}
+    private String jwtSecretkey;
 
-	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-		String token = request.getHeader(Constants.HEADER_AUTHORIZACION_KEY);
-		if (token != null) {
-			// Se procesa el token y se recupera el usuario.
-			String user = Jwts.parser()
-						.setSigningKey(jwtSecretkey)
-						.parseClaimsJws(token.replace(Constants.TOKEN_BEARER_PREFIX, ""))
-						.getBody()
-						.getSubject();
+    public JWTAuthorizationFilter(AuthenticationManager authManager, String jwtSecretkey) {
+        super(authManager);
+        this.jwtSecretkey = jwtSecretkey;
+    }
 
-			if (user != null) {
-				return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
-			}
-			return null;
-		}
-		return null;
-	}
+    @Override
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+            throws IOException, ServletException {
+        String header = req.getHeader(Constants.HEADER_AUTHORIZACION_KEY);
+        if (header == null || !header.startsWith(Constants.TOKEN_BEARER_PREFIX)) {
+            chain.doFilter(req, res);
+            return;
+        }
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        chain.doFilter(req, res);
+    }
+
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+        String token = request.getHeader(Constants.HEADER_AUTHORIZACION_KEY);
+        if (token != null) {
+            // Se procesa el token y se recupera el usuario.
+            String user = Jwts.parser().setSigningKey(jwtSecretkey)
+                    .parseClaimsJws(token.replace(Constants.TOKEN_BEARER_PREFIX, "")).getBody().getSubject();
+
+            if (user != null) {
+                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+            }
+            return null;
+        }
+        return null;
+    }
 }

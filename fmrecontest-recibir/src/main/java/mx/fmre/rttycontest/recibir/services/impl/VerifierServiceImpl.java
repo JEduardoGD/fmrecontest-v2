@@ -19,7 +19,7 @@ import mx.fmre.rttycontest.persistence.model.Email;
 import mx.fmre.rttycontest.persistence.model.EmailEmailError;
 import mx.fmre.rttycontest.persistence.model.EmailEmailErrorPk;
 import mx.fmre.rttycontest.persistence.model.EmailStatus;
-import mx.fmre.rttycontest.persistence.repository.EmailEmailErrorRepository;
+import mx.fmre.rttycontest.persistence.repository.IEmailEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
@@ -29,11 +29,11 @@ import mx.fmre.rttycontest.recibir.services.IVerifierService;
 @Service
 public class VerifierServiceImpl implements IVerifierService {
 
-	@Autowired private IEmailEstatusRepository   emailEstatusRepository;
-	@Autowired private IEditionRepository        editionRepository;
-	@Autowired private IEmailRepository          emailRepository;
-	@Autowired private EmailEmailErrorRepository emailEmailErrorRepository;
-	@Autowired private ApplicationContext        appContext;
+	@Autowired private IEmailEstatusRepository    emailEstatusRepository;
+	@Autowired private IEditionRepository         editionRepository;
+	@Autowired private IEmailRepository           emailRepository;
+	@Autowired private IEmailEmailErrorRepository emailEmailErrorRepository;
+	@Autowired private ApplicationContext         appContext;
 	
 	@Value("${messages.perminute}")
 	private Integer messagesPerminute;

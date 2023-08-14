@@ -117,4 +117,8 @@ public class ContestLog implements Serializable {
 	// bi-directional many-to-one association to Contestqso
 	@OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
 	private List<RelConteoContestLog> relConteoContestLogs;
+
+    // bi-directional many-to-one association to Contestqso
+    @OneToMany(mappedBy = "contestLog", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private List<RelExternallogEdition> relExternallogEditions;
 }

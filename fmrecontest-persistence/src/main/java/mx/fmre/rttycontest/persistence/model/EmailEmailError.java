@@ -35,3 +35,4 @@ public class EmailEmailError implements Serializable{/**
 	@Column(name = "D_FECHA_REGISTRO")
 	private Date fechaRegistro;
 }
+

@@ -11,7 +11,7 @@ import mx.fmre.rttycontest.persistence.model.EmailEmailError;
 import mx.fmre.rttycontest.persistence.model.EmailEmailErrorPk;
 
 @Repository
-public interface EmailEmailErrorRepository extends JpaRepository<EmailEmailError, EmailEmailErrorPk> {
+public interface IEmailEmailErrorRepository extends JpaRepository<EmailEmailError, EmailEmailErrorPk> {
 	
 	@Query(value ="select eee from EmailEmailError eee where eee.pk.emailId = :emailId")
 	public List<EmailEmailError> findByEmailId(@Param("emailId") Integer emailId);

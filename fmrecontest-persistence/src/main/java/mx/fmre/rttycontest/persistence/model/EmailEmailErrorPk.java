@@ -22,3 +22,4 @@ public class EmailEmailErrorPk implements Serializable{
 	@Column(name = "N_ID_CAT_EMAIL_ERROR", insertable=false, updatable=false)
 	private Integer catErrorid;
 }
+

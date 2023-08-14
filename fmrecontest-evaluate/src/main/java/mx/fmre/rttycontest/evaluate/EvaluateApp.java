@@ -59,7 +59,7 @@ public class EvaluateApp implements CommandLineRunner {
 		completeDxccService.completeDxccEntityQsos();
 		completeDxccService.completeDxccEntityLogs();
 		completeDxccService.completeBandsOnQsos();
-		
+
 		List<Edition> editions = editionRepository.getActiveEditionOfContest();
 		for (Edition edition : editions) {
             DxccEntity mexicoDxccEntity = null;
