@@ -19,8 +19,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import mx.fmre.rttycontest.api.util.Constants;
 import mx.fmre.rttycontest.persistence.repository.IUserRepository;
 
-@Configuration
-@EnableWebSecurity
+//@Configuration
+//@EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
@@ -48,6 +48,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
             "/v2/api-docs",
             "/webjars/**",
             "/auth/**",
+            "/results/**",
             "/external/import"
     };
 

@@ -18,6 +18,7 @@ import mx.fmre.rttycontest.bs.dxcc.util.DxccUtil;
 import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
+import mx.fmre.rttycontest.bs.util.LogsListUtil;
 import mx.fmre.rttycontest.evaluate.services.IEvaluateService;
 import mx.fmre.rttycontest.evaluate.services.IGeneralServiceUtils;
 import mx.fmre.rttycontest.exception.FmreContestException;
@@ -29,6 +30,7 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
+import mx.fmre.rttycontest.persistence.model.EmailEmailError;
 import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
 import mx.fmre.rttycontest.persistence.model.RelExternallogEdition;
@@ -40,6 +42,7 @@ import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
+import mx.fmre.rttycontest.persistence.repository.IEmailEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
@@ -50,22 +53,23 @@ import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 @SuppressWarnings("unused")
 @Service
 @Slf4j
-public class EvaluateServiceImpl implements IEvaluateService {
+public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateService {
 
-	@Autowired private IEditionRepository              editionRepository;
-	@Autowired private IContestLogRepository           contestLogRepository;
-	@Autowired private IContestQsoRepository           contestQsoRepository;
-	@Autowired private ApplicationContext              appContext;
-	@Autowired private IConteoRepository               conteoRepository;
-	@Autowired private ICatQsoErrorRepository          catQsoErrorRepository;
-	@Autowired private IRelQsoConteoRepository         relQsoConteoRepository;
-	@Autowired private IRelQsoConteoQsoErrorRepository relQsoConteoQsoErrorRepository;
-	@Autowired private IRelConteoContestLogRepository  relConteoContestLogRepository;
-	@Autowired private IEmailRepository                emailRepository;
-    @Autowired private IGeneralServiceUtils            generalServiceUtils;
-    @Autowired private ExternalDxccService             externalDxccService;
-    @Autowired private IDxccEntityRepository           dxccEntityRepository;
+	@Autowired private IEditionRepository               editionRepository;
+	@Autowired private IContestLogRepository            contestLogRepository;
+	@Autowired private IContestQsoRepository            contestQsoRepository;
+	@Autowired private ApplicationContext               appContext;
+	@Autowired private IConteoRepository                conteoRepository;
+	@Autowired private ICatQsoErrorRepository           catQsoErrorRepository;
+	@Autowired private IRelQsoConteoRepository          relQsoConteoRepository;
+	@Autowired private IRelQsoConteoQsoErrorRepository  relQsoConteoQsoErrorRepository;
+	@Autowired private IRelConteoContestLogRepository   relConteoContestLogRepository;
+	@Autowired private IEmailRepository                 emailRepository;
+    @Autowired private IGeneralServiceUtils             generalServiceUtils;
+    @Autowired private ExternalDxccService              externalDxccService;
+    @Autowired private IDxccEntityRepository            dxccEntityRepository;
     @Autowired private IRelExternallogEditionRepository relExternallogEditionRepository;
+    @Autowired private IEmailEmailErrorRepository       emailEmailErrorRepository;
     
     @Value("${FMRE_CALLSIGN}")
     private String xe1lmCallsign;
@@ -99,21 +103,8 @@ public class EvaluateServiceImpl implements IEvaluateService {
             log.error(e1.getLocalizedMessage());
         }
         
-        List<ContestLog> contestLogToEvaluate = new ArrayList<>();
-		
-		for (Email emailFiltered : emailsFiltered) {
-            ContestLog contestLog = emailFiltered.getContestLog();
-            contestLogToEvaluate.add(contestLog);
-		}
         
-        List<RelExternallogEdition> relExternallogEditionList = relExternallogEditionRepository.findAll()
-                .stream()
-                .filter(r -> r.getEdition().getId().equals(edition.getId()))
-                .collect(Collectors.toList());
-        
-        for (RelExternallogEdition relExternallogEdition : relExternallogEditionList) {
-            contestLogToEvaluate.add(contestLogRepository.findById(relExternallogEdition.getContestLog().getId()).orElse(null));
-        }
+        List<ContestLog> contestLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, emailsFiltered, edition);
         
         for(ContestLog contestLog: contestLogToEvaluate) {
             log.info("{} de {}; time remaining: {}", current, contestLogToEvaluate.size(),
@@ -198,21 +189,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 	        
 			int i = 1;
 	        
-	        List<ContestLog> contestLogToEvaluate = new ArrayList<>();
-	        
-	        for (Email emailFiltered : emailsFiltered) {
-	            ContestLog contestLog = emailFiltered.getContestLog();
-	            contestLogToEvaluate.add(contestLog);
-	        }
-	        
-	        List<RelExternallogEdition> relExternallogEditionList = relExternallogEditionRepository.findAll()
-	                .stream()
-	                .filter(r -> r.getEdition().getId().equals(edition.getId()))
-	                .collect(Collectors.toList());
-	        
-	        for (RelExternallogEdition relExternallogEdition : relExternallogEditionList) {
-	            contestLogToEvaluate.add(contestLogRepository.findById(relExternallogEdition.getContestLog().getId()).orElse(null));
-	        }
+	        List<ContestLog> contestLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, emailsFiltered, edition);
 
             for (ContestLog contestLog : contestLogToEvaluate) {
                 log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, contestLogToEvaluate.size());
@@ -231,10 +208,17 @@ public class EvaluateServiceImpl implements IEvaluateService {
                     Integer points = null;
                     points = dxccServiceQrz.getPoints(mexicoDxccEntity, contestLog, qso);
                     RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
-                    relQsoConteo.setPoints(points);
+                    if(relQsoConteo != null) {
+                        relQsoConteo.setPoints(points);
+                    } else {
+                        log.error("No pudo setearse el conteo para el qso {} conteo {}", qso.getId(), conteo.getId());
+                    }
                     return relQsoConteo;
                 }).collect(Collectors.toList());
-                relQsoConteoRepository.saveAll(relQsoConteos);
+                List<RelQsoConteo> relQsoConteosFiltered = relQsoConteos.stream().filter(r -> null != r).collect(Collectors.toList());
+                if(!relQsoConteosFiltered.isEmpty()) {
+                    relQsoConteoRepository.saveAll(relQsoConteos);
+                }
             }
 		}
 	}
@@ -254,12 +238,12 @@ public class EvaluateServiceImpl implements IEvaluateService {
 			
 			List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
             List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
+            
+            List<ContestLog> contexLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, emailsFiltered, edition);
 
 			int i = 1;
 
-            for (Email emailFiltered : emailsFiltered) {
-                ContestLog contestLog = emailFiltered.getContestLog();
-
+            for (ContestLog contestLog : contexLogToEvaluate) {
                 Long contestLogGroup = contestLog.getGroup();
                 if (null != contestLogGroup) {
                     List<ContestLog> groupContestlogs = emailsFiltered.stream()
@@ -292,9 +276,10 @@ public class EvaluateServiceImpl implements IEvaluateService {
             List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
 			
 			int i = 1;
+            
+            List<ContestLog> contexLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, emailsFiltered, edition);
 
-			for (Email emailFiltered : emailsFiltered) {
-                ContestLog contestLog = emailFiltered.getContestLog();
+            for (ContestLog contestLog : contexLogToEvaluate) {
 				log.info("Evaluating log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog)
 						.stream()
@@ -328,8 +313,11 @@ public class EvaluateServiceImpl implements IEvaluateService {
 						.size();
 				long totalPoints = sumOfPoints * (long)multipliers;
 				
-//				Integer emailId = contestLog.getEmail().getId();
-//				List<EmailEmailError> listRelEmailEmailerror = emailEmailErrorRepository.findByEmailId(emailId);
+                List<EmailEmailError> listRelEmailEmailerror = new ArrayList<>();
+                if (contestLog.getEmail() != null && contestLog.getEmail().getId() != null) {
+                    Integer emailId = contestLog.getEmail().getId();
+                    listRelEmailEmailerror = emailEmailErrorRepository.findByEmailId(emailId);
+                }
 				
 				RelConteoContestLog relConteoContestLog = new RelConteoContestLog();
 				relConteoContestLog.setConteo(conteo);
@@ -337,7 +325,7 @@ public class EvaluateServiceImpl implements IEvaluateService {
 				relConteoContestLog.setSumOfPoints(sumOfPoints);
 				relConteoContestLog.setMultipliers(multipliers);
 				relConteoContestLog.setTotalPoints(totalPoints);
-				relConteoContestLog.setComplete(relQsoConteoNoComplete == null/* && listRelEmailEmailerror.size() <= 0*/);
+				relConteoContestLog.setComplete(relQsoConteoNoComplete == null  && listRelEmailEmailerror.size() <= 0);
 				relConteoContestLogRepository.save(relConteoContestLog);
 			}
 		}
