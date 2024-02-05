@@ -25,7 +25,7 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.Edition;
 
 @Slf4j
-@Service("qsoParserRtty2023ServiceImpl")
+@Service("qsoParserRtty2024ServiceImpl")
 public class QsoParserRtty2024ServiceImpl implements IQsoParserService {
 	private final String propertiesMap = "" + 
 			"address=ADDRESS\n" + 
