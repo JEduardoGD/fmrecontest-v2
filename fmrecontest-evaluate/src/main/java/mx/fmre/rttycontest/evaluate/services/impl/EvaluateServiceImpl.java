@@ -258,7 +258,7 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
                             .collect(Collectors.toList());
                 }
 
-                log.info("Setting multipliers log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
+                log.info("Setting multipliers log id {} ({} / {})", contestLog.getId(), i++, contexLogToEvaluate.size());
                 List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
                 qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
                         .collect(Collectors.toList());
@@ -280,7 +280,7 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
             List<ContestLog> contexLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, emailsFiltered, edition);
 
             for (ContestLog contestLog : contexLogToEvaluate) {
-				log.info("Evaluating log id {} ({} / {})", contestLog.getId(), i++, emailsFiltered.size());
+				log.info("Evaluating log id {} ({} / {})", contestLog.getId(), i++, contexLogToEvaluate.size());
 				List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog)
 						.stream()
 						.filter(q -> (q.getError() == null || q.getError().booleanValue() == false))

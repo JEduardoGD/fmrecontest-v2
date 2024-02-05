@@ -18,9 +18,11 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "TBL_CONTEST_LOG")
 public class ContestLog implements Serializable {
 	/**
@@ -29,6 +31,7 @@ public class ContestLog implements Serializable {
 	private static final long serialVersionUID = 2148036771250831124L;
 
 	@Id
+	@EqualsAndHashCode.Include
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "N_ID_CONTEST_LOG")
 	private Long id;
