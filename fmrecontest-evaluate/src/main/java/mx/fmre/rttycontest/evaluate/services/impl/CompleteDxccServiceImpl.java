@@ -1,7 +1,6 @@
 package mx.fmre.rttycontest.evaluate.services.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
 import mx.fmre.rttycontest.bs.dxcc.util.DxccUtil;
 import mx.fmre.rttycontest.bs.frequency.service.IFrequencyBsService;
 import mx.fmre.rttycontest.bs.util.DateTimeUtil;
+import mx.fmre.rttycontest.bs.util.LogsListUtil;
 import mx.fmre.rttycontest.evaluate.services.ICompleteDxccService;
 import mx.fmre.rttycontest.evaluate.services.IGeneralServiceUtils;
 import mx.fmre.rttycontest.exception.FmreContestException;
@@ -26,7 +26,6 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.Email;
-import mx.fmre.rttycontest.persistence.model.RelExternallogEdition;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestQsoRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
@@ -36,7 +35,7 @@ import mx.fmre.rttycontest.persistence.repository.IRelExternallogEditionReposito
 
 @Slf4j
 @Service
-public class CompleteDxccServiceImpl implements ICompleteDxccService {
+public class CompleteDxccServiceImpl extends LogsListUtil implements ICompleteDxccService {
 
 	@Autowired private IEditionRepository               editionRepository;
 	@Autowired private IEmailRepository                 emailRepository;
@@ -61,26 +60,12 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
             Date startDate = new Date();
             int current = 1;
             
-            List<ContestLog> contestLogToEvaluate = new ArrayList<>();
-            
-            //for external logs
-            List<RelExternallogEdition> relExternallogEditionList = relExternallogEditionRepository.findAll()
-                    .stream()
-                    .filter(r -> r.getEdition().getId().equals(edition.getId()))
-                    .collect(Collectors.toList());
-            for (RelExternallogEdition relExternallogEdition : relExternallogEditionList) {
-                contestLogToEvaluate.add(relExternallogEdition.getContestLog());
-            }
-            
             
             //for internal logs
             List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
             List<Email> filtered = generalServiceUtils.filter(emailsOfEdition, edition);
-            for (Email email : filtered) {
-                ContestLog contestLog = contestLogRepository.findByEmail(email);
-                contestLogToEvaluate.add(contestLog);
-            }
             
+            List<ContestLog> contestLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, filtered, edition);
             
             for (ContestLog contestLog : contestLogToEvaluate) {
                 List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
@@ -119,26 +104,12 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
 
         for (Edition edition : editions) {
             
-            List<ContestLog> contestLogToEvaluate = new ArrayList<>();
-            
-            List<RelExternallogEdition> relExternallogEditionList = relExternallogEditionRepository.findAll()
-                    .stream()
-                    .filter(r -> r.getEdition().getId().equals(edition.getId()))
-                    .collect(Collectors.toList());
-            
-            for (RelExternallogEdition relExternallogEdition : relExternallogEditionList) {
-                contestLogToEvaluate.add(contestLogRepository.findById(relExternallogEdition.getContestLog().getId()).orElse(null));
-            }
-            
             Map<String, DxccEntity> map = DxccUtil.fillDxccMap(dxccEntityRepository, edition);
             List<Email> emailsOfEdition = emailRepository.specialQuery(edition);
             List<Email> emailsFiltered = generalServiceUtils.filter(emailsOfEdition, edition);
-
-            for (Email emailFiltered : emailsFiltered) {
-                ContestLog contestLog = emailFiltered.getContestLog();
-                contestLogToEvaluate.add(contestLog);
-            }
             
+            List<ContestLog> contestLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, emailsFiltered, edition);
+
             for (ContestLog contestLog : contestLogToEvaluate) {
                 try {
                     DxccEntity dxccEntity = null;
@@ -187,21 +158,7 @@ public class CompleteDxccServiceImpl implements ICompleteDxccService {
             
             List<Email> filtered = generalServiceUtils.filter(emailsOfEdition, edition);
             
-            List<ContestLog> contestLogToEvaluate = new ArrayList<>();
-            
-            List<RelExternallogEdition> relExternallogEditionList = relExternallogEditionRepository.findAll()
-                    .stream()
-                    .filter(r -> r.getEdition().getId().equals(edition.getId()))
-                    .collect(Collectors.toList());
-            
-            for (RelExternallogEdition relExternallogEdition : relExternallogEditionList) {
-                contestLogToEvaluate.add(contestLogRepository.findById(relExternallogEdition.getContestLog().getId()).orElse(null));
-            }
-            
-            for (Email email : filtered) {
-                ContestLog contestLog = contestLogRepository.findByEmail(email);
-                contestLogToEvaluate.add(contestLog);
-            }
+            List<ContestLog> contestLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, filtered, edition);
 
             for (ContestLog contestLog : contestLogToEvaluate) {
                 List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);

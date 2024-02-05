@@ -27,14 +27,17 @@ public class SpringFoxConfig {
           .apis(RequestHandlerSelectors.any())              
           .paths(PathSelectors.any())
           .build()
-          .securitySchemes(Lists.newArrayList(apiKey()))
-          .securityContexts(Lists.newArrayList(securityContext()));                                           
+          .securitySchemes(Lists.newArrayList(apiKey()))/*
+          .securityContexts(Lists.newArrayList(securityContext()))*/;                                           
     }
     
+    /*
 	@Bean
 	SecurityContext securityContext() {
 		return SecurityContext.builder().securityReferences(defaultAuth()).forPaths(PathSelectors.any()).build();
 	}
+	*/
+	
 
 	List<SecurityReference> defaultAuth() {
 		AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessEverything");

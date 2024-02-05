@@ -2,6 +2,7 @@ package mx.fmre.rttycontest.bs.reports.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -20,12 +21,10 @@ import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.EmailEmailError;
-import mx.fmre.rttycontest.persistence.model.LastEmail;
 import mx.fmre.rttycontest.persistence.model.RelConteoContestLog;
-import mx.fmre.rttycontest.persistence.repository.IEmailEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IConteoRepository;
 import mx.fmre.rttycontest.persistence.repository.IContestLogRepository;
-import mx.fmre.rttycontest.persistence.repository.ILastEmailRepository;
+import mx.fmre.rttycontest.persistence.repository.IEmailEmailErrorRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelConteoContestLogRepository;
 
 @Service
@@ -35,9 +34,8 @@ public class ResultsReportsImpl implements IResultsReports {
 	@Autowired private IConteoRepository              conteoRepository;
 	@Autowired private IContestLogRepository          contestLogRepository;
 	@Autowired private IRelConteoContestLogRepository relConteoContestLogRepository;
-	@Autowired private ILastEmailRepository           lastEmailRepository;
-	@Autowired private IEmailEmailErrorRepository      emailEmailErrorRepository;
     @Autowired private ExternalDxccService            externalDxccService;
+    @Autowired private IEmailEmailErrorRepository     emailEmailErrorRepository;
 
 	private DxccEntity mexicoDxccEntity;
     
@@ -332,38 +330,65 @@ public class ResultsReportsImpl implements IResultsReports {
 	private List<RelConteoContestLog> filterContestLogList(Integer conteoId) {
 		Conteo conteo = conteoRepository.findById(conteoId).orElse(null);
 
-		Integer editionId = conteo.getEdition().getId();
-
-		List<Integer> lasEmailContestLogList = lastEmailRepository.findByEditionId(editionId).stream()
-				.map(LastEmail::getContestLogId).collect(Collectors.toList());
-
-		List<RelConteoContestLog> listRelConteoContestLog = relConteoContestLogRepository.findByConteo(conteo).stream()
-				.filter(rcl -> {
-					for (Integer l : lasEmailContestLogList) {
-						if (l.longValue() == rcl.getContestLog().getId().longValue())
-							return true;
-					}
-					return false;
-				}).filter(RelConteoContestLog::isComplete).collect(Collectors.toList());
+		List<RelConteoContestLog> listRelConteoContestLog = relConteoContestLogRepository.findByConteo(conteo);
 
 		// filter complete
 		listRelConteoContestLog = listRelConteoContestLog.stream().filter(RelConteoContestLog::isComplete)
 				.collect(Collectors.toList());
 
 		listRelConteoContestLog = listRelConteoContestLog.stream().filter(rccl -> {
-			Long contestLogId = rccl.getContestLog().getId();
-			ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
+            Long contestLogId = rccl.getContestLog().getId();
+            ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
+            if (contestLog.getEmail() == null) {
+                log.error("Log eliminado por errores en el correo: {}", contestLog.getId());
+                return true;
+            }
 			Integer emailId = contestLog.getEmail().getId();
 			List<EmailEmailError> listRelEmailEmailerror = emailEmailErrorRepository.findByEmailId(emailId);
 			return listRelEmailEmailerror.size() <= 0;
 		}).collect(Collectors.toList());
-
+		
+        // remove that sent by two vias
+        List<ContestLog> contestlogList = listRelConteoContestLog.stream()
+                .map(c -> contestLogRepository.findById(c.getContestLog().getId()).orElse(null))
+                .filter(c -> c != null)
+                .collect(Collectors.toList());
+        
+        Set<String> callsignSet = contestlogList.stream()
+                .map(ContestLog::getCallsign).collect(Collectors.toSet());
+        
+        List<ContestLog> listToRemove = new ArrayList<>();
+        
+        for (String s : callsignSet) {
+            List<ContestLog> contestLogOfString = contestlogList.stream()
+                    .filter(c -> c.getCallsign().equals(s))
+                    .filter(c -> null != c)
+                    .collect(Collectors.toList());
+            ContestLog contestLogGood = contestLogOfString.get(0);
+            List<ContestLog> listToRemoveForCallsign = contestLogOfString.stream()
+                    .filter(c -> !c.equals(contestLogGood))
+                    .collect(Collectors.toList());
+            listToRemove.addAll(listToRemoveForCallsign);
+        }
+        
+        listToRemove.forEach(x -> log.error("log eliminado por ya encontrarse: {}", x.getId()));
+        
+        List<RelConteoContestLog> listRelConteoContestLogToRemove = listRelConteoContestLog.stream()
+                .filter(r -> {
+                    Long id = r.getContestLog().getId();
+                    ContestLog contestLog = contestLogRepository.findById(id).orElse(null);
+                    return listToRemove.contains(contestLog);
+                })
+                .collect(Collectors.toList());
+        
+        listRelConteoContestLog.removeAll(listRelConteoContestLogToRemove);
+        
 		return listRelConteoContestLog;
 	}
 
 	@Override
 	public byte[] allResultsReport(int conteoId) {
-		List<RelConteoContestLog> listRelConteoContestLog = this.filterContestLogList(conteoId);
+	    List<RelConteoContestLog> listRelConteoContestLog = filterContestLogList(conteoId);
 
 		List<ContestLog> contestLogList = listRelConteoContestLog.stream()
 				.map(rcc -> contestLogRepository.findById(rcc.getContestLog().getId()).orElse(null))
@@ -382,7 +407,7 @@ public class ResultsReportsImpl implements IResultsReports {
         }
 
 		ArrayList<String[]> allResults = new ArrayList<>();
-		int id = 202200001;
+		int id = 202300001;
 
 		{
 			List<RelConteoContestLog> highPowerListRelConteoContestLog = ResultReportsUtil
@@ -397,8 +422,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						/*r[4]*/ "HIGH", 
 						r[5], 
 						r[6], 
-						"2021", 
-						r[1] + "-" + "2021" };
+						"2023", 
+						r[1] + "-" + "2023" };
 				allResults.add(l);
 			}
 		}
@@ -415,8 +440,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						/*r[3]*/   null, 
 						/*r[4]*/   "LOW", 
 						r[5], 
-						r[6], "2021", 
-						r[1] + "-" + "2021" };
+						r[6], "2023", 
+						r[1] + "-" + "2023" };
 				allResults.add(l);
 			}
 		}
@@ -433,8 +458,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						r[3], 
 						/*r[4]*/   "HIGH", 
 						r[5], 
-						r[6], "2021", 
-						r[1] + "-" + "2021" };
+						r[6], "2023", 
+						r[1] + "-" + "2023" };
 				allResults.add(l);
 			}
 		}
@@ -451,8 +476,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						r[3], 
 						/*r[4]*/   "LOW", 
 						r[5], 
-						r[6], "2021", 
-						r[1] + "-" + "2021" };
+						r[6], "2023", 
+						r[1] + "-" + "2023" };
 				allResults.add(l);
 			}
 		}
@@ -469,8 +494,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						null, 
 						/*r[4]*/   "HIGH", 
 						r[5], 
-						r[6], "2021", 
-						r[1] + "-" + "2021" };
+						r[6], "2023", 
+						r[1] + "-" + "2023" };
 				allResults.add(l);
 			}
 		}
@@ -487,8 +512,8 @@ public class ResultsReportsImpl implements IResultsReports {
 						null, 
 						/*r[4]*/   "LOW", 
 						r[5], 
-						r[6], "2021", 
-						r[1] + "-" + "2021" };
+						r[6], "2023", 
+						r[1] + "-" + "2023" };
 				allResults.add(l);
 			}
 		}
@@ -508,4 +533,6 @@ public class ResultsReportsImpl implements IResultsReports {
 		return CsvUtil.createCsvByteArray(header, allResults);
 
 	}
+	
+	
 }

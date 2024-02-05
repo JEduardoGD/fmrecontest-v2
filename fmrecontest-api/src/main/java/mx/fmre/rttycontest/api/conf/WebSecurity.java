@@ -48,6 +48,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
             "/v2/api-docs",
             "/webjars/**",
             "/auth/**",
+            "/results/**",
             "/external/import"
     };
 

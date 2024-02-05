@@ -73,8 +73,8 @@ public class EvaluateApp implements CommandLineRunner {
 			String description = "conteo for edition id " + edition.getId();
 			Conteo conteo = evaluateService.createConteo(edition, description);
 			evaluateService.findForErrorsOnQsos(conteo, edition);
-			evaluateService.setPointsForQssos(mexicoDxccEntity, conteo);
-			evaluateService.setMultipliesQsos(conteo);
+            evaluateService.setPointsForQssos(mexicoDxccEntity, conteo);
+            evaluateService.setMultipliesQsos(conteo);
 			evaluateService.evaluateActiveEditions(conteo);
 		}
 	}
