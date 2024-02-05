@@ -27,7 +27,7 @@ import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.recibir.business.IVerificacionEmail;
 
 @Slf4j
-@Service("verificacionEmailRtty2023Impl")
+@Service("verificacionEmailRtty2024Impl")
 public class verificacionEmailRtty2024Impl implements IVerificacionEmail {
 	@Autowired private IEditionRepository       editionRepository;
 	@Autowired private IAttachedFileRepository  attachedFileRepository;
