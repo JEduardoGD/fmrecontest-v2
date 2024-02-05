@@ -22,6 +22,12 @@ public class DxccUtil {
         listObjectsQsos.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
         List<DxccEntityCallsignDAO> listObjectsLogs = dxccEntityRepository.getAllByEditionOnLogs(edition);
         listObjectsLogs.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
+        //
+        List<DxccEntityCallsignDAO> listObjectsExternalQsos = dxccEntityRepository.getAllByEditionOnExternalQso(edition);
+        listObjectsExternalQsos.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
+        List<DxccEntityCallsignDAO> listObjectsExternalLogs = dxccEntityRepository.getAllByEditionOnExternalLogs(edition);
+        listObjectsExternalLogs.stream().forEach(o -> map.put(o.getCallsign(), o.getDxccEntity()));
+        
         return map;
     }
 

@@ -15,7 +15,7 @@ import mx.fmre.rttycontest.persistence.model.User;
 import mx.fmre.rttycontest.persistence.repository.IUserRepository;
 
 @Slf4j
-@Component
+//@Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 	
 	@Autowired private IUserRepository userRepository;
