@@ -86,7 +86,9 @@ public class ParserServiceImpl implements IParserService {
 		if (subject != null && (
 				subject.toLowerCase().contains("undelivered") || 
 				subject.toLowerCase().contains("spam") || 
-				subject.toLowerCase().startsWith("mail delivery deferred")))
+				subject.toLowerCase().startsWith("mail delivery deferred")) ||
+		        subject.toLowerCase().contains("mail delivery failed: returning message to sender") ||
+		        subject.toLowerCase().startsWith("no se puede entregar"))
 			return true;
 		if(email.getRecipientsFromAddress().toLowerCase().contains("rtty@fmre.mx"))
 			return true;
