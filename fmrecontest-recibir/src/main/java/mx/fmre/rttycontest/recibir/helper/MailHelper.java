@@ -3,7 +3,10 @@ package mx.fmre.rttycontest.recibir.helper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -12,6 +15,7 @@ import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +31,9 @@ import mx.fmre.rttycontest.persistence.model.EmailStatus;
 
 @Slf4j
 public class MailHelper {
+	private static final String REGEX_COMMA_OR_SEMMICOLON = "(\\,|\\;)";
+	private static final String REGEX_PATTERN = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" 
+	        + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 	private MailHelper() {
 		// not called
 	}
@@ -46,7 +53,7 @@ public class MailHelper {
 				try (InputStream is = bodyPart.getInputStream()) {
 					byte[] byteArray = FileUtil.inputStreamToByteArray(is);
 					String contentType = bodyPart.getContentType();
-					
+
 					String filename = bodyPart.getFileName();
 					if (filename.startsWith("=?UTF-8?b?"))
 						try {
@@ -56,7 +63,7 @@ public class MailHelper {
 							log.error(iae.getLocalizedMessage());
 							filename = FileUtil.getMd5Hash(byteArray) + ".log";
 						}
-					
+
 					AttachedFileDTO attachedFileDTO = new AttachedFileDTO();
 					attachedFileDTO.setFilename(filename);
 					attachedFileDTO.setByteArray(byteArray);
@@ -131,6 +138,30 @@ public class MailHelper {
 		}
 		String newString = sb.toString();
 		return newString.substring(0, newString.length() - 1);
+	}
+
+	public static List<String> parseMailStrings(String mailString) {
+		if (mailString == null || mailString.length() <= 0) {
+			return null;
+		}
+		String[] strAray = mailString.split(REGEX_COMMA_OR_SEMMICOLON);
+		return Arrays.asList(strAray).stream().filter(s -> Pattern.matches(REGEX_PATTERN, s))
+				.collect(Collectors.toList());
+	}
+	
+	public static InternetAddress[] addressesListParse(List<String> addressesList) {
+		if (addressesList == null || addressesList.size() <= 0) {
+			return null;
+		}
+		InternetAddress[] addressesArrays = new InternetAddress[addressesList.size()];
+		for (int i = 0; i < addressesList.size(); i++) {
+			try {
+				addressesArrays[i] = new InternetAddress(addressesList.get(i));
+			} catch (AddressException e) {
+				log.warn(e.getMessage());
+			}
+		}
+		return addressesArrays;
 	}
 }
 

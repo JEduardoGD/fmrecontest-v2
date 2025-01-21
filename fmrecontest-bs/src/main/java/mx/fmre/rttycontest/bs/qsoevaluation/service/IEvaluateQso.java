@@ -2,7 +2,6 @@ package mx.fmre.rttycontest.bs.qsoevaluation.service;
 
 import java.util.List;
 
-import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
 import mx.fmre.rttycontest.persistence.model.ContestLog;

@@ -46,6 +46,7 @@ public class RecibirApplication {
         mailService.scanContest();
         log.debug("ending mailService.scanContest()");
     }
+    
 
     @Scheduled(cron = "${cron.identify.expression}")
     public void crontIdentifyLogFiles() {
@@ -53,7 +54,7 @@ public class RecibirApplication {
         parserService.identifyLogFiles();
         log.debug("ending mailService.identifyLogFiles()");
     }
-
+    
     @Scheduled(cron = "${cron.parse.expression}")
     public void cronParseRecivedEmails() {
         log.debug("starting mailService.parseRecivedEmails()...");
