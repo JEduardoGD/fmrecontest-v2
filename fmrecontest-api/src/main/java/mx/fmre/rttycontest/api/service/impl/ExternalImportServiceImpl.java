@@ -40,23 +40,26 @@ public class ExternalImportServiceImpl implements ExternalImportService {
     @Override
     public boolean importExternal() {
         
-        Edition edition = editionRepository.findById(6).orElse(null);
+        Edition edition = editionRepository.findById(7).orElse(null);
 
-        List<ExternalLogs> externalLogsList = externalLogsRepository.findAll();
+		List<ExternalLogs> externalLogsList = externalLogsRepository.findAll().stream().filter(el -> el.getId() > 404)
+				.collect(Collectors.toList());
+        
         List<ExternalQso> externalQsoList = externalQsoRepository.findAll();
         int i = 1;
+        Calendar cal = Calendar.getInstance();
+        cal.set(2024, 1, 1);
 
-        for (ExternalLogs externalLog : externalLogsList) {
-            List<ExternalQso> externalQsoListFiltered = externalQsoList.stream()
-                    .filter(s -> s.getExternalQsoKey().getCallsing1().equalsIgnoreCase(externalLog.getCallsign()))
-                    .collect(Collectors.toList());
-            log.info("Parseando log externo {} de {} ({} qsos)", i++, externalLogsList.size(), externalQsoListFiltered.size());
-            
-            saveContestLog(edition, externalLog, externalQsoListFiltered);
-            
-            
+		for (ExternalLogs externalLog : externalLogsList) {
+			List<ExternalQso> externalQsoListFiltered = externalQsoList.stream()
+					.filter(s -> s.getExternalQsoKey().getCallsing1().equalsIgnoreCase(externalLog.getCallsign())
+							&& s.getExternalQsoKey().getFecha().after(cal.getTime()))
+					.collect(Collectors.toList());
+			log.info("Parseando log externo {} de {} ({} qsos)", i++, externalLogsList.size(),
+					externalQsoListFiltered.size());
 
-        }
+			saveContestLog(edition, externalLog, externalQsoListFiltered);
+		}
 
         return true;
     }

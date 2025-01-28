@@ -22,7 +22,8 @@ public class DateTimeUtil {
 	public static String timeRemaining(Date startDate, int current, int total) {
 		if (current <= 0)
 			return "can't calculate time left";
-		long diff = (new Date()).getTime() - startDate.getTime();
+		Date nowDate = new Date();
+		long diff = nowDate.getTime() - startDate.getTime();
 		long mult = (total - 1) * diff;
 		double leftMiliseconds = (mult / current);
 		if(leftMiliseconds >= 0 && leftMiliseconds <= 1000)

@@ -40,6 +40,7 @@ import mx.fmre.rttycontest.recibir.dto.EmailDataDTO;
 import mx.fmre.rttycontest.recibir.dto.ErrorDTO;
 import mx.fmre.rttycontest.recibir.dto.OthersLogs;
 import mx.fmre.rttycontest.recibir.helper.EncryptDecryptStringHelper;
+import mx.fmre.rttycontest.recibir.helper.MailHelper;
 import mx.fmre.rttycontest.recibir.services.IResponderService;
 import mx.fmre.rttycontest.recibir.services.MailContentBuilder;
 
@@ -114,10 +115,10 @@ public class ResponderServiceImpl implements IResponderService {
 				
 				if (edition.getTest()) {
 					emailDataDTO.setToAddress(edition.getEmailTest());
-					emailDataDTO.setBcc(null);
+					emailDataDTO.setBccList(null);
 				} else {
 					emailDataDTO.setToAddress(email.getRecipientsFromAddress());
-					emailDataDTO.setBcc(edition.getBcc());
+					emailDataDTO.setBccList(MailHelper.parseMailStrings(edition.getBcc()));
 				}
 				emailDataDTO.setTemplate(edition.getTemplate());
 				emailDataDTO.setDateOfSend(email.getSentDate());
@@ -229,8 +230,10 @@ public class ResponderServiceImpl implements IResponderService {
 				messageHelper.setTo(new InternetAddress(emailDataDTO.getToAddress()));
 			}
 			
-			if (emailDataDTO.getBcc() != null) {
-				messageHelper.setBcc(new InternetAddress(emailDataDTO.getBcc()));
+			InternetAddress[] bccArray = MailHelper.addressesListParse(emailDataDTO.getBccList());
+
+			if (bccArray != null && bccArray.length > 0) {
+				messageHelper.setBcc(bccArray);
 			}
 
 			messageHelper.setSubject(emailDataDTO.getSubject());
