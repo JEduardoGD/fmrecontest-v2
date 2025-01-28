@@ -20,10 +20,10 @@ import javax.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "TBL_CONTEST_LOG")
+@Data
 public class ContestLog implements Serializable {
 	/**
 	 * 

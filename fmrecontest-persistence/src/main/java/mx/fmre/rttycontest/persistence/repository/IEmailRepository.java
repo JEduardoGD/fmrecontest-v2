@@ -60,6 +60,17 @@ public interface IEmailRepository extends JpaRepository<Email, Integer> {
 	@Query(value = "" +
 			"SELECT E " +
 			"FROM Email E " +
+			"WHERE E.edition = :edition and " +
+			"      E.emailStatus in :statuses and " +
+			"      E.verifiedAt IS NOT NULL AND " +
+			"      E.answeredAt IS NOT NULL ")
+	public List<Email> findByEditionAndEmailStatusesAndVerifiedAndAnswered(
+			@Param("edition") Edition edition, 
+			@Param("statuses") List<EmailStatus> statuses);
+
+	@Query(value = "" +
+			"SELECT E " +
+			"FROM Email E " +
 			"WHERE upper(E.subject) = upper(:subject) and " +
 			"            E.edition = :edition and " +
 			"            E.sentDate <= :d ")

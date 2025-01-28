@@ -47,6 +47,30 @@ public class EvaluateApp implements CommandLineRunner {
     
     @Value("${FMRE_CALLSIGN}")
     private String xe1lmCallsign;
+    
+    @Value("${spring.datasource.url}")
+    private String springDatasourceUrl;
+    @Value("${spring.datasource.username}")
+    private String springDatasourceUsername;
+    @Value("${spring.datasource.password}")
+    private String springDatasourcePassword;
+    @Value("${email.password.encodingkey}")
+    private String emailPasswordEncodingkey;
+    @Value("${amazon.creds.secretkey}")
+    private String amazonCredsSecretkey;
+    @Value("${amazon.creds.acceskey}")
+    private String amazonCredsAcceskey;
+    @Value("${amazon.s3.bucketname}")
+    private String amazonS3Bucketname;
+    @Value("${file.manager.impl}")
+    private String fileManagerImpl;
+    @Value("${jwt.secretkey}")
+    private String jwtSecretkey;
+    @Value("${jwt.token.expirationtime}")
+    private String jwtTokenExpirationtime;
+    @Value("${jwt.issuer.info}")
+    private String jwtIssuerInfo;
+    
 
 	@Autowired private IEditionRepository editionRepository;
 
@@ -56,6 +80,19 @@ public class EvaluateApp implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+	    log.info(springDatasourceUrl);
+	    log.info(springDatasourceUsername);
+	    log.info(springDatasourcePassword);
+	    log.info(emailPasswordEncodingkey);
+	    log.info(amazonCredsSecretkey);
+	    log.info(amazonCredsAcceskey);
+	    log.info(amazonS3Bucketname);
+	    log.info(fileManagerImpl);
+	    log.info(jwtSecretkey);
+	    log.info(jwtTokenExpirationtime);
+	    log.info(jwtIssuerInfo);
+	    
+	    
 		completeDxccService.completeDxccEntityQsos();
 		completeDxccService.completeDxccEntityLogs();
 		completeDxccService.completeBandsOnQsos();

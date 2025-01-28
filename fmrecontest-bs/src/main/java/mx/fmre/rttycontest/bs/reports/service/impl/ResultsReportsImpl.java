@@ -340,6 +340,7 @@ public class ResultsReportsImpl implements IResultsReports {
             Long contestLogId = rccl.getContestLog().getId();
             ContestLog contestLog = contestLogRepository.findById(contestLogId).orElse(null);
             if (contestLog.getEmail() == null) {
+            	
                 log.error("Log eliminado por errores en el correo: {}", contestLog.getId());
                 return true;
             }
