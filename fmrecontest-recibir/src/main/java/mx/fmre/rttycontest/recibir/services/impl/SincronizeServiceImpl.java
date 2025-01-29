@@ -100,7 +100,7 @@ public class SincronizeServiceImpl implements SincronizeService {
 				try {
 					Long nextId = externalConnectionService.getNextId();
 					if (nextId == null) {
-						nextId = 0l;
+						nextId = 1l;
 					}
 					localAGuardar.setId(nextId);
 					localAGuardar = externalConnectionService.save(localAGuardar);
