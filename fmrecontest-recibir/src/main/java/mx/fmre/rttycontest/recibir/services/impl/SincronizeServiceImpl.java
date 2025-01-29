@@ -99,6 +99,9 @@ public class SincronizeServiceImpl implements SincronizeService {
 				log.info("Se va a guardar el local: {}", localAGuardar.toString());
 				try {
 					Long nextId = externalConnectionService.getNextId();
+					if (nextId == null) {
+						nextId = 0l;
+					}
 					localAGuardar.setId(nextId);
 					localAGuardar = externalConnectionService.save(localAGuardar);
 					log.info("Guardado: {}", localAGuardar);
