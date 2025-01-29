@@ -15,7 +15,7 @@ public class ResetClientConfigurator {
 	public RestTemplate restTemplate() {
 		log.info("create rest template");
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory("http://localhost:9080"));
+		restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory("http://192.168.0.199:9080"));
 		return restTemplate;
 	}
 }
