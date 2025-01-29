@@ -38,7 +38,6 @@ public class RecibirApplication {
         SpringApplication.run(RecibirApplication.class);
     }
     
-    /*
     @Scheduled(cron = "${cron.scanner.expression}")
     public void crontScanContest() {
         log.debug("starting mailService.scanContest()...");
@@ -73,7 +72,6 @@ public class RecibirApplication {
         responderService.responseParsedEmail();
         log.debug("ending mailService.responseParsedEmail()");
     }
-    */
 
     @Scheduled(cron = "${cron.sincronizar.expression}")
     public void cronSincronizerService() {
