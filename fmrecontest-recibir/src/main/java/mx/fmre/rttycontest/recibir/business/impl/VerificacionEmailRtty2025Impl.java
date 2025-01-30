@@ -119,7 +119,7 @@ public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
 		} else
 			throw new FmreContestException("The test \"" + EMAIL_WITHOUT_CONTSTLOG + "\" is not found for editon with ID " + editionId);
 
-		/*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
+		/*WRONG_CHANGE_CODE*/
 		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, WRONG_CHANGE_CODE);
 		if(x != null) {
 			if(this.verify_WRONG_CHANGE_CODE(email, edition, attachedFiles)) {
@@ -135,7 +135,7 @@ public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
                 listCatEmailError.add(x);
             }
         } else
-            throw new FmreContestException("The test \"" + WRONG_CHANGE_CODE + "\" is not found for editon with ID " + editionId);
+            throw new FmreContestException("The test \"" + LOG_WITHOUT_CALLSIGN + "\" is not found for editon with ID " + editionId);
 		
 
 		return listCatEmailError;
@@ -213,11 +213,11 @@ public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
 				String exchangeStr = qso.getExchangee();
 				try {
 					Integer.parseInt(exchangeStr);
-					allExchangeAreText = false;
-					break;
 				} catch (NumberFormatException e) {
 					@SuppressWarnings("unused")
 					String err = e.getLocalizedMessage();
+					allExchangeAreText = false;
+					break;
 				}
 			}
 			return !allExchangeAreText;
