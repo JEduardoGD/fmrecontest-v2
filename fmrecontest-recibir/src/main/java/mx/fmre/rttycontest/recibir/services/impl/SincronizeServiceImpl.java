@@ -8,7 +8,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
@@ -22,6 +22,7 @@ import mx.fmre.rttycontest.persistence.repository.IEditionRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailEstatusRepository;
 import mx.fmre.rttycontest.persistence.repository.IEmailRepository;
 import mx.fmre.rttycontest.recibir.dto.RemoteLog;
+import mx.fmre.rttycontest.recibir.exception.ExternalConnectionException;
 import mx.fmre.rttycontest.recibir.services.ExternalConnectionService;
 import mx.fmre.rttycontest.recibir.services.SincronizeService;
 
@@ -47,7 +48,7 @@ public class SincronizeServiceImpl implements SincronizeService {
 	}
 
 	@Override
-	public void sincronize() {
+	public void sincronize(){
 
 		List<RemoteLog> allLocales = new ArrayList<>();
 
@@ -76,7 +77,13 @@ public class SincronizeServiceImpl implements SincronizeService {
 			}
 
 			// 1. Get all saved logs in external
-			RemoteLog[] allSavedByYearArr = externalConnectionService.getAllByYear(edition.getYear());
+			RemoteLog[] allSavedByYearArr;
+			try {
+				allSavedByYearArr = externalConnectionService.getAllByYear(edition.getYear());
+			} catch (ExternalConnectionException e) {
+				log.error("Error al ejecutar el metodo externalConnectionService.getAllByYear: {}", e.getMessage());
+				return;
+			}
 			if (allSavedByYearArr == null) {
 				log.warn("La repsuesta a la consulta de registros externos fue nula");
 				return;
@@ -105,11 +112,10 @@ public class SincronizeServiceImpl implements SincronizeService {
 					localAGuardar.setId(nextId);
 					localAGuardar = externalConnectionService.save(localAGuardar);
 					log.info("Guardado: {}", localAGuardar);
-				} catch (HttpClientErrorException e) {
+				} catch (ExternalConnectionException e) {
 					log.error(e.getMessage());
 				}
 			}
 		}
-
 	}
 }
