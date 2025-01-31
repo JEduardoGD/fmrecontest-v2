@@ -56,10 +56,11 @@ public class SincronizeServiceImpl implements SincronizeService {
 		for (Edition edition : editions) {
 			List<Email> emails = emailRepository.findByEditionAndEmailStatusesAndVerifiedAndAnswered(edition,
 					listEstatuses);
+			List<Integer> idsEmailWithError = new ArrayList<>();
 			for (Email email : emails) {
 				List<CatEmailError> errors = emailErrorRepository.getErrorsOfEmail(email);
 				if (errors != null && !errors.isEmpty()) {
-					log.info("no se agrega a la lista de archivos a sincronizar por tener errorres en el correo con id {}", email.getId());
+					idsEmailWithError.add(email.getId());
 					continue;
 				}
 				
@@ -69,6 +70,10 @@ public class SincronizeServiceImpl implements SincronizeService {
 				remoteLog.setCallsign(contestLog.getCallsign());
 				remoteLog.setAnio(edition.getYear() + "");
 				allLocales.add(remoteLog);
+			}
+			if (!idsEmailWithError.isEmpty()) {
+				log.info("no se agrega a la lista de archivos a sincronizar por tener errorres en el correo: {}",
+						idsEmailWithError);
 			}
 
 			if (allLocales == null || allLocales.isEmpty()) {
