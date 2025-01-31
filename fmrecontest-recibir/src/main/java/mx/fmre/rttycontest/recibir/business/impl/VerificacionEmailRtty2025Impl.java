@@ -29,37 +29,37 @@ import mx.fmre.rttycontest.recibir.business.IVerificacionEmail;
 @Slf4j
 @Service("verificacionEmailRtty2025Impl")
 public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
-	@Autowired private IEditionRepository       editionRepository;
-	@Autowired private IAttachedFileRepository  attachedFileRepository;
+	@Autowired private IEditionRepository editionRepository;
+	@Autowired private IAttachedFileRepository attachedFileRepository;
 	@Autowired private ICatEmailErrorRepository catEmailErrorRepository;
-	@Autowired private IContestLogRepository    contestLogRepository;
-	@Autowired private IContestQsoRepository    contestQsoRepository;
-	@Autowired private ExternalDxccService      externalDxccService;
-	
+	@Autowired private IContestLogRepository contestLogRepository;
+	@Autowired private IContestQsoRepository contestQsoRepository;
+	@Autowired private ExternalDxccService externalDxccService;
+
 	@Value("${FMRE_CALLSIGN}")
 	private String FMRE_CALLSIG;
 
-	private final String EMAIL_WITHOUT_SUBJECT                  = "EMAIL_WITHOUT_SUBJECT";
-	private final String EMAIL_WITHOUT_ATTACHED_FILES           = "EMAIL_WITHOUT_ATTACHED_FILES";
+	private final String EMAIL_WITHOUT_SUBJECT = "EMAIL_WITHOUT_SUBJECT";
+	private final String EMAIL_WITHOUT_ATTACHED_FILES = "EMAIL_WITHOUT_ATTACHED_FILES";
 	private final String SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN = "SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN";
-	private final String EMAIL_WITHOUT_CONTSTLOG                = "EMAIL_WITHOUT_CONTSTLOG";
-	private final String SUBJECT_WITH_MORE_THAN_ONE_WORD        = "SUBJECT_WITH_MORE_THAN_ONE_WORD";
-	private final String WRONG_CHANGE_CODE                      = "WRONG_CHANGE_CODE";
-    private final String LOG_WITHOUT_CALLSIGN                   = "LOG_WITHOUT_CALLSIGN";
-	
+	private final String EMAIL_WITHOUT_CONTSTLOG = "EMAIL_WITHOUT_CONTSTLOG";
+	private final String SUBJECT_WITH_MORE_THAN_ONE_WORD = "SUBJECT_WITH_MORE_THAN_ONE_WORD";
+	private final String WRONG_CHANGE_CODE = "WRONG_CHANGE_CODE";
+	private final String LOG_WITHOUT_CALLSIGN = "LOG_WITHOUT_CALLSIGN";
+
 	private DxccEntity mexicoDxccEntity;
-	
-    @PostConstruct
-    private void init() {
-        try {
-            mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByEntityName("mexico");
-            if (mexicoDxccEntity == null) {
-                mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByCallsign(FMRE_CALLSIG);
-            }
-        } catch (FmreContestException e) {
-            log.error(e.getLocalizedMessage());
-        }
-    }
+
+	@PostConstruct
+	private void init() {
+		try {
+			mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByEntityName("mexico");
+			if (mexicoDxccEntity == null) {
+				mexicoDxccEntity = externalDxccService.getDxccFromExternalServicesByCallsign(FMRE_CALLSIG);
+			}
+		} catch (FmreContestException e) {
+			log.error(e.getLocalizedMessage());
+		}
+	}
 
 	@Override
 	public List<CatEmailError> verify(Email email) throws FmreContestException {
@@ -98,45 +98,48 @@ public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
 				listCatEmailError.add(x);
 			}
 		} else
-			throw new FmreContestException(
-					"The test \"" + SUBJECT_WITH_MORE_THAN_ONE_WORD + "\" is not found for editon with ID " + editionId);
+			throw new FmreContestException("The test \"" + SUBJECT_WITH_MORE_THAN_ONE_WORD
+					+ "\" is not found for editon with ID " + editionId);
 
-		/*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
+		/* SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN */
 		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN);
-		if(x != null) {
-			if(this.verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(email, edition, attachedFiles)) {
+		if (x != null) {
+			if (this.verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(email, edition, attachedFiles)) {
 				listCatEmailError.add(x);
 			}
 		} else
-			throw new FmreContestException("The test \"" + SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN + "\" is not found for editon with ID " + editionId);
+			throw new FmreContestException("The test \"" + SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN
+					+ "\" is not found for editon with ID " + editionId);
 
-		/*SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN*/
+		/* SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN */
 		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, EMAIL_WITHOUT_CONTSTLOG);
-		if(x != null) {
-			if(this.verify_EMAIL_WITHOUT_CONTSTLOG(email, edition, attachedFiles)) {
+		if (x != null) {
+			if (this.verify_EMAIL_WITHOUT_CONTSTLOG(email, edition, attachedFiles)) {
 				listCatEmailError.add(x);
 			}
 		} else
-			throw new FmreContestException("The test \"" + EMAIL_WITHOUT_CONTSTLOG + "\" is not found for editon with ID " + editionId);
+			throw new FmreContestException(
+					"The test \"" + EMAIL_WITHOUT_CONTSTLOG + "\" is not found for editon with ID " + editionId);
 
-		/*WRONG_CHANGE_CODE*/
+		/* WRONG_CHANGE_CODE */
 		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, WRONG_CHANGE_CODE);
-		if(x != null) {
-			if(this.verify_WRONG_CHANGE_CODE(email, edition, attachedFiles)) {
+		if (x != null) {
+			if (this.verify_WRONG_CHANGE_CODE(email, edition, attachedFiles)) {
 				listCatEmailError.add(x);
 			}
 		} else
-			throw new FmreContestException("The test \"" + WRONG_CHANGE_CODE + "\" is not found for editon with ID " + editionId);
-		
-		/*LOG_WITHOUT_CALLSIGN*/
-        x = catEmailErrorRepository.findByEditionAndDescripcion(edition, LOG_WITHOUT_CALLSIGN);
-        if(x != null) {
-            if(this.verify_LOG_WITHOUT_CALLSIGN(email)) {
-                listCatEmailError.add(x);
-            }
-        } else
-            throw new FmreContestException("The test \"" + LOG_WITHOUT_CALLSIGN + "\" is not found for editon with ID " + editionId);
-		
+			throw new FmreContestException(
+					"The test \"" + WRONG_CHANGE_CODE + "\" is not found for editon with ID " + editionId);
+
+		/* LOG_WITHOUT_CALLSIGN */
+		x = catEmailErrorRepository.findByEditionAndDescripcion(edition, LOG_WITHOUT_CALLSIGN);
+		if (x != null) {
+			if (this.verify_LOG_WITHOUT_CALLSIGN(email)) {
+				listCatEmailError.add(x);
+			}
+		} else
+			throw new FmreContestException(
+					"The test \"" + LOG_WITHOUT_CALLSIGN + "\" is not found for editon with ID " + editionId);
 
 		return listCatEmailError;
 	}
@@ -153,16 +156,17 @@ public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
 	private boolean verify_SUBJECT_WITH_MORE_THAN_ONE_WORD(Email email, Edition edition,
 			List<AttachedFile> attachedFiles) {
 		String subject = email.getSubject();
-		if(subject != null && !"".equals(subject)) {
+		if (subject != null && !"".equals(subject)) {
 			String[] arr = subject.split("\\s");
 			return arr.length > 1;
 		}
 		return false;
 	}
 
-	private boolean verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(Email email, Edition edition, List<AttachedFile> attachedFiles) {
+	private boolean verify_SUBJECT_NOT_EQUALS_CONTESTLOG_CALLSIGN(Email email, Edition edition,
+			List<AttachedFile> attachedFiles) {
 		ContestLog contestLog = contestLogRepository.findByEmail(email);
-		if(contestLog == null || contestLog.getCallsign() == null || email.getSubject() == null)
+		if (contestLog == null || contestLog.getCallsign() == null || email.getSubject() == null)
 			return false;
 		String contestLogCallsign = contestLog.getCallsign().toUpperCase();
 		String subject = email.getSubject().toUpperCase();
@@ -171,28 +175,29 @@ public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
 
 	private boolean verify_EMAIL_WITHOUT_CONTSTLOG(Email email, Edition edition, List<AttachedFile> attachedFiles) {
 		ContestLog contestLog = contestLogRepository.findByEmail(email);
-		if(contestLog == null)
+		if (contestLog == null)
 			return true;
 		return false;
 	}
 
-	private boolean verify_WRONG_CHANGE_CODE(Email email, Edition edition, List<AttachedFile> attachedFiles) throws FmreContestException {
-        ContestLog contestLog = contestLogRepository.findByEmail(email);
-        if (null == contestLog) {
-            log.error("ContestLog es nulo");
-            return false;
-        }
+	private boolean verify_WRONG_CHANGE_CODE(Email email, Edition edition, List<AttachedFile> attachedFiles)
+			throws FmreContestException {
+		ContestLog contestLog = contestLogRepository.findByEmail(email);
+		if (null == contestLog) {
+			log.error("ContestLog es nulo");
+			return false;
+		}
 
-        if (contestLog.getCallsign() == null || contestLog.getCallsign().equals("")) {
-            log.error("ContestLog.callsign es nulo o cadena vacía");
-            return false;
-        }
-		
+		if (contestLog.getCallsign() == null || contestLog.getCallsign().equals("")) {
+			log.error("ContestLog.callsign es nulo o cadena vacía");
+			return false;
+		}
+
 		DxccEntity dxccLogEntity = externalDxccService.getDxccFromExternalServicesByCallsign(contestLog.getCallsign());
-		
+
 		List<ContestQso> contestQsos = contestQsoRepository.findByContestLog(contestLog);
 
-		if (!mexicoDxccEntity.equals(dxccLogEntity)) {
+		if (!mexicoDxccEntity.getEntityCode().equals(dxccLogEntity.getEntityCode())) {
 			// validacion para paises distintos de mexico
 			boolean allExchangeAreInteger = true;
 			for (ContestQso qso : contestQsos) {
@@ -205,47 +210,43 @@ public class VerificacionEmailRtty2025Impl implements IVerificacionEmail {
 				}
 			}
 			// verificar que todos los codigos enviados sean texto
-			return !allExchangeAreInteger;
+			if (!allExchangeAreInteger) {
+				return true;
+			}
+			return false;
 		} else {
 			// validacion para mexico
-			boolean allExchangeAreText = true;
+			boolean allExchangeAreText = false;
 			for (ContestQso qso : contestQsos) {
 				String exchangeStr = qso.getExchangee();
 				try {
 					Integer.parseInt(exchangeStr);
+					allExchangeAreText = true;
+					break;
 				} catch (NumberFormatException e) {
 					@SuppressWarnings("unused")
 					String err = e.getLocalizedMessage();
-					allExchangeAreText = false;
-					break;
 				}
 			}
-			return !allExchangeAreText;
+			// verificar que todos los codigos enviados sean texto
+			if (!allExchangeAreText) {
+				return false;
+			}
+			return true;
 		}
 	}
-    
-    private boolean verify_LOG_WITHOUT_CALLSIGN(Email email) {
-        ContestLog contestLog = contestLogRepository.findByEmail(email);
-        if (null == contestLog) {
-            log.error("ContestLog es nulo");
-            return false;
-        }
 
-        if (contestLog.getCallsign() == null || contestLog.getCallsign().equals("")) {
-            log.error("ContestLog.callsign es nulo o cadena vacía");
-            return true;
-        }
-        return false;
-    }
+	private boolean verify_LOG_WITHOUT_CALLSIGN(Email email) {
+		ContestLog contestLog = contestLogRepository.findByEmail(email);
+		if (null == contestLog) {
+			log.error("ContestLog es nulo");
+			return false;
+		}
+
+		if (contestLog.getCallsign() == null || contestLog.getCallsign().equals("")) {
+			log.error("ContestLog.callsign es nulo o cadena vacía");
+			return true;
+		}
+		return false;
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
