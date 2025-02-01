@@ -1,5 +1,9 @@
 package mx.fmre.rttycontest.recibir;
 
+import java.util.TimeZone;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -38,6 +42,12 @@ public class RecibirApplication {
         SpringApplication.run(RecibirApplication.class);
     }
     
+    @PostConstruct
+    private void init() {
+    	TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
+    }
+    
+
     @Scheduled(cron = "${cron.scanner.expression}")
     public void crontScanContest() {
         log.debug("starting mailService.scanContest()...");
