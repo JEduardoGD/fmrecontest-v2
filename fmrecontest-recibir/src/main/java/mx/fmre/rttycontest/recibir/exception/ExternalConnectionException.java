@@ -1,10 +1,8 @@
 package mx.fmre.rttycontest.recibir.exception;
 
-import org.springframework.web.client.ResourceAccessException;
-
 public class ExternalConnectionException extends Exception {
 
-	public ExternalConnectionException(ResourceAccessException e) {
+	public ExternalConnectionException(Exception e) {
 		super(e);
 	}
 

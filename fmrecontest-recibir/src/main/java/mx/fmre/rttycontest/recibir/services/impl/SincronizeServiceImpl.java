@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.persistence.model.CatEmailError;
@@ -102,9 +101,14 @@ public class SincronizeServiceImpl implements SincronizeService {
 
 			// 3. Remover de remoto todos los remotos de la lista local
 			allLocales.removeAll(allSavedByYearList);
+			
+			StringBuffer sb = new StringBuffer();
+			for (RemoteLog l : allLocales) {
+				sb.append(String.format("{%s|%s}", l.getAnio(), l.getCallsign())).append(" ");
+			}
 
 			// 4. Los que queden vivos faltan de ser guardar
-			log.info("Faltan de guardar: {}", allLocales);
+			log.info("Faltan de guardar: {}", sb.toString());
 			
 			if (allLocales != null && !allLocales.isEmpty()) {
 				RemoteLog localAGuardar = allLocales.get(0);
