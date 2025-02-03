@@ -42,7 +42,7 @@ public class ExternalConnectionServiceImpl implements ExternalConnectionService 
 		// 1. getting by all saved logs
 		try {
 			return restTemplate.postForObject(SAVE, remoteLog, RemoteLog.class);
-		} catch (ResourceAccessException e) {
+		} catch (Exception e) {
 			throw new ExternalConnectionException(e);
 		}
 	}

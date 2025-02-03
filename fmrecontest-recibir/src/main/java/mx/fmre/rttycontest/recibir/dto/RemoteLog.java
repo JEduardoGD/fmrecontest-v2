@@ -82,12 +82,12 @@ public class RemoteLog implements Serializable {
 		if (anio == null) {
 			if (other.anio != null)
 				return false;
-		} else if (!anio.equals(other.anio))
+		} else if (!anio.equalsIgnoreCase(other.anio))
 			return false;
 		if (callsign == null) {
 			if (other.callsign != null)
 				return false;
-		} else if (!callsign.equals(other.callsign))
+		} else if (!callsign.equalsIgnoreCase(other.callsign))
 			return false;
 		return true;
 	}
