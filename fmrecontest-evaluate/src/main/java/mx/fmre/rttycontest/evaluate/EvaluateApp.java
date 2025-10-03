@@ -79,19 +79,7 @@ public class EvaluateApp implements CommandLineRunner {
 	}
 
 	@Override
-	public void run(String... args) throws Exception {
-	    log.info(springDatasourceUrl);
-	    log.info(springDatasourceUsername);
-	    log.info(springDatasourcePassword);
-	    log.info(emailPasswordEncodingkey);
-	    log.info(amazonCredsSecretkey);
-	    log.info(amazonCredsAcceskey);
-	    log.info(amazonS3Bucketname);
-	    log.info(fileManagerImpl);
-	    log.info(jwtSecretkey);
-	    log.info(jwtTokenExpirationtime);
-	    log.info(jwtIssuerInfo);
-	    
+	public void run(String... args) throws Exception {    
 	    
 		completeDxccService.completeDxccEntityQsos();
 		completeDxccService.completeDxccEntityLogs();

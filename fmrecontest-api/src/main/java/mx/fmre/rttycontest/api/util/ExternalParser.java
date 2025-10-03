@@ -46,7 +46,7 @@ public abstract class ExternalParser {
         cl.setAddressCity(e.getAddress2());
         cl.setAddressCountry(e.getAddress3());
         cl.setAddressStateProvince(e.getAddress4());
-        cl.setCallsign(e.getCallsign());
+        cl.setCallsign(e.getExternalLogsId().getCallsign());
         cl.setCategoryBand(e.getCategoryBand());
         cl.setCategoryMode(e.getCategoryMode());
         cl.setCategoryOperator(e.getCategoryOperator());

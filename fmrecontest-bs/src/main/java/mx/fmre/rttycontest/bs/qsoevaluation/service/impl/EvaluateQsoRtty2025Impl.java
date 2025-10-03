@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
+import mx.fmre.rttycontest.bs.util.StaticValues;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
@@ -26,6 +28,7 @@ import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
 @Service("evaluateQsoRtty2025")
+@Slf4j
 public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 	
 	@Autowired private IDxccEntityRepository       dxccEntityRepository;
@@ -133,6 +136,8 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		}
 		
 		
+		
+		
 		return listErrors;
 	}
 
@@ -141,6 +146,12 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		DxccEntity dxccEntityHome = contestLog.getDxccEntity();
 		
 		if(dxccEntityHome == null) {
+			return null;
+		}
+		
+		if (qso.getDxccEntity() == null) {
+			log.warn("No se pudo asignar puntos al QSO id: {} del log id: {} porque no tiene entidad DXCC asignada",
+					qso.getId(), contestLog.getId());
 			return null;
 		}
 		
@@ -167,6 +178,11 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		List<String> multpliesList = new ArrayList<>();
 		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
 		for(ContestQso qso:qsos) {
+			StringBuffer sbKey = new StringBuffer();
+			sbKey.append(qso.getExchanger() != null ? qso.getExchanger() : StaticValues.EMPTY_STRING);
+			sbKey.append(";");
+			sbKey.append(qso.getBand() != null ? qso.getBand().getId() : StaticValues.EMPTY_STRING);
+			String key = sbKey.toString();
 			String exchangeR = qso.getExchanger();
 			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
 
@@ -175,22 +191,26 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 				continue;	
 			}
 			
+			if(qso.getError() != null && qso.getError().booleanValue()) {
+				relQsoConteo.setMultiply(false);
+                continue;	
+            }
+			
 			DxccEntity qsoDxccEntity = dxccEntityRepository
 					.findById(qso.getDxccEntity().getId())
 					.orElse(null);
 			
-			if(qsoDxccEntity.equals(mexicoDxccEntity)) {
-				if(this.allowedMexicoEntities.contains(exchangeR) && !multpliesList.contains(exchangeR)) {
+			if (qsoDxccEntity.equals(mexicoDxccEntity)) {
+				if (this.allowedMexicoEntities.contains(exchangeR) && !multpliesList.contains(key)) {
 					relQsoConteo.setMultiply(true);
-					multpliesList.add(exchangeR);
+					multpliesList.add(key);
 				} else {
 					relQsoConteo.setMultiply(false);
 				}
 			} else {
-				exchangeR = qso.getDxccEntity().getId() + "";
-				if(!multpliesList.contains(exchangeR)) {
+				if (!multpliesList.contains(key)) {
 					relQsoConteo.setMultiply(true);
-					multpliesList.add(exchangeR);
+					multpliesList.add(key);
 				} else {
 					relQsoConteo.setMultiply(false);
 				}
