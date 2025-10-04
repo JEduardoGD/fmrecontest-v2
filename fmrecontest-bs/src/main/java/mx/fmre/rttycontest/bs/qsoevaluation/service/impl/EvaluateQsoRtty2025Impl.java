@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import mx.fmre.rttycontest.bs.dto.MultiplierDTO;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
-import mx.fmre.rttycontest.bs.util.StaticValues;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
 import mx.fmre.rttycontest.persistence.model.Conteo;
@@ -24,7 +23,6 @@ import mx.fmre.rttycontest.persistence.model.ContestQso;
 import mx.fmre.rttycontest.persistence.model.DxccEntity;
 import mx.fmre.rttycontest.persistence.model.Edition;
 import mx.fmre.rttycontest.persistence.model.RelQsoConteo;
-import mx.fmre.rttycontest.persistence.model.State;
 import mx.fmre.rttycontest.persistence.repository.ICatBandRepository;
 import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
@@ -180,14 +178,14 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		//List<String> multpliesList = new ArrayList<>();
 		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
 		for(ContestQso qso:qsos) {
-			CatBand band = qso.getBand();
-			DxccEntity dxccEntity = qso.getDxccEntity();
-			State state = qso.getState();
+			Integer bandId = qso.getBand() != null ? qso.getBand().getId() : null;
+			Long dxccEntityCode = qso.getDxccEntity() != null ? qso.getDxccEntity().getEntityCode() : null;
+			String stateSiglas = qso.getState() != null ? qso.getState().getSiglas() : null;
 			
 			MultiplierDTO multiplierDTO = new MultiplierDTO();
-			multiplierDTO.setBandId(band != null ? band.getId() : null);
-			multiplierDTO.setDxccEntityCode(dxccEntity != null ? dxccEntity.getEntityCode() : null);
-			multiplierDTO.setStateOnMexico(state != null ? state.getSiglas() : null);
+			multiplierDTO.setBandId(bandId);
+			multiplierDTO.setDxccEntityCode(dxccEntityCode);
+			multiplierDTO.setStateOnMexico(stateSiglas);
 			
 			List<MultiplierDTO> multiplierList = new ArrayList<>();
 			
