@@ -1,0 +1,9 @@
+#!/bin/bash
+
+MAVEN_HOME=
+JAVA_HOME=
+
+$JAVA_HOME/bin/java -version
+
+$JAVA_HOME/bin/java -jar -DAMAZON_CRED_BUCKETNAME= -DAMAZON_CRED_SECRETKEY= -DAMAZON_CREDS_ACCESSKEY= -DEMAIL_PASSWORD_KEYENCODE= -DFILE_MANAGER_IMPL=FileManagerServiceAwsS3 -DJWT_ISSUER_INFO= -DJWT_SECRETKEY= -DJWT_TOKEN_EXPIRATIONTIME= -DMYSQL_DB_PASSWORD= -DMYSQL_DB_URL=jdbc:mysql://HOST:PORT/NAME\?useUnicode=true\&useJDBCCompliantTimezoneShift=true\&useLegacyDatetimeCode=false\&serverTimezone=UTC\&characterEncoding=utf-8 -DMYSQL_DB_USERNAME= -DQRZ_PASSWORD= -DQRZ_USERNAME= ./target/fmrecontest-api-2.0.0.jar
+

@@ -37,4 +37,4 @@ contest_*
 fmrecontest-api.log
 fmrecontest-api.log.*
 *.bat
-
+run-api.sh

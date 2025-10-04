@@ -33,4 +33,4 @@ build/
 ### OTHERS ###
 contest_*
 *.bat
-
+run-evaluate.sh
