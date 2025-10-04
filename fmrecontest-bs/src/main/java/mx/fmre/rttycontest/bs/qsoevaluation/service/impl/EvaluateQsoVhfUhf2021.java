@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import mx.fmre.rttycontest.bs.dto.MultiplierDTO;
 import mx.fmre.rttycontest.bs.gridlocator.service.ILocatorService;
 import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
@@ -104,7 +105,7 @@ public class EvaluateQsoVhfUhf2021 implements IEvaluateQso {
     }
 
     @Override
-    public void setMultiplies(DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
+    public void setMultiplies(List<MultiplierDTO> multiplierList,DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
         List<String> multpliesList = new ArrayList<>();
         List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
         for (ContestQso qso : qsos) {
