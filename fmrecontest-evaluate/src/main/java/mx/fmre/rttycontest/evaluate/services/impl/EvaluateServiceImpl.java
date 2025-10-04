@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dto.MultiplierDTO;
 import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
 import mx.fmre.rttycontest.bs.dxcc.util.DxccUtil;
 import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
@@ -295,7 +296,8 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
                 qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
                         .collect(Collectors.toList());
                 qsos = contestQsoRepository.findByContestLog(contestLog);
-                dxccServiceQrz.setMultiplies(mexicoDxccEntity, conteo, qsos);
+                List<MultiplierDTO> multiplierList = new ArrayList<>();
+                dxccServiceQrz.setMultiplies(multiplierList, mexicoDxccEntity, conteo, qsos);
             }
 		}
 	}

@@ -174,7 +174,7 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 	}
 
 	@Override
-	public void setMultiplies(DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
+	public void setMultiplies(List<MultiplierDTO> multiplierList, DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
 		//List<String> multpliesList = new ArrayList<>();
 		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
 		for(ContestQso qso:qsos) {
@@ -187,16 +187,8 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 			multiplierDTO.setSatateId(satateId);
 			multiplierDTO.setBandId(bandId);
 			
-			List<MultiplierDTO> multiplierList = new ArrayList<>();
-			
-			//StringBuffer sbKey = new StringBuffer();
-			//sbKey.append(qso.getExchanger() != null ? qso.getExchanger() : StaticValues.EMPTY_STRING);
-			//sbKey.append(";");
-			//sbKey.append(qso.getBand() != null ? qso.getBand().getId() : StaticValues.EMPTY_STRING);
-			//String key = sbKey.toString();
-			//String exchangeR = qso.getExchanger();
 			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
-
+			
 			if(qso.getDxccEntity() == null) {
 				relQsoConteo.setMultiply(false);
 				continue;	
@@ -213,29 +205,6 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 				relQsoConteo.setMultiply(false);
 			}
 			
-			/*
-			
-			DxccEntity qsoDxccEntity = dxccEntityRepository
-					.findById(qso.getDxccEntity().getId())
-					.orElse(null);
-			
-			if (qsoDxccEntity.equals(mexicoDxccEntity)) {
-				if (this.allowedMexicoEntities.contains(exchangeR) && !multpliesList.contains(key)) {
-					relQsoConteo.setMultiply(true);
-					multpliesList.add(key);
-				} else {
-					relQsoConteo.setMultiply(false);
-				}
-			} else {
-				if (!multpliesList.contains(key)) {
-					relQsoConteo.setMultiply(true);
-					multpliesList.add(key);
-				} else {
-					relQsoConteo.setMultiply(false);
-				}
-			}
-			*/
-
 			listRelQsoConteo.add(relQsoConteo);
 		}
 		relQsoConteoRepository.saveAll(listRelQsoConteo);
