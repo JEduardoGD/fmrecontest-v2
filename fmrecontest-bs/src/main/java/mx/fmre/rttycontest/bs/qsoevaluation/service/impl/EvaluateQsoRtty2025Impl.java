@@ -180,11 +180,17 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		for(ContestQso qso:qsos) {
 			Integer bandId = qso.getBand() != null ? qso.getBand().getId() : null;
 			Long dxccEntityId = qso.getDxccEntity() != null ? qso.getDxccEntity().getId() : null;
-			Long satateId = qso.getState() != null ? qso.getState().getId() : null;
+			DxccEntity dxccEntity = null;
+			if(dxccEntityId != null) {
+				dxccEntity = dxccEntityRepository.findById(dxccEntityId).orElse(null);
+			}
 			
 			MultiplierDTO multiplierDTO = new MultiplierDTO();
-			multiplierDTO.setDxccEntityId(dxccEntityId);
-			multiplierDTO.setSatateId(satateId);
+			multiplierDTO.setDxccEntityCode(dxccEntity != null ? dxccEntity.getEntityCode() : null);
+			multiplierDTO.setSatate(null);
+			if(dxccEntity != null && mexicoDxccEntity.getEntityCode().equals(dxccEntity.getEntityCode())) {
+				multiplierDTO.setSatate(qso.getExchanger());
+			}
 			multiplierDTO.setBandId(bandId);
 			
 			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
@@ -212,15 +218,13 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 	
 	private boolean isMultiplier(List<MultiplierDTO> multiplierList, DxccEntity mexicoDxccEntity,
 			MultiplierDTO multiplierDTO) {
-		if (multiplierDTO == null || multiplierDTO.getDxccEntityId() == null || multiplierDTO.getBandId() == null) {
+		if (multiplierDTO == null || multiplierDTO.getDxccEntityCode() == null || multiplierDTO.getBandId() == null) {
 			return false;
 		}
-		if (multiplierDTO.getDxccEntityId().equals(mexicoDxccEntity.getId())) {
-			if (multiplierDTO.getSatateId() == null) {
-				return false;
-			}
-			MultiplierDTO filtered = multiplierList.stream().filter(m -> m.getBandId().equals(multiplierDTO.getBandId())
-					&& m.getSatateId().equals(multiplierDTO.getSatateId())).findFirst().orElse(null);
+		if (multiplierDTO.getDxccEntityCode().equals(mexicoDxccEntity.getEntityCode())) {
+			MultiplierDTO filtered = multiplierList.stream()
+					.filter(m -> m.getBandId().equals(multiplierDTO.getBandId())
+					&& m.getSatate().equals(multiplierDTO.getSatate())).findFirst().orElse(null);
 			if (filtered == null) {
 				multiplierList.add(multiplierDTO);
 				return true;
@@ -228,7 +232,7 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		} else {
 			MultiplierDTO filtered = multiplierList.stream()
 					.filter(m -> m.getBandId().equals(multiplierDTO.getBandId())
-							&& m.getDxccEntityId().equals(multiplierDTO.getDxccEntityId()))
+							&& m.getDxccEntityCode().equals(multiplierDTO.getDxccEntityCode()))
 					.findFirst().orElse(null);
 			if (filtered == null) {
 				multiplierList.add(multiplierDTO);
