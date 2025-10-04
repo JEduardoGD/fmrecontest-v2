@@ -223,6 +223,8 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		}
 		if (multiplierDTO.getDxccEntityCode().equals(mexicoDxccEntity.getEntityCode())) {
 			MultiplierDTO filtered = multiplierList.stream()
+					.filter(m -> m.getBandId() != null)
+					.filter(m -> m.getSatate() != null)
 					.filter(m -> m.getBandId().equals(multiplierDTO.getBandId())
 					&& m.getSatate().equals(multiplierDTO.getSatate())).findFirst().orElse(null);
 			if (filtered == null) {
@@ -231,6 +233,8 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 			}
 		} else {
 			MultiplierDTO filtered = multiplierList.stream()
+					.filter(m -> m.getBandId() != null)
+					.filter(m -> m.getDxccEntityCode() != null)
 					.filter(m -> m.getBandId().equals(multiplierDTO.getBandId())
 							&& m.getDxccEntityCode().equals(multiplierDTO.getDxccEntityCode()))
 					.findFirst().orElse(null);
