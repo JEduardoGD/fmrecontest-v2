@@ -33,6 +33,11 @@ public class RecibirApplication {
 	
 	@Value("${spring.datasource.url}")
 	private static String sprintDatasorceUrl;
+	
+	@Value("${logging.level.root}")
+	private static String loggigLevelRoot;
+	
+	
 
     @Autowired private IMailService mailService;
     @Autowired private IVerifierService verifierService;
@@ -43,6 +48,7 @@ public class RecibirApplication {
     public static void main(String[] args) {
     	log.info("--------------------------");
     	log.info(sprintDatasorceUrl);
+    	log.info(loggigLevelRoot);
     	TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
         SpringApplication.run(RecibirApplication.class);
     	log.info("--------------------------");
