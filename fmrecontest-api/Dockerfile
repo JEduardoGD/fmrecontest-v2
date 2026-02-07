@@ -1,4 +1,4 @@
-FROM openjdk:8-alpine
+FROM openjdk:11.0.16-jdk
 
 LABEL maintainer="eduardo_gd@hotmail.com"
 
