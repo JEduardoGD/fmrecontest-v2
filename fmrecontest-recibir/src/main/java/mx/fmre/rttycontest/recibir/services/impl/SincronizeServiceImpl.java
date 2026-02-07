@@ -64,7 +64,6 @@ public class SincronizeServiceImpl implements SincronizeService {
 				}
 				
 				ContestLog contestLog = contestLogRepository.findByEmail(email);
-				// List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
 				RemoteLog remoteLog = new RemoteLog(contestLog);
 				remoteLog.setCallsign(contestLog.getCallsign());
 				remoteLog.setAnio(edition.getYear() + "");

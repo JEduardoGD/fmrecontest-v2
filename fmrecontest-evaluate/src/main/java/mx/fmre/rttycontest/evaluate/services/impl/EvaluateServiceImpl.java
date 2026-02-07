@@ -13,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dto.MultiplierDTO;
 import mx.fmre.rttycontest.bs.dxcc.service.ExternalDxccService;
 import mx.fmre.rttycontest.bs.dxcc.util.DxccUtil;
 import mx.fmre.rttycontest.bs.gridlocator.service.impl.LocatorServiceException;
@@ -71,6 +72,8 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
     @Autowired private IRelExternallogEditionRepository relExternallogEditionRepository;
     @Autowired private IEmailEmailErrorRepository       emailEmailErrorRepository;
     
+	private List<ContestQso> allQsls = new ArrayList<>();
+    
     @Value("${FMRE_CALLSIGN}")
     private String xe1lmCallsign;
 	
@@ -104,7 +107,13 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
         }
         
         
-        List<ContestLog> contestLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository, contestLogRepository, emailsFiltered, edition);
+		List<ContestLog> contestLogToEvaluate = getContexLogToEvaluate(relExternallogEditionRepository,
+				contestLogRepository, emailsFiltered, edition);
+
+		for (ContestLog cl : contestLogToEvaluate) {
+			allQsls.addAll(contestQsoRepository.findByContestLog(cl));
+		}
+        
         
         for(ContestLog contestLog: contestLogToEvaluate) {
             log.info("{} de {}; time remaining: {}", current, contestLogToEvaluate.size(),
@@ -155,6 +164,25 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
 			relQsoConteo = relQsoConteoRepository.save(relQsoConteo);
 			
 			List<CatQsoError> resEvaluation = dxccServiceQrz.findForErrors(mexicoDxccEntity, edition, contestLog, qso, catQsoErrors);
+			
+			//CatQsoError catQsoErrorUnique = catQsoErrors.stream().filter(error-> error.getKey().equalsIgnoreCase("UNIQUE")).findFirst().orElse(null);
+			
+			/*
+			String receptorCallsign = qso.getCallsignr();
+			CatBand band = qso.getBand();
+			if(band != null) {
+				List<ContestQso> u = allQsls.stream()
+						.filter(q -> q.getCallsigne() != null && q.getBand() != null)
+						.filter(q -> q.getCallsigne().equalsIgnoreCase(receptorCallsign) && q.getBand().getId().equals(band.getId()))
+						.collect(Collectors.toList());
+				if(u.isEmpty()) {
+					resEvaluation.add(catQsoErrorUnique);
+				}
+			} else {
+				resEvaluation.add(catQsoErrorUnique);
+			}
+			*/
+			
 			if(resEvaluation.isEmpty()) {
 				continue;
 			}
@@ -174,8 +202,14 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
 			}
 			relQsoConteoQsoErrorRepository.saveAll(relQsoConteoQsoErrorList);
 		}
-	}
+		
 
+		
+		for(ContestQso qso: qsos) {
+			
+		}
+	}
+	
 	@Override
 	public void setPointsForQssos(DxccEntity mexicoDxccEntity, Conteo conteo) {
         
@@ -194,7 +228,6 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
             for (ContestLog contestLog : contestLogToEvaluate) {
                 log.info("Setting points for Log id {} ({} / {})", contestLog.getId(), i++, contestLogToEvaluate.size());
                 List<ContestQso> qsos = contestQsoRepository.findByContestLog(contestLog);
-                qsos = contestQsoRepository.findByContestLog(contestLog);
                 qsos = qsos
                         .stream()
                         .filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
@@ -263,7 +296,8 @@ public class EvaluateServiceImpl extends LogsListUtil implements IEvaluateServic
                 qsos = qsos.stream().filter(q -> (q.getError() == null || q.getError().booleanValue() == false))
                         .collect(Collectors.toList());
                 qsos = contestQsoRepository.findByContestLog(contestLog);
-                dxccServiceQrz.setMultiplies(mexicoDxccEntity, conteo, qsos);
+                List<MultiplierDTO> multiplierList = new ArrayList<>();
+                dxccServiceQrz.setMultiplies(multiplierList, mexicoDxccEntity, conteo, qsos);
             }
 		}
 	}

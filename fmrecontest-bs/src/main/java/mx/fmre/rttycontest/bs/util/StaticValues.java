@@ -8,5 +8,6 @@ public final class StaticValues {
 
 	public static final String HIGH_POWER = "HIGH";
 	public static final String LOW_POWER  = "LOW";
+	public static final String EMPTY_STRING = "";
 
 }
