@@ -40,7 +40,6 @@ public class RecibirApplication {
     	TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
         SpringApplication.run(RecibirApplication.class);
     }
-    
     @Scheduled(cron = "${cron.scanner.expression}")
     public void crontScanContest() {
         log.debug("starting mailService.scanContest()...");
@@ -54,7 +53,7 @@ public class RecibirApplication {
         parserService.identifyLogFiles();
         log.debug("ending mailService.identifyLogFiles()");
     }
-
+    
     @Scheduled(cron = "${cron.parse.expression}")
     public void cronParseRecivedEmails() {
         log.debug("starting mailService.parseRecivedEmails()...");

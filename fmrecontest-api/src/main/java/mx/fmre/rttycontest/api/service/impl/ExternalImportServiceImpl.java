@@ -40,20 +40,22 @@ public class ExternalImportServiceImpl implements ExternalImportService {
     @Override
     public boolean importExternal() {
         
-        Edition edition = editionRepository.findById(7).orElse(null);
+        Edition edition = editionRepository.findById(8).orElse(null);
+        String year = "2025";
 
-		List<ExternalLogs> externalLogsList = externalLogsRepository.findAll().stream().filter(el -> el.getId() > 404)
+		List<ExternalLogs> externalLogsList = externalLogsRepository.findAll().stream()
+				.filter(u -> u.getId() == 0)
 				.collect(Collectors.toList());
         
         List<ExternalQso> externalQsoList = externalQsoRepository.findAll();
         int i = 1;
-        Calendar cal = Calendar.getInstance();
-        cal.set(2024, 1, 1);
+        //Calendar cal = Calendar.getInstance();
+        //cal.set(2024, 1, 1);
 
 		for (ExternalLogs externalLog : externalLogsList) {
 			List<ExternalQso> externalQsoListFiltered = externalQsoList.stream()
-					.filter(s -> s.getExternalQsoKey().getCallsing1().equalsIgnoreCase(externalLog.getCallsign())
-							&& s.getExternalQsoKey().getFecha().after(cal.getTime()))
+					.filter(s -> s.getExternalQsoKey().getCallsing1().equalsIgnoreCase(externalLog.getExternalLogsId().getCallsign()) &&
+							year.equalsIgnoreCase(externalLog.getExternalLogsId().getAno()))
 					.collect(Collectors.toList());
 			log.info("Parseando log externo {} de {} ({} qsos)", i++, externalLogsList.size(),
 					externalQsoListFiltered.size());

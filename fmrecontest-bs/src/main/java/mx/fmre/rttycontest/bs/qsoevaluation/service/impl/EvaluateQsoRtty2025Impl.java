@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+import mx.fmre.rttycontest.bs.dto.MultiplierDTO;
 import mx.fmre.rttycontest.bs.qsoevaluation.service.IEvaluateQso;
 import mx.fmre.rttycontest.persistence.model.CatBand;
 import mx.fmre.rttycontest.persistence.model.CatQsoError;
@@ -26,6 +28,7 @@ import mx.fmre.rttycontest.persistence.repository.IDxccEntityRepository;
 import mx.fmre.rttycontest.persistence.repository.IRelQsoConteoRepository;
 
 @Service("evaluateQsoRtty2025")
+@Slf4j
 public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 	
 	@Autowired private IDxccEntityRepository       dxccEntityRepository;
@@ -133,6 +136,8 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		}
 		
 		
+		
+		
 		return listErrors;
 	}
 
@@ -141,6 +146,12 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 		DxccEntity dxccEntityHome = contestLog.getDxccEntity();
 		
 		if(dxccEntityHome == null) {
+			return null;
+		}
+		
+		if (qso.getDxccEntity() == null) {
+			log.warn("No se pudo asignar puntos al QSO id: {} del log id: {} porque no tiene entidad DXCC asignada",
+					qso.getId(), contestLog.getId());
 			return null;
 		}
 		
@@ -163,41 +174,75 @@ public class EvaluateQsoRtty2025Impl implements IEvaluateQso {
 	}
 
 	@Override
-	public void setMultiplies(DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
-		List<String> multpliesList = new ArrayList<>();
+	public void setMultiplies(List<MultiplierDTO> multiplierList, DxccEntity mexicoDxccEntity, Conteo conteo, List<ContestQso> qsos) {
+		//List<String> multpliesList = new ArrayList<>();
 		List<RelQsoConteo> listRelQsoConteo = new ArrayList<>();
 		for(ContestQso qso:qsos) {
-			String exchangeR = qso.getExchanger();
+			Integer bandId = qso.getBand() != null ? qso.getBand().getId() : null;
+			Long dxccEntityId = qso.getDxccEntity() != null ? qso.getDxccEntity().getId() : null;
+			DxccEntity dxccEntity = null;
+			if(dxccEntityId != null) {
+				dxccEntity = dxccEntityRepository.findById(dxccEntityId).orElse(null);
+			}
+			
+			MultiplierDTO multiplierDTO = new MultiplierDTO();
+			multiplierDTO.setDxccEntityCode(dxccEntity != null ? dxccEntity.getEntityCode() : null);
+			multiplierDTO.setSatate(null);
+			if(dxccEntity != null && mexicoDxccEntity.getEntityCode().equals(dxccEntity.getEntityCode())) {
+				multiplierDTO.setSatate(qso.getExchanger());
+			}
+			multiplierDTO.setBandId(bandId);
+			
 			RelQsoConteo relQsoConteo = relQsoConteoRepository.findByContestQsoAndConteo(qso, conteo);
-
+			
 			if(qso.getDxccEntity() == null) {
 				relQsoConteo.setMultiply(false);
 				continue;	
 			}
 			
-			DxccEntity qsoDxccEntity = dxccEntityRepository
-					.findById(qso.getDxccEntity().getId())
-					.orElse(null);
+			if(qso.getError() != null && qso.getError().booleanValue()) {
+				relQsoConteo.setMultiply(false);
+                continue;	
+            }
 			
-			if(qsoDxccEntity.equals(mexicoDxccEntity)) {
-				if(this.allowedMexicoEntities.contains(exchangeR) && !multpliesList.contains(exchangeR)) {
-					relQsoConteo.setMultiply(true);
-					multpliesList.add(exchangeR);
-				} else {
-					relQsoConteo.setMultiply(false);
-				}
+			if (isMultiplier(multiplierList, mexicoDxccEntity, multiplierDTO)) {
+				relQsoConteo.setMultiply(true);
 			} else {
-				exchangeR = qso.getDxccEntity().getId() + "";
-				if(!multpliesList.contains(exchangeR)) {
-					relQsoConteo.setMultiply(true);
-					multpliesList.add(exchangeR);
-				} else {
-					relQsoConteo.setMultiply(false);
-				}
+				relQsoConteo.setMultiply(false);
 			}
-
+			
 			listRelQsoConteo.add(relQsoConteo);
 		}
 		relQsoConteoRepository.saveAll(listRelQsoConteo);
+	}
+	
+	private boolean isMultiplier(List<MultiplierDTO> multiplierList, DxccEntity mexicoDxccEntity,
+			MultiplierDTO multiplierDTO) {
+		if (multiplierDTO == null || multiplierDTO.getDxccEntityCode() == null || multiplierDTO.getBandId() == null) {
+			return false;
+		}
+		if (multiplierDTO.getDxccEntityCode().equals(mexicoDxccEntity.getEntityCode())) {
+			MultiplierDTO filtered = multiplierList.stream()
+					.filter(m -> m.getBandId() != null)
+					.filter(m -> m.getSatate() != null)
+					.filter(m -> m.getBandId().equals(multiplierDTO.getBandId())
+					&& m.getSatate().equals(multiplierDTO.getSatate())).findFirst().orElse(null);
+			if (filtered == null) {
+				multiplierList.add(multiplierDTO);
+				return true;
+			}
+		} else {
+			MultiplierDTO filtered = multiplierList.stream()
+					.filter(m -> m.getBandId() != null)
+					.filter(m -> m.getDxccEntityCode() != null)
+					.filter(m -> m.getBandId().equals(multiplierDTO.getBandId())
+							&& m.getDxccEntityCode().equals(multiplierDTO.getDxccEntityCode()))
+					.findFirst().orElse(null);
+			if (filtered == null) {
+				multiplierList.add(multiplierDTO);
+				return true;
+			}
+		}
+		return false;
 	}
 }

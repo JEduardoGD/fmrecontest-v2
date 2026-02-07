@@ -43,7 +43,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	
 	private static final String[] AUTH_WHITELIST = {
             // -- swagger ui
-            "/**"
+			"/external/**",
+			"/results/**"
     };
 
 	@Bean
