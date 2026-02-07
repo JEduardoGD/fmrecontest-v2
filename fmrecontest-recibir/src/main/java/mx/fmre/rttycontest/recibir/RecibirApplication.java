@@ -3,6 +3,7 @@ package mx.fmre.rttycontest.recibir;
 import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -29,6 +30,9 @@ import mx.fmre.rttycontest.recibir.services.SincronizeService;
 
 @Slf4j
 public class RecibirApplication {
+	
+	@Value("${spring.datasource.url}")
+	private static String sprintDatasorceUrl;
 
     @Autowired private IMailService mailService;
     @Autowired private IVerifierService verifierService;
@@ -37,8 +41,11 @@ public class RecibirApplication {
     @Autowired private SincronizeService sincronizeService;
 
     public static void main(String[] args) {
+    	log.info("--------------------------");
+    	log.info(sprintDatasorceUrl);
     	TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
         SpringApplication.run(RecibirApplication.class);
+    	log.info("--------------------------");
     }
     @Scheduled(cron = "${cron.scanner.expression}")
     public void crontScanContest() {
